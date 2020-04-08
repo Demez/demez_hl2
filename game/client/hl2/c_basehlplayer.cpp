@@ -95,12 +95,9 @@ float C_BaseHLPlayer::GetFOV()
 {
 	//Find our FOV with offset zoom value
 	float flFOVOffset = BaseClass::GetFOV() + GetZoom();
-
-	// Clamp FOV in MP
-	int min_fov = ( gpGlobals->maxClients == 1 ) ? 5 : default_fov.GetInt();
 	
 	// Don't let it go too low
-	flFOVOffset = max( min_fov, flFOVOffset );
+	flFOVOffset = max(default_fov.GetInt(), flFOVOffset );
 
 	return flFOVOffset;
 }

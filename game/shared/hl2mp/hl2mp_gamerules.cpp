@@ -809,7 +809,37 @@ void CHL2MPRules::ClientSettingsChanged( CBasePlayer *pPlayer )
 		UTIL_LogPrintf( "\"%s\" cl_cmdrate = \"%s\"\n", pHL2Player->GetPlayerName(), engine->GetClientConVarValue( pHL2Player->entindex(), "cl_cmdrate" ));
 	}
 
-	BaseClass::ClientSettingsChanged( pPlayer );
+	// BaseClass::ClientSettingsChanged( pPlayer );
+	const char* pszName = engine->GetClientConVarValue(pPlayer->entindex(), "name");
+
+	const char* pszOldName = pPlayer->GetPlayerName();
+
+	// msg everyone if someone changes their name,  and it isn't the first time (changing no name to current name)
+	// Note, not using FStrEq so that this is case sensitive
+	if (pszOldName[0] != 0 && Q_strcmp(pszOldName, pszName))
+	{
+		char text[256];
+		Q_snprintf(text, sizeof(text), "%s changed name to %s\n", pszOldName, pszName);
+
+		UTIL_ClientPrintAll(HUD_PRINTTALK, text);
+
+		IGameEvent* event = gameeventmanager->CreateEvent("player_changename");
+		if (event)
+		{
+			event->SetInt("userid", pPlayer->GetUserID());
+			event->SetString("oldname", pszOldName);
+			event->SetString("newname", pszName);
+			gameeventmanager->FireEvent(event);
+		}
+
+		pPlayer->SetPlayerName(pszName);
+	}
+
+	const char* pszFov = engine->GetClientConVarValue(pPlayer->entindex(), "demez_fov");
+	if (pszFov)
+	{
+		pPlayer->SetDefaultFOV(atoi(pszFov));
+	}
 #endif
 	
 }

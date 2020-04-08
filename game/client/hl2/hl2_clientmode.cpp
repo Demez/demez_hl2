@@ -7,14 +7,14 @@
 //=============================================================================//
 #include "cbase.h"
 #include "ivmodemanager.h"
-#include "clientmode_hlnormal.h"
+#include "clientmode_hl2mpnormal.h"
 #include "panelmetaclassmgr.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-// default FOV for HL2
-ConVar default_fov( "default_fov", "75", FCVAR_CHEAT );
+ConVar default_fov("default_fov", "90", FCVAR_ARCHIVE | FCVAR_USERINFO, "Sets the base field-of-view.");
+ConVar demez_fov("demez_fov", "90", FCVAR_ARCHIVE | FCVAR_USERINFO, "Sets the base field-of-view.");
 
 // The current client mode. Always ClientModeNormal in HL.
 IClientMode *g_pClientMode = NULL;
