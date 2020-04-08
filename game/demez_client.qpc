@@ -102,8 +102,6 @@ files
 			"client/hl2/c_weapon_crossbow.cpp"
 			// "client/hl2/c_weapon_physcannon.cpp"
 			"client/hl2/c_weapon_stunstick.cpp"
-			// "client/hl2/clientmode_hlnormal.cpp"
-			// "client/hl2/clientmode_hlnormal.h"
 			"client/hl2/fx_antlion.cpp"
 			"client/hl2/fx_bugbait.cpp"
 			"client/hl2/fx_hl2_impacts.cpp"
