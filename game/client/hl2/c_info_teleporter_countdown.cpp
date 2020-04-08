@@ -10,7 +10,7 @@
 #include <vgui/IVGUI.h>
 #include <vgui_controls/Controls.h>
 #include <vgui_controls/Label.h>
-#include "clientmode_hlnormal.h"
+#include "clientmode_hl2mpnormal.h"
 #include "tier1/utllinkedlist.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
