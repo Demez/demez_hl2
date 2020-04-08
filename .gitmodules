@@ -1,0 +1,4 @@
+[submodule "quiver"]
+	path = quiver
+	url = https://github.com/quiverteam/Engine.git
+	branch = upcoming

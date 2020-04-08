@@ -1,0 +1,355 @@
+// ---------------------------------------------------------------
+// Demez Mod - Server
+// ---------------------------------------------------------------
+macro PROJECT_NAME "Server - Demez"
+macro TYPE "server"
+
+include "demez_shared.qpc"
+
+configuration
+{
+	general
+	{
+		include_directories
+		{
+			"server/episodic"
+			"server/hl2"
+			"server/hl2mp"
+			
+			"server/weapons/hl2"
+		}
+	}
+
+	compiler
+	{
+		preprocessor_definitions
+		{
+			"HL2_DLL"
+		}
+	}
+}
+
+files
+{
+	folder "Base"
+	{
+		"$SRCDIR/game/server/ai_relationship.cpp"
+		"$SRCDIR/game/server/basegrenade_concussion.cpp"
+		"$SRCDIR/game/server/basegrenade_contact.cpp"
+		"$SRCDIR/game/server/basegrenade_timed.cpp"
+		"$SRCDIR/game/server/EntityFlame.h"
+		"$SRCDIR/game/server/hl2/Func_Monitor.cpp"
+		"$SRCDIR/game/server/h_cycler.cpp"
+		"$SRCDIR/game/server/h_cycler.h"
+		"$SRCDIR/game/server/monstermaker.cpp"
+		"$SRCDIR/game/server/monstermaker.h"
+		"$SRCDIR/game/server/physics_bone_follower.h"
+		"$SRCDIR/game/server/team_objectiveresource.cpp"
+		"$SRCDIR/game/server/team_objectiveresource.h"
+		"$SRCDIR/game/server/team_spawnpoint.cpp"
+		"$SRCDIR/game/server/team_spawnpoint.h"
+		
+		"$SRCDIR/game/server/ai_eventresponse.cpp"
+		"$SRCDIR/game/server/ai_eventresponse.h"
+		"$SRCDIR/game/server/grenadethrown.cpp"
+		"$SRCDIR/game/server/grenadethrown.h"
+		// "$SRCDIR/game/server/logic_achievement.cpp"
+		"$SRCDIR/game/server/vehicle_choreo_generic.cpp"
+		
+		"$SRCDIR/game/shared/ragdoll_shared.h"
+		"$SRCDIR/game/shared/solidsetdefaults.h"
+		"$SRCDIR/game/shared/hl2/survival_gamerules.cpp"
+		"$SRCDIR/game/shared/vehicle_choreo_generic_shared.h"
+		"$SRCDIR/game/shared/touchlink.h"
+	
+		"$SRCDIR/game/shared/teamplayroundbased_gamerules.cpp"
+		
+		"$SRCDIR/game/server/BaseBludgeonWeapon.cpp"
+		"$SRCDIR/game/server/BaseBludgeonWeapon.h"
+			
+		folder "AI"
+		{
+			"$SRCDIR/game/server/ai_behavior_passenger.cpp"
+			"$SRCDIR/game/server/ai_behavior_passenger.h"
+		}
+			
+		folder "NPCs"
+		{
+			"$SRCDIR/game/server/npc_Talker.cpp"
+			"$SRCDIR/game/server/npc_Talker.h"
+		}
+	}
+
+	folder "HL2 DLL"
+	{			
+		folder "Episodic"
+		{
+			"server/episodic/ai_behavior_alyx_injured.cpp"
+			"server/episodic/ai_behavior_alyx_injured.h"
+			"server/episodic/ai_behavior_passenger_companion.cpp"
+			"server/episodic/ai_behavior_passenger_companion.h"
+			"server/episodic/ai_behavior_passenger_zombie.cpp"
+			"server/episodic/ai_behavior_passenger_zombie.h"
+			
+			"server/episodic/npc_advisor.cpp"
+			"server/episodic/npc_combine_cannon.cpp"
+			"server/episodic/npc_hunter.cpp"
+			"server/episodic/npc_hunter.h"
+			"server/episodic/npc_magnusson.cpp"
+			"server/episodic/prop_scalable.cpp"
+
+			"server/episodic/weapon_striderbuster.cpp"
+			"server/episodic/weapon_striderbuster.h"
+			"server/episodic/ep1_gamestats.h"
+			"server/episodic/ep2_gamestats.h"
+			"server/episodic/ep1_gamestats.cpp"	\
+			"server/episodic/ep2_gamestats.cpp"
+			{
+				precompiled_header "none"
+			}
+		}
+		
+		folder "NPCs"
+		{
+			"server/episodic/npc_puppet.cpp"
+			"server/hl2/npc_alyx_episodic.cpp"
+			"server/hl2/npc_alyx_episodic.h"
+			"server/hl2/npc_antlion.cpp"
+			"server/hl2/npc_antlion.h"
+			"server/hl2/npc_antlionguard.cpp"
+			"server/hl2/npc_antliongrub.cpp"
+			"server/hl2/npc_apcdriver.cpp"
+			"server/hl2/npc_attackchopper.cpp"
+			"server/hl2/npc_attackchopper.h"
+			"server/hl2/npc_barnacle.cpp"
+			"server/hl2/npc_barnacle.h"
+			"server/hl2/npc_barney.cpp"
+			"server/hl2/npc_basescanner.cpp"
+			"server/hl2/npc_basescanner.h"
+			"server/hl2/npc_BaseZombie.cpp"
+			"server/hl2/npc_BaseZombie.h"
+			"server/hl2/npc_breen.cpp"
+			"server/hl2/npc_bullseye.cpp"
+			"server/hl2/npc_bullseye.h"
+			"server/hl2/npc_citizen17.cpp"
+			"server/hl2/npc_citizen17.h"
+			"server/hl2/npc_combine.cpp"
+			"server/hl2/npc_combine.h"
+			"server/hl2/npc_combinecamera.cpp"
+			"server/hl2/npc_combinedropship.cpp"
+			"server/hl2/npc_combinegunship.cpp"
+			"server/hl2/npc_combines.cpp"
+			"server/hl2/npc_combines.h"
+			"server/hl2/npc_cranedriver.cpp"
+			"server/hl2/npc_crow.cpp"
+			"server/hl2/npc_crow.h"
+			"server/hl2/npc_dog.cpp"
+			"server/hl2/npc_eli.cpp"
+			"server/hl2/npc_enemyfinder.cpp"
+			"server/hl2/npc_fastzombie.cpp"
+			"server/hl2/npc_fisherman.cpp"
+			"server/hl2/npc_gman.cpp"
+			"server/hl2/npc_headcrab.cpp"
+			"server/hl2/npc_headcrab.h"
+			"server/hl2/npc_ichthyosaur.cpp"
+			"server/hl2/npc_kleiner.cpp"
+			"server/hl2/npc_launcher.cpp"
+			"server/hl2/npc_Manhack.cpp"
+			"server/hl2/npc_manhack.h"
+			"server/hl2/npc_metropolice.cpp"
+			"server/hl2/npc_metropolice.h"
+			"server/hl2/npc_monk.cpp"
+			"server/hl2/npc_mossman.cpp"
+			"server/hl2/npc_playercompanion.cpp"
+			"server/hl2/npc_playercompanion.h"
+			"server/hl2/npc_PoisonZombie.cpp"
+			"server/hl2/npc_rollermine.cpp"
+			"server/hl2/npc_rollermine.h"
+			"server/hl2/npc_scanner.cpp"
+			"server/hl2/npc_scanner.h"
+			"server/hl2/npc_stalker.cpp"
+			"server/hl2/npc_stalker.h"
+			"server/hl2/npc_strider.cpp"
+			"server/hl2/npc_strider.h"
+			"server/hl2/npc_turret_ceiling.cpp"
+			"server/hl2/npc_turret_floor.cpp"
+			"server/hl2/npc_turret_ground.cpp"
+			"server/hl2/npc_vortigaunt_episodic.cpp"
+			"server/hl2/npc_vortigaunt_episodic.h"
+			"server/hl2/npc_zombie.cpp"
+			"server/hl2/npc_zombine.cpp"
+		}
+		
+		folder "Weapons"
+		{
+			"$SRCDIR/game/server/weapon_cubemap.cpp"
+			
+			"server/weapons/hl2/weapon_rpg.cpp"
+			"server/weapons/hl2/weapon_rpg.h"
+		
+			"server/hl2/weapon_alyxgun.cpp"
+			"server/hl2/weapon_alyxgun.h"
+			"server/hl2/weapon_annabelle.cpp"
+			"server/hl2/weapon_bugbait.cpp"
+			
+			"server/hl2/weapon_gauss.h"
+			
+			"server/hl2/grenade_ar2.cpp"
+			"server/hl2/grenade_ar2.h"
+			"server/hl2/grenade_bugbait.cpp"
+			"server/hl2/grenade_bugbait.h"
+			"server/hl2/grenade_frag.cpp"
+			"server/hl2/grenade_frag.h"
+			"server/hl2/grenade_spit.cpp"
+			"server/hl2/grenade_spit.h"
+			
+			// "server/hl2/weapon_ar2.cpp"
+			// "server/hl2/weapon_ar2.h"
+			
+			/*"server/hl2/weapon_357.cpp"
+			"server/hl2/weapon_citizenpackage.cpp"
+			"server/hl2/weapon_citizenpackage.h"
+			"server/hl2/weapon_crossbow.cpp"
+			"server/hl2/weapon_crowbar.cpp"
+			"server/hl2/weapon_crowbar.h"
+			"server/hl2/weapon_frag.cpp"
+			"server/hl2/weapon_physcannon.cpp"
+			"server/hl2/weapon_physcannon.h"
+			"server/hl2/weapon_pistol.cpp"
+			"server/hl2/weapon_shotgun.cpp"
+			"server/hl2/weapon_smg1.cpp"*/
+			"server/hl2/weapon_stunstick.cpp"
+			"server/hl2/weapon_stunstick.h"
+		}
+		
+		folder "AI"
+		{
+			"server/hl2/ai_allymanager.cpp"
+			"server/hl2/ai_behavior_actbusy.cpp"
+			"server/hl2/ai_behavior_actbusy.h"
+			"server/hl2/ai_behavior_functank.cpp"
+			"server/hl2/ai_behavior_functank.h"
+			"server/hl2/ai_behavior_holster.cpp"
+			"server/hl2/ai_behavior_holster.h"
+			"server/hl2/ai_behavior_operator.cpp"
+			"server/hl2/ai_behavior_operator.h"
+			"server/hl2/ai_behavior_police.cpp"
+			"server/hl2/ai_behavior_police.h"
+			"server/hl2/ai_goal_police.cpp"
+			"server/hl2/ai_goal_police.h"
+			"server/hl2/ai_interactions.h"
+			"server/hl2/ai_spotlight.cpp"
+			"server/hl2/ai_spotlight.h"
+		}
+		
+		folder "Vehicles"
+		{
+			"server/hl2/vehicle_airboat.cpp"
+			"server/hl2/vehicle_apc.h"
+			"server/hl2/vehicle_cannon.cpp"
+			"server/hl2/vehicle_crane.cpp"
+			"server/hl2/vehicle_crane.h"
+			"server/hl2/vehicle_jeep.cpp"
+			"server/hl2/vehicle_prisoner_pod.cpp"
+			"server/hl2/vehicle_viewcontroller.cpp"
+		}
+		
+		"server/hl2/antlion_dust.cpp"
+		"server/hl2/antlion_dust.h"
+		"server/hl2/antlion_maker.cpp"
+		"server/hl2/antlion_maker.h"
+		"server/hl2/ar2_explosion.cpp"
+		"server/hl2/ar2_explosion.h"
+		"server/hl2/basehlcombatweapon.cpp"
+		"server/hl2/basehlcombatweapon.h"
+		"server/hl2/cbasehelicopter.cpp"
+		"server/hl2/cbasehelicopter.h"
+		"server/hl2/cbasespriteprojectile.cpp"
+		"server/hl2/cbasespriteprojectile.h"
+		"server/hl2/citadel_effects.cpp"
+		"server/hl2/combine_mine.cpp"
+		"server/hl2/combine_mine.h"
+		"server/hl2/energy_wave.h"
+		"server/hl2/env_alyxemp.cpp"
+		"server/hl2/env_headcrabcanister.cpp"
+		"server/hl2/env_speaker.cpp"
+		"server/hl2/env_starfield.cpp"
+		"server/hl2/Func_Monitor.cpp"
+		"server/hl2/func_recharge.cpp"
+		"server/hl2/func_tank.cpp"
+		"server/hl2/func_tank.h"
+		"server/hl2/hl2_ai_network.cpp"
+		// "server/hl2/hl2_client.cpp"
+		"server/hl2/hl2_eventlog.cpp"
+		"server/hl2/hl2_player.cpp"
+		"server/hl2/hl2_player.h"
+		"server/hl2/hl2_playerlocaldata.cpp"
+		"server/hl2/hl2_playerlocaldata.h"
+		"server/hl2/hl2_triggers.cpp"
+		"server/hl2/hl_playermove.cpp"
+		"server/hl2/info_darknessmode_lightsource.cpp"
+		"server/hl2/info_darknessmode_lightsource.h"
+		"server/hl2/info_teleporter_countdown.cpp"
+		"server/hl2/item_ammo.cpp"
+		"server/hl2/item_battery.cpp"
+		"server/hl2/item_dynamic_resupply.cpp"
+		"server/hl2/item_dynamic_resupply.h"
+		"server/hl2/item_healthkit.cpp"
+		"server/hl2/item_itemcrate.cpp"
+		"server/hl2/item_suit.cpp"
+		"server/hl2/look_door.cpp"
+		"server/hl2/monster_dummy.cpp"
+		
+		"server/hl2/point_apc_controller.cpp"
+		"server/hl2/prop_combine_ball.cpp"
+		"server/hl2/prop_combine_ball.h"
+		"server/episodic/vehicle_jeep_episodic.cpp"
+		"server/episodic/vehicle_jeep_episodic.h"
+		"server/hl2/prop_thumper.cpp"
+		"server/hl2/proto_sniper.cpp"
+		"server/hl2/rotorwash.cpp"
+		"server/hl2/rotorwash.h"
+		"server/hl2/script_intro.cpp"
+		"server/hl2/script_intro.h"
+
+		"server/hl2/func_bulletshield.cpp"
+		"server/hl2/func_bulletshield.h"
+
+		folder "unused"
+		{
+			"server/hl2/grenade_beam.cpp"
+			"server/hl2/grenade_beam.h"
+			"server/hl2/grenade_homer.cpp"
+			"server/hl2/grenade_homer.h"
+			"server/hl2/grenade_pathfollower.cpp"
+			"server/hl2/grenade_pathfollower.h"
+			"server/hl2/npc_missiledefense.cpp"
+			"server/hl2/vehicle_apc.cpp"
+			"server/hl2/weapon_cguard.cpp"
+			"server/hl2/weapon_flaregun.cpp"
+			"server/hl2/weapon_flaregun.h"
+		}
+	}
+
+	folder "HL2MP"
+	{
+		"server/hl2mp/hl2mp_bot_temp.cpp"
+		"server/hl2mp/hl2mp_bot_temp.h"
+		"server/hl2mp/hl2mp_client.cpp"
+		"server/hl2mp/hl2mp_cvars.cpp"
+		"server/hl2mp/hl2mp_gameinterface.cpp"
+		"server/hl2mp/hl2mp_gameinterface.h"
+		"server/hl2mp/hl2mp_player.cpp"
+		"server/hl2mp/hl2mp_player.h"
+
+		folder "Weapons"
+		{
+			"server/hl2mp/grenade_satchel.cpp"
+			"server/hl2mp/grenade_satchel.h"
+			"server/hl2mp/grenade_tripmine.cpp"
+			"server/hl2mp/grenade_tripmine.h"
+			"server/hl2mp/te_hl2mp_shotgun_shot.cpp"
+			"server/hl2mp/te_hl2mp_shotgun_shot.h"
+		}
+	}
+}

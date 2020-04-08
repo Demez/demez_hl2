@@ -1,0 +1,139 @@
+// ---------------------------------------------------------------
+// Demez Mod - Shared
+// ---------------------------------------------------------------
+macro GAMENAME "../../output/demez"
+
+macro SRCDIR "../quiver/src"
+// macro SRCDIR "../.."
+// include "_$TYPE_base.qpc" "../quiver/src/game/$TYPE"
+include "../quiver/src/game/$TYPE/_$TYPE_base.qpc"
+
+macro GAME_FOLDER "demez"
+macro SHARED_DIR "$SRCDIR/game/shared"
+macro SHARED_GAME "$SHARED_DIR/$GAME_FOLDER"
+
+// temp
+macro _ROOT_DIR_ABS "D:\projects\source\demez_hl2"
+
+configuration
+{
+	general
+	{
+		out_dir "./$CONFIG/$PLATFORM/$GAME_FOLDER/$TYPE"
+		int_dir "./$CONFIG/$PLATFORM/$GAME_FOLDER/$TYPE"
+		
+		include_directories
+		{
+			"shared"
+			"shared/episodic"
+			"shared/hl2"
+			"shared/hl2mp"
+			
+			"shared/weapons/hl2mp"
+			
+			"$TYPE"
+			"$TYPE/hl2"
+			"$TYPE/hl2mp"
+			"$TYPE/episodic"
+			
+			"$SRCDIR/game/$TYPE"
+		}
+	}
+
+	compiler
+	{
+		preprocessor_definitions
+		{
+			"HL2MP"
+			"HL2_EPISODIC"
+		}
+	}
+	
+    // add to quiver later
+    debug
+    {
+		// TODO: add an absolute root dir macro to qpc, $_ROOT_DIR_ABS
+        command     "$_ROOT_DIR_ABS\quiver/game/bin/$PLATFORM/quiver.exe"
+        working_dir "$SRCDIR/.."
+        arguments   "-noborder -sw -novid -dev -game \"$_ROOT_DIR_ABS/output/demez\""
+    }
+}
+
+files
+{
+	folder "Source Files"
+	{
+		"$SHARED_DIR/predicted_viewmodel.cpp"
+		"$SHARED_DIR/predicted_viewmodel.h"
+		
+		// why server only wtf
+		// "$SHARED_DIR/ragdoll_shared.h"
+		// "$SHARED_DIR/solidsetdefaults.h"
+		// "$SHARED_DIR/touchlink.h"
+
+		folder "HL2 DLL"
+		{
+			folder "Episodic"
+			{
+				"shared/episodic/*"
+			}
+			
+			"$SHARED_DIR/script_intro_shared.cpp"
+			
+			"shared/hl2/basehlcombatweapon_shared.*"
+			"shared/hl2/citadel_effects_shared.h"
+			"shared/hl2/env_headcrabcanister_shared.cpp"
+			"shared/hl2/env_headcrabcanister_shared.h"
+			"shared/hl2/hl2_gamerules.cpp"
+			"shared/hl2/hl2_gamerules.h"
+			"shared/hl2/hl2_shareddefs.h"
+			"shared/hl2/hl2_usermessages.cpp"
+			"shared/hl2/hl_gamemovement.cpp"
+			"shared/hl2/hl_gamemovement.h"
+			
+			"shared/hl2/env_alyxemp_shared.h"
+			"shared/hl2/hl2_player_shared.h"
+			"shared/hl2/hl_movedata.h"
+			
+			// on server only so uhhhh
+			"shared/hl2/survival_gamerules.cpp"
+		}
+
+		folder "HL2MP"
+		{
+			"shared/hl2mp/hl2mp_gamerules.cpp"
+			"shared/hl2mp/hl2mp_gamerules.h"
+			"shared/hl2mp/hl2mp_player_shared.cpp"
+			"shared/hl2mp/hl2mp_player_shared.h"
+			"shared/hl2mp/hl2mp_weapon_parse.cpp"
+			"shared/hl2mp/hl2mp_weapon_parse.h"
+
+			folder "Weapons"
+			{
+				"shared/weapons/hl2mp/weapon_357.cpp"
+				"shared/weapons/hl2mp/weapon_ar2.cpp"
+				"shared/weapons/hl2mp/weapon_ar2.h"
+				"shared/weapons/hl2mp/weapon_crossbow.cpp"
+				"shared/weapons/hl2mp/weapon_crowbar.cpp"
+				"shared/weapons/hl2mp/weapon_frag.cpp"
+				"shared/weapons/hl2mp/weapon_hl2mpbase.cpp"
+				"shared/weapons/hl2mp/weapon_hl2mpbase.h"
+				"shared/weapons/hl2mp/weapon_hl2mpbase_machinegun.cpp"
+				"shared/weapons/hl2mp/weapon_hl2mpbase_machinegun.h"
+				"shared/weapons/hl2mp/weapon_hl2mpbasebasebludgeon.cpp"
+				"shared/weapons/hl2mp/weapon_hl2mpbasehlmpcombatweapon.cpp"
+				"shared/weapons/hl2mp/weapon_hl2mpbasehlmpcombatweapon.h"
+				"shared/weapons/hl2mp/weapon_physcannon.cpp"
+				"shared/weapons/hl2mp/weapon_physcannon.h"
+				"shared/weapons/hl2mp/weapon_pistol.cpp"
+				// "shared/weapons/hl2mp/weapon_rpg.cpp"
+				// "shared/weapons/hl2mp/weapon_rpg.h"
+				"shared/weapons/hl2mp/weapon_shotgun.cpp"
+				"shared/weapons/hl2mp/weapon_slam.cpp"
+				"shared/weapons/hl2mp/weapon_slam.h"
+				"shared/weapons/hl2mp/weapon_smg1.cpp"
+				// "shared/weapons/hl2mp/weapon_stunstick.cpp"
+			}
+		}
+	}
+}
