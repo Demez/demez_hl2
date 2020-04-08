@@ -31,7 +31,7 @@
 // memdbgon must be the last include file in a .cpp file!!!
 // #include "tier0/memdbgon.h"
 
-static ConVar demez_flashlight("sv_demez_flashlight", "1", FCVAR_ARCHIVE, "Allow flashlights");
+static ConVar demez_flashlight("demez_sv_flashlight", "1", FCVAR_ARCHIVE, "Allow flashlights");
 
 int g_iLastCitizenModel = 0;
 int g_iLastCombineModel = 0;

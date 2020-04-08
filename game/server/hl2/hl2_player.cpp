@@ -75,21 +75,11 @@ extern int gEvilImpulse101;
 
 ConVar sv_autojump( "sv_autojump", "0" );
 
-ConVar hl2_walkspeed( "hl2_walkspeed", "150" );
-ConVar hl2_normspeed( "hl2_normspeed", "190" );
-ConVar hl2_sprintspeed( "hl2_sprintspeed", "320" );
+ConVar hl2_walkspeed( "demez_sv_walkspeed", "150" );
+ConVar hl2_normspeed( "demez_sv_normspeed", "190" );
+ConVar hl2_sprintspeed( "demez_sv_sprintspeed", "320" );
 
 ConVar hl2_darkness_flashlight_factor ( "hl2_darkness_flashlight_factor", "1" );
-
-#ifdef HL2MP
-	#define	HL2_WALK_SPEED 150
-	#define	HL2_NORM_SPEED 190
-	#define	HL2_SPRINT_SPEED 320
-#else
-	#define	HL2_WALK_SPEED hl2_walkspeed.GetFloat()
-	#define	HL2_NORM_SPEED hl2_normspeed.GetFloat()
-	#define	HL2_SPRINT_SPEED hl2_sprintspeed.GetFloat()
-#endif
 
 ConVar player_showpredictedposition( "player_showpredictedposition", "0" );
 ConVar player_showpredictedposition_timestep( "player_showpredictedposition_timestep", "1.0" );
@@ -97,7 +87,8 @@ ConVar player_showpredictedposition_timestep( "player_showpredictedposition_time
 ConVar player_squad_transient_commands( "player_squad_transient_commands", "1", FCVAR_REPLICATED );
 ConVar player_squad_double_tap_time( "player_squad_double_tap_time", "0.25" );
 
-ConVar sv_infinite_aux_power( "sv_infinite_aux_power", "0", FCVAR_CHEAT );
+ConVar demez_sv_infinite_aux_power("demez_sv_infinite_aux_power", "1");
+ConVar demez_sv_infinite_flashlight("demez_sv_infinite_flashlight", "1", FCVAR_ARCHIVE);
 
 ConVar autoaim_unlock_target( "autoaim_unlock_target", "0.8666" );
 
@@ -1206,7 +1197,7 @@ void CHL2_Player::StartSprinting( void )
 	filter.UsePredictionRules();
 	EmitSound( filter, entindex(), "HL2Player.SprintStart" );
 
-	SetMaxSpeed( HL2_SPRINT_SPEED );
+	SetMaxSpeed(hl2_sprintspeed.GetFloat());
 	m_fIsSprinting = true;
 }
 
@@ -1222,11 +1213,11 @@ void CHL2_Player::StopSprinting( void )
 
 	if( IsSuitEquipped() )
 	{
-		SetMaxSpeed( HL2_NORM_SPEED );
+		SetMaxSpeed(hl2_normspeed.GetFloat());
 	}
 	else
 	{
-		SetMaxSpeed( HL2_WALK_SPEED );
+		SetMaxSpeed(hl2_walkspeed.GetFloat());
 	}
 
 	m_fIsSprinting = false;
@@ -1258,7 +1249,7 @@ void CHL2_Player::EnableSprint( bool bEnable )
 //-----------------------------------------------------------------------------
 void CHL2_Player::StartWalking( void )
 {
-	SetMaxSpeed( HL2_WALK_SPEED );
+	SetMaxSpeed(hl2_walkspeed.GetFloat());
 	m_fIsWalking = true;
 }
 
@@ -1266,7 +1257,7 @@ void CHL2_Player::StartWalking( void )
 //-----------------------------------------------------------------------------
 void CHL2_Player::StopWalking( void )
 {
-	SetMaxSpeed( HL2_NORM_SPEED );
+	SetMaxSpeed(hl2_normspeed.GetFloat());
 	m_fIsWalking = false;
 }
 
@@ -1857,7 +1848,7 @@ void CHL2_Player::SuitPower_Initialize( void )
 bool CHL2_Player::SuitPower_Drain( float flPower )
 {
 	// Suitpower cheat on?
-	if ( sv_infinite_aux_power.GetBool() )
+	if (demez_sv_infinite_aux_power.GetBool() )
 		return true;
 
 	m_HL2Local.m_flSuitPower -= flPower;
@@ -3235,10 +3226,9 @@ void CHL2_Player::UpdateClientData( void )
 	}
 
 	// Update Flashlight
-#ifdef HL2_EPISODIC
 	if ( Flashlight_UseLegacyVersion() == false )
 	{
-		if ( FlashlightIsOn() && sv_infinite_aux_power.GetBool() == false )
+		if ( FlashlightIsOn() && demez_sv_infinite_flashlight.GetBool() == false )
 		{
 			m_HL2Local.m_flFlashBattery -= FLASH_DRAIN_TIME * gpGlobals->frametime;
 			if ( m_HL2Local.m_flFlashBattery < 0.0f )
@@ -3260,7 +3250,6 @@ void CHL2_Player::UpdateClientData( void )
 	{
 		m_HL2Local.m_flFlashBattery = -1.0f;
 	}
-#endif // HL2_EPISODIC
 
 	BaseClass::UpdateClientData();
 }
