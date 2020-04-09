@@ -17,6 +17,11 @@ static ConVar sv_ladderautomountdot( "sv_ladderautomountdot", "0.4", FCVAR_REPLI
 
 static ConVar sv_ladder_useonly( "sv_ladder_useonly", "0", FCVAR_REPLICATED, "If set, ladders can only be mounted by pressing +USE" );
 
+static ConVar demez_bhop_mode("demez_bhop_mode", "1", FCVAR_ARCHIVE, "0 - hl1, 1 - hl2 release, 2 - abh, 3 - afh");
+static ConVar demez_auto_bhop("demez_auto_bhop", "1", FCVAR_ARCHIVE);
+
+extern ConVar sv_gravity;
+
 #define USE_DISMOUNT_SPEED 100
 
 //-----------------------------------------------------------------------------
@@ -514,6 +519,297 @@ bool CHL2GameMovement::ExitLadderViaDismountNode( CFuncLadder *ladder, bool stri
 	}
 
 	return false;
+}
+
+bool CHL2GameMovement::CheckJumpButton(void)
+{
+	if (player->pl.deadflag)
+	{
+		mv->m_nOldButtons |= IN_JUMP;	// don't jump again until released
+		return false;
+	}
+
+	// See if we are waterjumping.  If so, decrement count and return.
+	if (player->m_flWaterJumpTime)
+	{
+		player->m_flWaterJumpTime -= gpGlobals->frametime;
+		if (player->m_flWaterJumpTime < 0)
+			player->m_flWaterJumpTime = 0;
+
+		return false;
+	}
+
+	// If we are in the water most of the way...
+	if (player->GetWaterLevel() >= 2)
+	{
+		// swimming, not jumping
+		SetGroundEntity(NULL);
+
+		if (player->GetWaterType() == CONTENTS_WATER)    // We move up a certain amount
+			mv->m_vecVelocity[2] = 100;
+		else if (player->GetWaterType() == CONTENTS_SLIME)
+			mv->m_vecVelocity[2] = 80;
+
+		// play swiming sound
+		if (player->m_flSwimSoundTime <= 0)
+		{
+			// Don't play sound again for 1 second
+			player->m_flSwimSoundTime = 1000;
+			PlaySwimSound();
+		}
+
+		return false;
+	}
+
+	// No more effect
+	if (player->GetGroundEntity() == NULL)
+	{
+		mv->m_nOldButtons |= IN_JUMP;
+		return false;		// in air, so no effect
+	}
+
+	// Don't allow jumping when the player is in a stasis field.
+#ifndef HL2_EPISODIC
+	if (player->m_Local.m_bSlowMovement)
+		return false;
+#endif
+
+	if (mv->m_nOldButtons & IN_JUMP && !demez_auto_bhop.GetBool())
+		return false;		// don't pogo stick
+
+	// Cannot jump will in the unduck transition.
+	if (player->m_Local.m_bDucking && (player->GetFlags() & FL_DUCKING))
+		return false;
+
+	// Still updating the eye position.
+	if (player->m_Local.m_flDuckJumpTime > 0.0f)
+		return false;
+
+	// In the air now.
+	SetGroundEntity(NULL);
+
+	player->PlayStepSound((Vector&) mv->GetAbsOrigin(), player->m_pSurfaceData, 1.0, true);
+
+	MoveHelper()->PlayerSetAnimation(PLAYER_JUMP);
+
+	float flGroundFactor = 1.0f;
+	if (player->m_pSurfaceData)
+	{
+		flGroundFactor = player->m_pSurfaceData->game.jumpFactor;
+	}
+
+	float flMul;
+	if (true)
+	{
+		Assert(sv_gravity.GetFloat() == 600.0f);
+		flMul = 160.0f;	// approx. 21 units.
+		// Assert(sv_gravity.GetFloat() == 800.0f);
+		// flMul = 268.3281572999747f;
+	}
+	else
+	{
+		// flMul = sqrt(2 * sv_gravity.GetFloat() * GAMEMOVEMENT_JUMP_HEIGHT);
+	}
+
+	// Acclerate upward
+	// If we are ducking...
+	float startz = mv->m_vecVelocity[2];
+	if ((player->m_Local.m_bDucking) || (player->GetFlags() & FL_DUCKING))
+	{
+		// d = 0.5 * g * t^2		- distance traveled with linear accel
+		// t = sqrt(2.0 * 45 / g)	- how long to fall 45 units
+		// v = g * t				- velocity at the end (just invert it to jump up that high)
+		// v = g * sqrt(2.0 * 45 / g )
+		// v^2 = g * g * 2.0 * 45 / g
+		// v = sqrt( g * 2.0 * 45 )
+		mv->m_vecVelocity[2] = flGroundFactor * flMul;  // 2 * gravity * height
+	}
+	else
+	{
+		mv->m_vecVelocity[2] += flGroundFactor * flMul;  // 2 * gravity * height
+	}
+
+	// Add a little forward velocity based on your current forward velocity - if you are not sprinting.
+	// Accelerated Back Hopping Code
+	CHLMoveData* pMoveData = (CHLMoveData*) mv;
+	Vector vecForward;
+	AngleVectors(mv->m_vecViewAngles, &vecForward);
+	vecForward.z = 0;
+	VectorNormalize(vecForward);
+
+	if (demez_bhop_mode.GetInt() == 3 || demez_bhop_mode.GetInt() == 2)
+	{
+		// We give a certain percentage of the current forward movement as a bonus to the jump speed.  That bonus is clipped
+		// to not accumulate over time.
+		float flSpeedBoostPerc = (!pMoveData->m_bIsSprinting && !player->m_Local.m_bDucked) ? 0.5f : 0.1f;
+		float flSpeedAddition = fabs(mv->m_flForwardMove * flSpeedBoostPerc);
+		float flMaxSpeed = mv->m_flMaxSpeed + (mv->m_flMaxSpeed * flSpeedBoostPerc);
+		float flNewSpeed = (flSpeedAddition + mv->m_vecVelocity.Length2D());
+
+		// If we're over the maximum, we want to only boost as much as will get us to the goal speed
+		if (flNewSpeed > flMaxSpeed)
+		{
+			flSpeedAddition -= flNewSpeed - flMaxSpeed;
+		}
+
+		if (mv->m_flForwardMove < 0.0f)
+		{
+			if (demez_bhop_mode.GetInt() == 3)
+				flSpeedAddition *= 1.0f;
+			else
+				flSpeedAddition *= -1.0f;
+		}
+
+		// Add it on
+		VectorAdd((vecForward * flSpeedAddition), mv->m_vecVelocity, mv->m_vecVelocity);
+	}
+	else if (demez_bhop_mode.GetInt() == 1)
+	{
+		if (!pMoveData->m_bIsSprinting && !player->m_Local.m_bDucked)
+		{
+			for (int iAxis = 0; iAxis < 2; ++iAxis)
+			{
+				vecForward[iAxis] *= (mv->m_flForwardMove * 0.5f);
+			}
+		}
+		else
+		{
+			for (int iAxis = 0; iAxis < 2; ++iAxis)
+			{
+				vecForward[iAxis] *= (mv->m_flForwardMove * 0.1f);
+			}
+		}
+
+		VectorAdd(vecForward, mv->m_vecVelocity, mv->m_vecVelocity);
+	}
+
+	FinishGravity();
+
+	// CheckV(player->CurrentCommandNumber(), "CheckJump", mv->m_vecVelocity);
+
+	mv->m_outJumpVel.z += mv->m_vecVelocity[2] - startz;
+	mv->m_outStepHeight += 0.15f;
+
+	// Set jump time.
+	if (gpGlobals->maxClients == 1)
+	{
+		player->m_Local.m_flJumpTime = GAMEMOVEMENT_JUMP_TIME;
+		player->m_Local.m_bInDuckJump = true;
+	}
+
+	// Flag that we jumped.
+	mv->m_nOldButtons |= IN_JUMP;	// don't jump again until released
+	return true;
+	// return BaseClass::CheckJumpButton();
+}
+
+void CHL2GameMovement::CheckFalling()
+{
+	// this function really deals with landing, not falling, so early out otherwise
+	if (player->GetGroundEntity() == NULL || player->m_Local.m_flFallVelocity <= 0)
+		return;
+
+	if (!IsDead() && player->m_Local.m_flFallVelocity >= PLAYER_FALL_PUNCH_THRESHOLD)
+	{
+		bool bAlive = true;
+		float fvol = 0.5;
+
+		if (player->GetWaterLevel() > 0)
+		{
+			// They landed in water.
+		}
+		else
+		{
+			// Scale it down if we landed on something that's floating...
+			if (player->GetGroundEntity()->IsFloating())
+			{
+				player->m_Local.m_flFallVelocity -= PLAYER_LAND_ON_FLOATING_OBJECT;
+			}
+
+			//
+			// They hit the ground.
+			//
+			if (player->GetGroundEntity()->GetAbsVelocity().z < 0.0f)
+			{
+				// Player landed on a descending object. Subtract the velocity of the ground entity.
+				player->m_Local.m_flFallVelocity += player->GetGroundEntity()->GetAbsVelocity().z;
+				player->m_Local.m_flFallVelocity = MAX(0.1f, player->m_Local.m_flFallVelocity);
+			}
+
+			if (player->m_Local.m_flFallVelocity > PLAYER_MAX_SAFE_FALL_SPEED)
+			{
+				//
+				// If they hit the ground going this fast they may take damage (and die).
+				//
+				bAlive = MoveHelper()->PlayerFallingDamage();
+				fvol = 1.0;
+			}
+			else if (player->m_Local.m_flFallVelocity > PLAYER_MAX_SAFE_FALL_SPEED / 2)
+			{
+				fvol = 0.85;
+			}
+			else if (player->m_Local.m_flFallVelocity < PLAYER_MIN_BOUNCE_SPEED)
+			{
+				fvol = 0;
+			}
+		}
+
+		PlayerRoughLandingEffects(fvol);
+
+		if (bAlive)
+		{
+			MoveHelper()->PlayerSetAnimation(PLAYER_WALK);
+		}
+	}
+
+	if (demez_auto_bhop.GetBool() && mv->m_nButtons & IN_JUMP)
+	{
+		CheckJumpButton();
+	}
+
+	//
+	// Clear the fall velocity so the impact doesn't happen again.
+	//
+	player->m_Local.m_flFallVelocity = 0;
+}
+
+void CHL2GameMovement::AirAccelerate(Vector& wishdir, float wishspeed, float accel)
+{
+	int i;
+	float addspeed, accelspeed, currentspeed;
+	float wishspd;
+
+	wishspd = wishspeed;
+
+	if (player->pl.deadflag)
+		return;
+
+	if (player->m_flWaterJumpTime)
+		return;
+
+	// Cap speed
+	if (wishspd > 30)
+		wishspd = 30;
+
+	// Determine veer amount
+	currentspeed = mv->m_vecVelocity.Dot(wishdir);
+
+	// See how much to add
+	addspeed = wishspd - currentspeed;
+
+	// If not adding any, done.
+	if (addspeed <= 0)
+		return;
+
+	// Determine acceleration speed after acceleration
+	accelspeed = accel * wishspeed * gpGlobals->frametime * player->m_surfaceFriction;
+
+	// Adjust pmove vel.
+	for (i = 0; i < 3; i++)
+	{
+		mv->m_vecVelocity[i] += accelspeed * wishdir[i];
+		mv->m_outWishVel[i] += accelspeed * wishdir[i];
+	}
 }
 
 //-----------------------------------------------------------------------------

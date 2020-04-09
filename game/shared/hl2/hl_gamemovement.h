@@ -37,12 +37,15 @@ public:
 	CHL2GameMovement();
 
 // Overrides
-	virtual void FullLadderMove();
-	virtual bool LadderMove( void );
-	virtual bool OnLadder( trace_t &trace );
-	virtual int GetCheckInterval( IntervalType_t type );
+	virtual void	FullLadderMove();
+	virtual bool	LadderMove( void );
+	virtual bool	OnLadder( trace_t &trace );
+	virtual int		GetCheckInterval( IntervalType_t type );
 	virtual void	SetGroundEntity( trace_t *pm );
-	virtual bool CanAccelerate( void );
+	virtual bool	CanAccelerate( void );
+	virtual bool	CheckJumpButton(void);
+	virtual void	CheckFalling(void);
+	virtual void	AirAccelerate(Vector& wishdir, float wishspeed, float accel);
 
 private:
 
