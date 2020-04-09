@@ -12,8 +12,10 @@ macro GAME_FOLDER "demez"
 macro SHARED_DIR "$SRCDIR/game/shared"
 macro SHARED_GAME "$SHARED_DIR/$GAME_FOLDER"
 
-// temp
+// temp, keeping until i get around to adding this macro to qpc
 macro _ROOT_DIR_ABS "D:\projects\source\demez_hl2"
+
+macro BASE_DEBUG_ARGS "-noborder -sw -novid -dev -game \"$_ROOT_DIR_ABS/output/demez\""
 
 configuration
 {
@@ -52,10 +54,10 @@ configuration
     // add to quiver later
     debug
     {
-		// TODO: add an absolute root dir macro to qpc, $_ROOT_DIR_ABS
         command     "$_ROOT_DIR_ABS\quiver/game/bin/$PLATFORM/quiver.exe"
         working_dir "$SRCDIR/.."
-        arguments   "-noborder -sw -novid -dev -game \"$_ROOT_DIR_ABS/output/demez\""
+        arguments   "$BASE_DEBUG_ARGS"							[$RELEASE]
+        arguments   "-hushasserts -noassert $BASE_DEBUG_ARGS"	[$DEBUG]
     }
 }
 
