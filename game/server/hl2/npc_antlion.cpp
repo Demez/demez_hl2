@@ -4022,60 +4022,65 @@ bool CNPC_Antlion::CorpseGib( const CTakeDamageInfo &info )
 void CNPC_Antlion::Touch( CBaseEntity *pOther )
 {
 	//See if the touching entity is a vehicle
-	CBasePlayer *pPlayer = ToBasePlayer( AI_GetSinglePlayer() );
-	
-	// FIXME: Technically we'll want to check to see if a vehicle has touched us with the player OR NPC driver
-
-	if ( pPlayer && pPlayer->IsInAVehicle() )
+	for (int i = 1; i <= gpGlobals->maxClients; i++)
 	{
-		IServerVehicle	*pVehicle = pPlayer->GetVehicle();
-		CBaseEntity *pVehicleEnt = pVehicle->GetVehicleEnt();
+		CBasePlayer* pPlayer = UTIL_PlayerByIndex(i);
+	
+		// FIXME: Technically we'll want to check to see if a vehicle has touched us with the player OR NPC driver
 
-		if ( pVehicleEnt == pOther )
+		if ( pPlayer && pPlayer->IsInAVehicle() )
 		{
-			CPropVehicleDriveable	*pDrivableVehicle = dynamic_cast<CPropVehicleDriveable *>( pVehicleEnt );
+			IServerVehicle	*pVehicle = pPlayer->GetVehicle();
+			CBaseEntity *pVehicleEnt = pVehicle->GetVehicleEnt();
 
-			if ( pDrivableVehicle != NULL )
+			if ( pVehicleEnt == pOther )
 			{
-				//Get tossed!
-				Vector	vecShoveDir = pOther->GetAbsVelocity();
-				Vector	vecTargetDir = GetAbsOrigin() - pOther->GetAbsOrigin();
-				
-				VectorNormalize( vecShoveDir );
-				VectorNormalize( vecTargetDir );
+				CPropVehicleDriveable	*pDrivableVehicle = dynamic_cast<CPropVehicleDriveable *>( pVehicleEnt );
 
-				bool bBurrowingOut = IsCurSchedule( SCHED_ANTLION_BURROW_OUT );
-
-				if ( ( ( pDrivableVehicle->m_nRPM > 75 ) && DotProduct( vecShoveDir, vecTargetDir ) <= 0 ) || bBurrowingOut == true )
+				if ( pDrivableVehicle != NULL )
 				{
-					if ( IsFlipped() || bBurrowingOut == true )
-					{
-						float flDamage = m_iHealth;
+					//Get tossed!
+					Vector	vecShoveDir = pOther->GetAbsVelocity();
+					Vector	vecTargetDir = GetAbsOrigin() - pOther->GetAbsOrigin();
+				
+					VectorNormalize( vecShoveDir );
+					VectorNormalize( vecTargetDir );
 
-						if ( random->RandomInt( 0, 10 ) > 4 )
-							 flDamage += 25;
+					bool bBurrowingOut = IsCurSchedule( SCHED_ANTLION_BURROW_OUT );
+
+					if ( ( ( pDrivableVehicle->m_nRPM > 75 ) && DotProduct( vecShoveDir, vecTargetDir ) <= 0 ) || bBurrowingOut == true )
+					{
+						if ( IsFlipped() || bBurrowingOut == true )
+						{
+							float flDamage = m_iHealth;
+
+							if ( random->RandomInt( 0, 10 ) > 4 )
+								 flDamage += 25;
 									
-						CTakeDamageInfo	dmgInfo( pVehicleEnt, pPlayer, flDamage, DMG_VEHICLE );
+							CTakeDamageInfo	dmgInfo( pVehicleEnt, pPlayer, flDamage, DMG_VEHICLE );
 					
-						CalculateMeleeDamageForce( &dmgInfo, vecShoveDir, pOther->GetAbsOrigin() );
-						TakeDamage( dmgInfo );
-					}
-					else
-					{
-						// We're being shoved
-						CTakeDamageInfo	dmgInfo( pVehicleEnt, pPlayer, 0, DMG_VEHICLE );
-						PainSound( dmgInfo );
+							CalculateMeleeDamageForce( &dmgInfo, vecShoveDir, pOther->GetAbsOrigin() );
+							TakeDamage( dmgInfo );
+						}
+						else
+						{
+							// We're being shoved
+							CTakeDamageInfo	dmgInfo( pVehicleEnt, pPlayer, 0, DMG_VEHICLE );
+							PainSound( dmgInfo );
 
-						SetCondition( COND_ANTLION_FLIPPED );
+							SetCondition( COND_ANTLION_FLIPPED );
 
-						vecTargetDir[2] = 0.0f;
+							vecTargetDir[2] = 0.0f;
 
-						ApplyAbsVelocityImpulse( ( vecTargetDir * 250.0f ) + Vector(0,0,64.0f) );
-						SetGroundEntity( NULL );
+							ApplyAbsVelocityImpulse( ( vecTargetDir * 250.0f ) + Vector(0,0,64.0f) );
+							SetGroundEntity( NULL );
 
-						CSoundEnt::InsertSound( SOUND_PHYSICS_DANGER, GetAbsOrigin(), 256, 0.5f, this );
+							CSoundEnt::InsertSound( SOUND_PHYSICS_DANGER, GetAbsOrigin(), 256, 0.5f, this );
+						}
 					}
 				}
+
+				break;  // safe to assume will only be touched by 1 vehicle per frame 
 			}
 		}
 	}

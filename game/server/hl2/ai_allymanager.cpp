@@ -124,13 +124,10 @@ void CAI_AllyManager::CountAllies( int *pTotal, int *pMedics )
 {
 	(*pTotal) = (*pMedics) = 0;
 
-	if ( !AI_IsSinglePlayer() )
-	{
-		// @TODO (toml 10-22-04): no MP support right now
-		return;
-	}
+	Vector			vAIPos;
+	Vector			vNearestPlayerPos;
+	CBasePlayer *	pPlayer;
 
-	const Vector &	vPlayerPos = UTIL_GetLocalPlayer()->GetAbsOrigin();
 	CAI_BaseNPC **	ppAIs 	= g_AI_Manager.AccessAIs();
 	int 			nAIs 	= g_AI_Manager.NumAIs();
 
@@ -145,16 +142,21 @@ void CAI_AllyManager::CountAllies( int *pTotal, int *pMedics )
 			// They only count if I can use them.
 			if( ppAIs[i]->HasSpawnFlags(SF_CITIZEN_NOT_COMMANDABLE) )
 				continue;
+
+			pPlayer = UTIL_GetNearestPlayer(ppAIs[i]->GetAbsOrigin());
 			
 			// They only count if I can use them.
-			if( ppAIs[i]->IRelationType( UTIL_GetLocalPlayer() ) != D_LI )
+			if( ppAIs[i]->IRelationType( pPlayer ) != D_LI )
 				continue;
+
+			vAIPos = ppAIs[i]->GetAbsOrigin();
+			vNearestPlayerPos = pPlayer->GetAbsOrigin();
 
 			// Skip distant NPCs
 			if ( !ppAIs[i]->IsInPlayerSquad() && 
 				!UTIL_FindClientInPVS( ppAIs[i]->edict() ) && 
-				( ( ppAIs[i]->GetAbsOrigin() - vPlayerPos ).LengthSqr() > 150*12 ||
-				  fabsf( ppAIs[i]->GetAbsOrigin().z - vPlayerPos.z ) > 192 ) )
+				( ( vAIPos - vNearestPlayerPos ).LengthSqr() > 150*12 ||
+				  fabsf( vAIPos.z - vNearestPlayerPos.z ) > 192 ) )
 				continue;
 
 			if( FClassnameIs( ppAIs[i], "npc_citizen" ) ) 

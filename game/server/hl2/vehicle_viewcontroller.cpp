@@ -134,7 +134,8 @@ void CPropVehicleViewController::ExitVehicle( int nRole )
 //-----------------------------------------------------------------------------
 void CPropVehicleViewController::InputForcePlayerIn( inputdata_t &inputdata )
 {
-	CBasePlayer *pPlayer = UTIL_PlayerByIndex(1);
+	// could this just use the host?
+	CBasePlayer *pPlayer = UTIL_GetNearestPlayer(GetAbsOrigin());
 	if ( !pPlayer )
 		return;
 

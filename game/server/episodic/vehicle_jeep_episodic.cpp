@@ -954,7 +954,7 @@ void CPropJeepEpisodic::UpdateRadar( bool forceUpdate )
 
 	//Msg("Server detected %d objects\n", m_iNumRadarContacts );
 
-	CBasePlayer *pPlayer = AI_GetSinglePlayer();
+	CBasePlayer* pPlayer = UTIL_GetNearestPlayer(GetAbsOrigin());
 	CSingleUserRecipientFilter filter(pPlayer);
 	UserMessageBegin( filter, "UpdateJalopyRadar" );
 	WRITE_BYTE( 0 ); // end marker
@@ -1308,6 +1308,12 @@ static void KillBlockingEnemyNPCs( CBasePlayer *pPlayer, CBaseEntity *pVehicleEn
 
 			CTakeDamageInfo dmgInfo( pVehicleEntity, pVehicleEntity, damageForce, contactList[i], 200.0f, DMG_CRUSH|DMG_VEHICLE );
 			npcList[i]->TakeDamage( dmgInfo );
+
+			// Occasionally on hitting an AI the game would crash from a null pointer, this fixes that
+			IPhysicsObject* physicsObj = npcList[i]->VPhysicsGetObject();
+			if (physicsObj == NULL)
+				return;
+
 			pVehiclePhysics->ApplyForceOffset( vehicleForce, contactList[i] );
 			PhysCollisionSound( pVehicleEntity, npcList[i]->VPhysicsGetObject(), CHAN_BODY, pVehiclePhysics->GetMaterialIndex(), npcList[i]->VPhysicsGetObject()->GetMaterialIndex(), gpGlobals->frametime, 200.0f );
 		}

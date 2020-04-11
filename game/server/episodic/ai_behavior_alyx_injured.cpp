@@ -423,12 +423,12 @@ void CAI_BehaviorAlyxInjured::GatherConditions( void )
 						HasCondition( COND_INJURED_OVERWHELMED ) );
 
 	// See if we're too far away from the player and in danger
-	if ( AI_IsSinglePlayer() && bInDanger )
+	if ( bInDanger )
 	{
 		bool bWarnPlayer = false;
 
 		// This only works in single-player
-		CBasePlayer *pPlayer = UTIL_PlayerByIndex( 1 );
+		CBasePlayer *pPlayer = UTIL_GetNearestPlayerPreferVisible(GetOuter());
 		if ( pPlayer != NULL )
 		{
 			// FIXME: This distance may need to be the length of the shortest walked path between the follower and the target
