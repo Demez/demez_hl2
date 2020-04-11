@@ -231,15 +231,6 @@ bool CHalfLife2::Damage_IsTimeBased( int iDmgType )
 #endif
 }
 
-#ifdef CLIENT_DLL
-#else
-
-#ifdef HL2_EPISODIC
-ConVar  alyx_darkness_force( "alyx_darkness_force", "0", FCVAR_CHEAT | FCVAR_REPLICATED );
-#endif // HL2_EPISODIC
-
-#endif // CLIENT_DLL
-
 
 #ifdef CLIENT_DLL //{
 
@@ -1765,9 +1756,6 @@ void CHalfLife2::LevelInitPreEntity()
 bool CHalfLife2::IsAlyxInDarknessMode()
 {
 #ifdef HL2_EPISODIC
-	if ( alyx_darkness_force.GetBool() )
-		return true;
-
 	return ( GlobalEntity_GetState( "ep_alyx_darknessmode" ) == GLOBAL_ON );
 #else
 	return false;

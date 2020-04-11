@@ -36,11 +36,18 @@ void Host_Say( edict_t *pEdict, bool teamonly );
 extern CBaseEntity*	FindPickerEntityClass( CBasePlayer *pPlayer, char *classname );
 extern bool			g_fGameOver;
 
-void FinishClientPutInServer( CHL2MP_Player *pPlayer )
+ConVarRef deathmatch("deathmatch");
+ConVarRef coop("coop");
+
+void FinishClientPutInServer( CHL2MP_Player *pPlayer, bool bLoadGame )
 {
 	pPlayer->InitialSpawn();
-	pPlayer->Spawn();
 
+	// will need to check if this player is outside the transition area, oof
+	if (!bLoadGame)
+	{
+		pPlayer->Spawn();
+	}
 
 	char sName[128];
 	Q_strncpy( sName, pPlayer->GetPlayerName(), sizeof( sName ) );
@@ -61,17 +68,20 @@ void FinishClientPutInServer( CHL2MP_Player *pPlayer )
 		ClientPrint( pPlayer, HUD_PRINTTALK, "You are on team %s1\n", pPlayer->GetTeam()->GetName() );
 	}
 
-	const ConVar *hostname = cvar->FindVar( "hostname" );
-	const char *title = (hostname) ? hostname->GetString() : "MESSAGE OF THE DAY";
+	if (!bLoadGame)
+	{
+		const ConVar *hostname = cvar->FindVar( "hostname" );
+		const char *title = (hostname) ? hostname->GetString() : "MESSAGE OF THE DAY";
 
-	KeyValues *data = new KeyValues("data");
-	data->SetString( "title", title );		// info panel title
-	data->SetString( "type", "1" );			// show userdata from stringtable entry
-	data->SetString( "msg",	"motd" );		// use this stringtable entry
+		KeyValues *data = new KeyValues("data");
+		data->SetString( "title", title );		// info panel title
+		data->SetString( "type", "1" );			// show userdata from stringtable entry
+		data->SetString( "msg",	"motd" );		// use this stringtable entry
 
-	pPlayer->ShowViewPortPanel( PANEL_INFO, true, data );
+		pPlayer->ShowViewPortPanel( PANEL_INFO, true, data );
 
-	data->deleteThis();
+		data->deleteThis();
+	}
 }
 
 /*
@@ -91,11 +101,8 @@ void ClientPutInServer( edict_t *pEdict, const char *playername )
 
 void ClientActive( edict_t *pEdict, bool bLoadGame )
 {
-	// Can't load games in CS!
-	Assert( !bLoadGame );
-
 	CHL2MP_Player *pPlayer = ToHL2MPPlayer( CBaseEntity::Instance( pEdict ) );
-	FinishClientPutInServer( pPlayer );
+	FinishClientPutInServer( pPlayer, bLoadGame );
 }
 
 
@@ -179,7 +186,13 @@ void GameStartFrame( void )
 	if ( g_fGameOver )
 		return;
 
-	gpGlobals->teamplay = (teamplay.GetInt() != 0);
+	teamplay.SetValue(demez_gamemode.GetInt() == DEMEZ_GAMEMODE_TEAMPLAY);
+	coop.SetValue(demez_gamemode.GetInt() == DEMEZ_GAMEMODE_COOP);
+	deathmatch.SetValue(demez_gamemode.GetInt() == DEMEZ_GAMEMODE_DEATHMATCH);
+
+	gpGlobals->teamplay =	(demez_gamemode.GetInt() == DEMEZ_GAMEMODE_TEAMPLAY);
+	gpGlobals->coop =		(demez_gamemode.GetInt() == DEMEZ_GAMEMODE_COOP);
+	gpGlobals->deathmatch = (demez_gamemode.GetInt() == DEMEZ_GAMEMODE_DEATHMATCH);
 
 #ifdef DEBUG
 	extern void Bot_RunAll();

@@ -26,8 +26,19 @@
 #define VEC_CROUCH_TRACE_MIN	HL2MPRules()->GetHL2MPViewVectors()->m_vCrouchTraceMin
 #define VEC_CROUCH_TRACE_MAX	HL2MPRules()->GetHL2MPViewVectors()->m_vCrouchTraceMax
 
+
+extern ConVar	demez_gamemode;
+
+#define DEMEZ_GAMEMODE_DEATHMATCH 0
+#define DEMEZ_GAMEMODE_TEAMPLAY 1
+#define DEMEZ_GAMEMODE_COOP 2
+
 enum
 {
+	// coop mode
+	TEAM_COOP = 3,
+
+	// team deathmatch mode
 	TEAM_COMBINE = 2,
 	TEAM_REBELS,
 };
@@ -128,11 +139,14 @@ public:
 	virtual bool	CanHavePlayerItem( CBasePlayer *pPlayer, CBaseCombatWeapon *pItem );
 	virtual bool FShouldSwitchWeapon( CBasePlayer *pPlayer, CBaseCombatWeapon *pWeapon );
 
+	void	InitDefaultAIRelationships(void);
 	void	AddLevelDesignerPlacedObject( CBaseEntity *pEntity );
 	void	RemoveLevelDesignerPlacedObject( CBaseEntity *pEntity );
 	void	ManageObjectRelocation( void );
 	void    CheckChatForReadySignal( CHL2MP_Player *pPlayer, const char *chatmsg );
 	const char *GetChatFormat( bool bTeamOnly, CBasePlayer *pPlayer );
+
+	virtual bool IsAlyxInDarknessMode();
 
 #endif
 	virtual void ClientDisconnected( edict_t *pClient );
@@ -142,13 +156,16 @@ public:
 
 	void PlayerKilled( CBasePlayer *pVictim, const CTakeDamageInfo &info );
 
-	
-	bool	IsTeamplay( void ) { return m_bTeamPlayEnabled;	}
+	bool	IsTeamplay( void )		{ return m_bTeamPlayEnabled;	}
+	bool	IsDeathmatch( void )	{ return !m_bCoOpEnabled;		}
+	bool	IsCoOp( void )			{ return m_bCoOpEnabled;		}
+
 	void	CheckAllPlayersReady( void );
 	
 private:
 	
 	CNetworkVar( bool, m_bTeamPlayEnabled );
+	CNetworkVar( bool, m_bCoOpEnabled );
 	CNetworkVar( float, m_flGameStartTime );
 	CUtlVector<EHANDLE> m_hRespawnableItemsAndWeapons;
 	float m_tmNextPeriodicThink;
