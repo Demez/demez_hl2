@@ -20,7 +20,6 @@
             
             game		|gameinfo_path|../ep2/ep2_pak.vpk
 			game		|gameinfo_path|../episodic/ep1_pak.vpk
-			game		|gameinfo_path|../hl2mp/hl2mp_pak.vpk
 			game		|gameinfo_path|../hl2/hl2_sound_vo_english.vpk
 			game		|gameinfo_path|../hl2/hl2_pak.vpk
 			game		|gameinfo_path|../hl2/hl2_textures.vpk
@@ -29,7 +28,6 @@
 			
 			game		|gameinfo_path|../ep2
 			game		|gameinfo_path|../episodic
-			game		|gameinfo_path|../hl2mp
 			game		|gameinfo_path|../hl2
             
 			core		|gameinfo_path|.
