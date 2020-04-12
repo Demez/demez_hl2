@@ -939,7 +939,7 @@ bool CHL2MPRules::ClientCommand( CBaseEntity *pEdict, const CCommand &args )
 
 // shared ammo definition
 // JAY: Trying to make a more physical bullet response
-#define BULLET_MASS_GRAINS_TO_LB(grains)	(0.002285*(grains)/16.0f)
+/*#define BULLET_MASS_GRAINS_TO_LB(grains)	(0.002285*(grains)/16.0f)
 #define BULLET_MASS_GRAINS_TO_KG(grains)	lbs2kg(BULLET_MASS_GRAINS_TO_LB(grains))
 
 // exaggerate all of the forces, but use real numbers to keep them consistent
@@ -993,7 +993,7 @@ CAmmoDef *GetAmmoDef()
 		}
 
 	return &def;
-}
+}*/
 
 #ifdef CLIENT_DLL
 

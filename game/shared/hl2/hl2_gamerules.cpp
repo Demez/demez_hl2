@@ -1783,9 +1783,6 @@ bool CHalfLife2::ShouldBurningPropsEmitLight()
 // Global functions.
 // ------------------------------------------------------------------------------------ //
 
-#ifndef HL2MP
-#ifndef PORTAL
-
 // shared ammo definition
 // JAY: Trying to make a more physical bullet response
 #define BULLET_MASS_GRAINS_TO_LB(grains)	(0.002285*(grains)/16.0f)
@@ -1886,16 +1883,12 @@ CAmmoDef *GetAmmoDef()
 		//
 		//=====================================================================
 
-#ifdef HL2_EPISODIC
-		def.AddAmmoType("StriderMinigun",	DMG_BULLET,					TRACER_LINE,			5, 5, 15, 1.0 * 750 * 12, AMMO_FORCE_DROP_IF_CARRIED ); // hit like a 1.0kg weight at 750 ft/s
-#else
-		def.AddAmmoType("StriderMinigun",	DMG_BULLET,					TRACER_LINE,			5, 15,15, 1.0 * 750 * 12, AMMO_FORCE_DROP_IF_CARRIED ); // hit like a 1.0kg weight at 750 ft/s
-#endif//HL2_EPISODIC
-
+		if (hl2_episodic.GetBool())
+			def.AddAmmoType("StriderMinigun",	DMG_BULLET,					TRACER_LINE,			5, 5, 15, 1.0 * 750 * 12, AMMO_FORCE_DROP_IF_CARRIED ); // hit like a 1.0kg weight at 750 ft/s
+		else
+			def.AddAmmoType("StriderMinigun",	DMG_BULLET,					TRACER_LINE,			5, 15,15, 1.0 * 750 * 12, AMMO_FORCE_DROP_IF_CARRIED ); // hit like a 1.0kg weight at 750 ft/s
 	}
 
 	return &def;
 }
 
-#endif
-#endif
