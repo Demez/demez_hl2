@@ -8,6 +8,12 @@
 #include "basehlcombatweapon_shared.h"
 
 #include "hl2_player_shared.h"
+#ifdef CLIENT_DLL
+#include "c_hl2mp_player.h"
+#else
+#include "hl2mp_player.h"
+#include "vphysics/constraints.h"
+#endif
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -402,6 +408,170 @@ float CBaseHLCombatWeapon::GetSpreadBias( WeaponProficiency_t proficiency )
 {
 	const WeaponProficiencyInfo_t *pProficiencyValues = GetProficiencyValues();
 	return (pProficiencyValues)[ proficiency ].bias;
+}
+
+//-----------------------------------------------------------------------------
+CBasePlayer* CBaseHLCombatWeapon::GetPlayerOwner() const
+{
+	return dynamic_cast<CBasePlayer*>(GetOwner());
+}
+
+//-----------------------------------------------------------------------------
+CHL2MP_Player* CBaseHLCombatWeapon::GetHL2MPPlayerOwner() const
+{
+	return dynamic_cast<CHL2MP_Player*>(GetOwner());
+}
+
+bool CBaseHLCombatWeapon::IsPredicted() const
+{
+	return true;
+}
+
+void CBaseHLCombatWeapon::WeaponSound(WeaponSound_t sound_type, float soundtime /* = 0.0f */)
+{
+#ifdef CLIENT_DLL
+
+	// If we have some sounds from the weapon classname.txt file, play a random one of them
+	const char* shootsound = GetWpnData().aShootSounds[sound_type];
+	if (!shootsound || !shootsound[0])
+		return;
+
+	CBroadcastRecipientFilter filter; // this is client side only
+	if (!te->CanPredict())
+		return;
+	//SecobMod__Information: This crashed due to it being set to GetPlayerOwner which is singleplayer only.
+	CBaseEntity::EmitSound(filter, GetHL2MPPlayerOwner()->entindex(), shootsound, &GetHL2MPPlayerOwner()->GetAbsOrigin());
+#else
+	BaseClass::WeaponSound(sound_type, soundtime);
+#endif
+}
+
+#ifdef GAME_DLL
+void CBaseHLCombatWeapon::Materialize(void)
+{
+	if (IsEffectActive(EF_NODRAW))
+	{
+		// changing from invisible state to visible.
+		EmitSound("AlyxEmp.Charge");
+
+		RemoveEffects(EF_NODRAW);
+		DoMuzzleFlash();
+	}
+
+	if (HasSpawnFlags(SF_NORESPAWN) == false)
+	{
+		VPhysicsInitNormal(SOLID_BBOX, GetSolidFlags() | FSOLID_TRIGGER, false);
+		SetMoveType(MOVETYPE_VPHYSICS);
+
+		HL2MPRules()->AddLevelDesignerPlacedObject(this);
+	}
+
+	if (HasSpawnFlags(SF_NORESPAWN) == false)
+	{
+		if (GetOriginalSpawnOrigin() == vec3_origin)
+		{
+			m_vOriginalSpawnOrigin = GetAbsOrigin();
+			m_vOriginalSpawnAngles = GetAbsAngles();
+		}
+	}
+
+	SetPickupTouch();
+
+	SetThink(NULL);
+}
+
+int CBaseHLCombatWeapon::ObjectCaps()
+{
+	return BaseClass::ObjectCaps() & ~FCAP_IMPULSE_USE;
+}
+
+#endif
+
+void CBaseHLCombatWeapon::FallInit(void)
+{
+#ifndef CLIENT_DLL
+	SetModel(GetWorldModel());
+	VPhysicsDestroyObject();
+
+	if (HasSpawnFlags(SF_NORESPAWN) == false)
+	{
+		SetMoveType(MOVETYPE_NONE);
+		SetSolid(SOLID_BBOX);
+		AddSolidFlags(FSOLID_TRIGGER);
+
+		UTIL_DropToFloor(this, MASK_SOLID);
+	}
+	else
+	{
+		if (!VPhysicsInitNormal(SOLID_BBOX, GetSolidFlags() | FSOLID_TRIGGER, false))
+		{
+			SetMoveType(MOVETYPE_NONE);
+			SetSolid(SOLID_BBOX);
+			AddSolidFlags(FSOLID_TRIGGER);
+		}
+		else
+		{
+#if !defined( CLIENT_DLL )
+			// Constrained start?
+			if (HasSpawnFlags(SF_WEAPON_START_CONSTRAINED))
+			{
+				//Constrain the weapon in place
+				IPhysicsObject* pReferenceObject, * pAttachedObject;
+
+				pReferenceObject = g_PhysWorldObject;
+				pAttachedObject = VPhysicsGetObject();
+
+				if (pReferenceObject && pAttachedObject)
+				{
+					constraint_fixedparams_t fixed;
+					fixed.Defaults();
+					fixed.InitWithCurrentObjectState(pReferenceObject, pAttachedObject);
+
+					fixed.constraint.forceLimit = lbs2kg(10000);
+					fixed.constraint.torqueLimit = lbs2kg(10000);
+
+					IPhysicsConstraint* pConstraint = GetConstraint();
+
+					pConstraint = physenv->CreateFixedConstraint(pReferenceObject, pAttachedObject, NULL, fixed);
+
+					pConstraint->SetGameData((void*) this);
+				}
+			}
+#endif //CLIENT_DLL
+		}
+	}
+
+	SetPickupTouch();
+
+	SetThink(&CBaseCombatWeapon::FallThink);
+
+	SetNextThink(gpGlobals->curtime + 0.1f);
+
+#endif
+}
+
+const CHL2MPSWeaponInfo& CBaseHLCombatWeapon::GetHL2MPWpnData() const
+{
+	const FileWeaponInfo_t* pWeaponInfo = &GetWpnData();
+	const CHL2MPSWeaponInfo* pHL2MPInfo;
+
+#ifdef _DEBUG
+	pHL2MPInfo = dynamic_cast<const CHL2MPSWeaponInfo*>(pWeaponInfo);
+	Assert(pHL2MPInfo);
+#else
+	pHL2MPInfo = static_cast<const CHL2MPSWeaponInfo*>(pWeaponInfo);
+#endif
+
+	return *pHL2MPInfo;
+}
+
+void CBaseHLCombatWeapon::FireBullets(const FireBulletsInfo_t& info)
+{
+	FireBulletsInfo_t modinfo = info;
+
+	modinfo.m_iPlayerDamage = GetHL2MPWpnData().m_iPlayerDamage;
+
+	BaseClass::FireBullets(modinfo);
 }
 
 //-----------------------------------------------------------------------------

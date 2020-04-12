@@ -27,7 +27,7 @@
 	#include "voice_gamemgr.h"
 	#include "iscorer.h"
 	#include "hl2mp_player.h"
-	#include "weapon_hl2mpbasehlmpcombatweapon.h"
+	#include "basehlcombatweapon.h"
 	#include "team.h"
 	#include "voice_gamemgr.h"
 	#include "hl2mp_gameinterface.h"
@@ -456,7 +456,7 @@ float CHL2MPRules::FlWeaponTryRespawn( CBaseCombatWeapon *pWeapon )
 Vector CHL2MPRules::VecWeaponRespawnSpot( CBaseCombatWeapon *pWeapon )
 {
 #ifndef CLIENT_DLL
-	CWeaponHL2MPBase *pHL2Weapon = dynamic_cast< CWeaponHL2MPBase*>( pWeapon );
+	CBaseHLCombatWeapon *pHL2Weapon = dynamic_cast< CBaseHLCombatWeapon*>( pWeapon );
 
 	if ( pHL2Weapon )
 	{
@@ -474,9 +474,9 @@ CItem* IsManagedObjectAnItem( CBaseEntity *pObject )
 	return dynamic_cast< CItem*>( pObject );
 }
 
-CWeaponHL2MPBase* IsManagedObjectAWeapon( CBaseEntity *pObject )
+CBaseHLCombatWeapon* IsManagedObjectAWeapon( CBaseEntity *pObject )
 {
-	return dynamic_cast< CWeaponHL2MPBase*>( pObject );
+	return dynamic_cast< CBaseHLCombatWeapon*>( pObject );
 }
 
 bool GetObjectsOriginalParameters( CBaseEntity *pObject, Vector &vOriginalOrigin, QAngle &vOriginalAngles )
@@ -492,7 +492,7 @@ bool GetObjectsOriginalParameters( CBaseEntity *pObject, Vector &vOriginalOrigin
 		pItem->m_flNextResetCheckTime = gpGlobals->curtime + sv_hl2mp_item_respawn_time.GetFloat();
 		return true;
 	}
-	else if ( CWeaponHL2MPBase *pWeapon = IsManagedObjectAWeapon( pObject )) 
+	else if ( CBaseHLCombatWeapon *pWeapon = IsManagedObjectAWeapon( pObject )) 
 	{
 		if ( pWeapon->m_flNextResetCheckTime > gpGlobals->curtime )
 			 return false;
@@ -1123,7 +1123,7 @@ void CHL2MPRules::CleanUpMap()
 	CBaseEntity *pCur = gEntList.FirstEnt();
 	while ( pCur )
 	{
-		CBaseHL2MPCombatWeapon *pWeapon = dynamic_cast< CBaseHL2MPCombatWeapon* >( pCur );
+		CBaseHLCombatWeapon *pWeapon = dynamic_cast< CBaseHLCombatWeapon* >( pCur );
 		// Weapons with owners don't want to be removed..
 		if ( pWeapon )
 		{

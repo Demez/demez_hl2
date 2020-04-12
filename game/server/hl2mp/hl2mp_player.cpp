@@ -5,7 +5,6 @@
 //=============================================================================//
 
 #include "cbase.h"
-#include "weapon_hl2mpbasehlmpcombatweapon.h"
 #include "hl2mp_player.h"
 #include "globalstate.h"
 #include "game.h"
@@ -16,10 +15,10 @@
 #include "hl2mp_gamerules.h"
 #include "KeyValues.h"
 #include "team.h"
-#include "weapon_hl2mpbase.h"
 #include "grenade_satchel.h"
 #include "eventqueue.h"
 #include "gamestats.h"
+#include "basehlcombatweapon.h"
 
 #include "engine/IEngineSound.h"
 #include "SoundEmitterSystem/isoundemittersystembase.h"
@@ -203,6 +202,9 @@ void CHL2MP_Player::GiveAllItems( void )
 
 void CHL2MP_Player::GiveDefaultItems( void )
 {
+	// TODO: store the players items when they die, and give them their previous items if they were in coop
+	// or are we able to just not remove the players items?
+
 	EquipSuit();
 
 	CBasePlayer::GiveAmmo( 255,	"Pistol");
@@ -594,7 +596,7 @@ void CHL2MP_Player::FireBullets ( const FireBulletsInfo_t &info )
 
 	FireBulletsInfo_t modinfo = info;
 
-	CWeaponHL2MPBase *pWeapon = dynamic_cast<CWeaponHL2MPBase *>( GetActiveWeapon() );
+	CBaseHLCombatWeapon *pWeapon = dynamic_cast<CBaseHLCombatWeapon *>( GetActiveWeapon() );
 
 	if ( pWeapon )
 	{
