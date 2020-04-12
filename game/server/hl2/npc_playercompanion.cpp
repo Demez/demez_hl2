@@ -348,95 +348,92 @@ void CNPC_PlayerCompanion::GatherConditions()
 {
 	BaseClass::GatherConditions();
 
-	if ( AI_IsSinglePlayer() )
-	{
-		CBasePlayer *pPlayer = UTIL_GetLocalPlayer();
+	CBasePlayer *pPlayer = ToBasePlayer( GetFollowBehavior().GetFollowTarget() );
 
-		if ( Classify() == CLASS_PLAYER_ALLY_VITAL )
+	if ( pPlayer && Classify() == CLASS_PLAYER_ALLY_VITAL )
+	{
+		bool bInPlayerSquad = ( m_pSquad && MAKE_STRING(m_pSquad->GetName()) == GetPlayerSquadName() );
+		if ( bInPlayerSquad )
 		{
-			bool bInPlayerSquad = ( m_pSquad && MAKE_STRING(m_pSquad->GetName()) == GetPlayerSquadName() );
-			if ( bInPlayerSquad )
+			if ( GetState() == NPC_STATE_SCRIPT || ( !HasCondition( COND_SEE_PLAYER ) && (GetAbsOrigin() - pPlayer->GetAbsOrigin()).LengthSqr() > Square(50 * 12) ) )
 			{
-				if ( GetState() == NPC_STATE_SCRIPT || ( !HasCondition( COND_SEE_PLAYER ) && (GetAbsOrigin() - pPlayer->GetAbsOrigin()).LengthSqr() > Square(50 * 12) ) )
-				{
-					RemoveFromSquad();
-				}
+				RemoveFromSquad();
 			}
-			else if ( GetState() != NPC_STATE_SCRIPT )
+		}
+		else if ( GetState() != NPC_STATE_SCRIPT )
+		{
+			if ( HasCondition( COND_SEE_PLAYER ) && (GetAbsOrigin() - pPlayer->GetAbsOrigin()).LengthSqr() < Square(25 * 12) )
 			{
-				if ( HasCondition( COND_SEE_PLAYER ) && (GetAbsOrigin() - pPlayer->GetAbsOrigin()).LengthSqr() < Square(25 * 12) )
+				if ( hl2_episodic.GetBool() )
 				{
-					if ( hl2_episodic.GetBool() )
-					{
-						// Don't stomp our squad if we're in one
-						if ( GetSquad() == NULL )
-						{
-							AddToSquad( GetPlayerSquadName() );
-						}
-					}
-					else
+					// Don't stomp our squad if we're in one
+					if ( GetSquad() == NULL )
 					{
 						AddToSquad( GetPlayerSquadName() );
 					}
 				}
-			}
-		}
-
-		m_flBoostSpeed = 0;
-
-		if ( m_AnnounceAttackTimer.Expired() &&
-			 ( GetLastEnemyTime() == 0.0 || gpGlobals->curtime - GetLastEnemyTime() > 20 ) )
-		{
-			// Always delay when an encounter begins
-			m_AnnounceAttackTimer.Set( 4, 8 );
-		}
-
-		if ( GetFollowBehavior().GetFollowTarget() && 
-			 ( GetFollowBehavior().GetFollowTarget()->IsPlayer() || GetCommandGoal() != vec3_invalid ) && 
-			 GetFollowBehavior().IsMovingToFollowTarget() && 
-			 GetFollowBehavior().GetGoalRange() > 0.1 &&
-			 BaseClass::GetIdealSpeed() > 0.1 )
-		{
-			Vector vPlayerToFollower = GetAbsOrigin() - pPlayer->GetAbsOrigin();
-			float dist = vPlayerToFollower.NormalizeInPlace();
-
-			bool bDoSpeedBoost = false;
-			if ( !HasCondition( COND_IN_PVS ) )
-				bDoSpeedBoost = true;
-			else if ( GetFollowBehavior().GetFollowTarget()->IsPlayer() )
-			{
-				if ( dist > GetFollowBehavior().GetGoalRange() * 2 )
+				else
 				{
-					float dot = vPlayerToFollower.Dot( pPlayer->EyeDirection3D() );
-					if ( dot < 0 )
-					{
-						bDoSpeedBoost = true;
-					}
+					AddToSquad( GetPlayerSquadName() );
 				}
 			}
+		}
+	}
 
-			if ( bDoSpeedBoost )
+	m_flBoostSpeed = 0;
+
+	if ( m_AnnounceAttackTimer.Expired() &&
+			( GetLastEnemyTime() == 0.0 || gpGlobals->curtime - GetLastEnemyTime() > 20 ) )
+	{
+		// Always delay when an encounter begins
+		m_AnnounceAttackTimer.Set( 4, 8 );
+	}
+
+	if ( GetFollowBehavior().GetFollowTarget() && 
+			( GetFollowBehavior().GetFollowTarget()->IsPlayer() || GetCommandGoal() != vec3_invalid ) && 
+			GetFollowBehavior().IsMovingToFollowTarget() && 
+			GetFollowBehavior().GetGoalRange() > 0.1 &&
+			BaseClass::GetIdealSpeed() > 0.1 )
+	{
+		Vector vPlayerToFollower = GetAbsOrigin() - pPlayer->GetAbsOrigin();
+		float dist = vPlayerToFollower.NormalizeInPlace();
+
+		bool bDoSpeedBoost = false;
+		if ( !HasCondition( COND_IN_PVS ) )
+			bDoSpeedBoost = true;
+		else if ( GetFollowBehavior().GetFollowTarget()->IsPlayer() )
+		{
+			if ( dist > GetFollowBehavior().GetGoalRange() * 2 )
 			{
-				float lag = dist / GetFollowBehavior().GetGoalRange();
-
-				float mult;
-				
-				if ( lag > 10.0 )
-					mult = 2.0;
-				else if ( lag > 5.0 )
-					mult = 1.5;
-				else if ( lag > 3.0 )
-					mult = 1.25;
-				else
-					mult = 1.1;
-
-				m_flBoostSpeed = pPlayer->GetSmoothedVelocity().Length();
-
-				if ( m_flBoostSpeed < BaseClass::GetIdealSpeed() )
-					m_flBoostSpeed = BaseClass::GetIdealSpeed();
-
-				m_flBoostSpeed *= mult;
+				float dot = vPlayerToFollower.Dot( pPlayer->EyeDirection3D() );
+				if ( dot < 0 )
+				{
+					bDoSpeedBoost = true;
+				}
 			}
+		}
+
+		if ( bDoSpeedBoost )
+		{
+			float lag = dist / GetFollowBehavior().GetGoalRange();
+
+			float mult;
+				
+			if ( lag > 10.0 )
+				mult = 2.0;
+			else if ( lag > 5.0 )
+				mult = 1.5;
+			else if ( lag > 3.0 )
+				mult = 1.25;
+			else
+				mult = 1.1;
+
+			m_flBoostSpeed = pPlayer->GetSmoothedVelocity().Length();
+
+			if ( m_flBoostSpeed < BaseClass::GetIdealSpeed() )
+				m_flBoostSpeed = BaseClass::GetIdealSpeed();
+
+			m_flBoostSpeed *= mult;
 		}
 	}
 
@@ -496,9 +493,9 @@ void CNPC_PlayerCompanion::GatherConditions()
 		DoCustomSpeechAI();
 	}
 
-	if ( AI_IsSinglePlayer() && hl2_episodic.GetBool() && !GetEnemy() && HasCondition( COND_HEAR_PLAYER ) )
+	if ( pPlayer && hl2_episodic.GetBool() && !GetEnemy() && HasCondition( COND_HEAR_PLAYER ) )
 	{
-		Vector los = ( UTIL_GetLocalPlayer()->EyePosition() - EyePosition() );
+		Vector los = ( pPlayer->EyePosition() - EyePosition() );
 		los.z = 0;
 		VectorNormalize( los );
 
@@ -514,7 +511,7 @@ void CNPC_PlayerCompanion::GatherConditions()
 //-----------------------------------------------------------------------------
 void CNPC_PlayerCompanion::DoCustomSpeechAI( void )
 {
-	CBasePlayer *pPlayer = AI_GetSinglePlayer();
+	CBasePlayer *pPlayer = UTIL_GetNearestPlayerPreferVisible( this );
 	
 	// Don't allow this when we're getting in the car
 #ifdef HL2_EPISODIC
@@ -547,7 +544,7 @@ void CNPC_PlayerCompanion::DoCustomSpeechAI( void )
 //-----------------------------------------------------------------------------
 void CNPC_PlayerCompanion::PredictPlayerPush()
 {
-	CBasePlayer *pPlayer = AI_GetSinglePlayer();
+	CBasePlayer *pPlayer = UTIL_GetNearestPlayerPreferVisible( this );
 	if ( pPlayer && pPlayer->GetSmoothedVelocity().LengthSqr() >= Square(140))
 	{
 		Vector predictedPosition = pPlayer->WorldSpaceCenter() + pPlayer->GetSmoothedVelocity() * .4;
@@ -747,6 +744,7 @@ int CNPC_PlayerCompanion::SelectSchedule()
 		}
 	}
 
+	// yeah throw another exception please
 	return BaseClass::SelectSchedule();
 }
 
@@ -970,17 +968,15 @@ int CNPC_PlayerCompanion::TranslateSchedule( int scheduleType )
 
 			if( CanReload() && pWeapon->UsesClipsForAmmo1() && pWeapon->Clip1() < ( pWeapon->GetMaxClip1() * .5 ) && OccupyStrategySlot( SQUAD_SLOT_EXCLUSIVE_RELOAD ) )
 			{
-				if ( AI_IsSinglePlayer() )
+				CBasePlayer *pPlayer = UTIL_GetNearestPlayerPreferVisible( this );
+				pWeapon = pPlayer->GetActiveWeapon();
+				if( pWeapon && pWeapon->UsesClipsForAmmo1() && 
+					pWeapon->Clip1() < ( pWeapon->GetMaxClip1() * .75 ) &&
+					pPlayer->GetAmmoCount( pWeapon->GetPrimaryAmmoType() ) )
 				{
-					CBasePlayer *pPlayer = UTIL_GetLocalPlayer();
-					pWeapon = pPlayer->GetActiveWeapon();
-					if( pWeapon && pWeapon->UsesClipsForAmmo1() && 
-						pWeapon->Clip1() < ( pWeapon->GetMaxClip1() * .75 ) &&
-						pPlayer->GetAmmoCount( pWeapon->GetPrimaryAmmoType() ) )
-					{
-						SpeakIfAllowed( TLK_PLRELOAD );
-					}
+					SpeakIfAllowed( TLK_PLRELOAD );
 				}
+
 				return SCHED_RELOAD;
 			}
 		}
@@ -1153,10 +1149,7 @@ void CNPC_PlayerCompanion::RunTask( const Task_t *pTask )
 
 		case TASK_PC_GET_PATH_OFF_COMPANION:
 			{
-				if ( AI_IsSinglePlayer() )
-				{
-					GetNavigator()->SetAllowBigStep( UTIL_GetLocalPlayer() );
-				}
+				GetNavigator()->SetAllowBigStep( UTIL_GetNearestPlayer( GetAbsOrigin() ) );
 				ChainRunTask( TASK_MOVE_AWAY_PATH, 48 );
 			}
 			break;
@@ -1513,7 +1506,7 @@ void CNPC_PlayerCompanion::Touch( CBaseEntity *pOther )
 		if ( m_afMemory & bits_MEMORY_PROVOKED )
 			return;
 			
-		TestPlayerPushing( ( pOther->IsPlayer() ) ? pOther : AI_GetSinglePlayer() );
+		TestPlayerPushing( ( pOther->IsPlayer() ) ? pOther : UTIL_GetNearestPlayerPreferVisible( this ) );
 	}
 }
 
@@ -1741,7 +1734,7 @@ void CNPC_PlayerCompanion::UpdateReadiness()
 		}
 	}
 
- 	if( ai_debug_readiness.GetBool() && AI_IsSinglePlayer() )
+ 	if( ai_debug_readiness.GetBool() )
 	{
 		// Draw the readiness-o-meter
 		Vector vecSpot;
@@ -1750,7 +1743,7 @@ void CNPC_PlayerCompanion::UpdateReadiness()
 		const float GRADLENGTH	= 4.0f;
 
 		Vector right;
-		UTIL_PlayerByIndex( 1 )->GetVectors( NULL, &right, NULL );
+		UTIL_GetNearestPlayer( GetAbsOrigin() )->GetVectors( NULL, &right, NULL );
 
 		if ( IsInScriptedReadinessState() )
  		{
@@ -1897,7 +1890,7 @@ bool CNPC_PlayerCompanion::PickTacticalLookTarget( AILookTargetArgs_t *pArgs )
 		// 1/3rd chance to authoritatively look at player
 		if( random->RandomInt( 0, 2 ) == 0 )
 		{
-			pArgs->hTarget = AI_GetSinglePlayer();
+			pArgs->hTarget = UTIL_GetNearestPlayerPreferVisible( this );
 			return true;
 		}
 	}
@@ -2784,7 +2777,7 @@ void CNPC_PlayerCompanion::OnFriendDamaged( CBaseCombatCharacter *pSquadmate, CB
 			}
 		}
 
-		CBasePlayer *pPlayer = AI_GetSinglePlayer();
+		CBasePlayer *pPlayer = UTIL_GetNearestPlayerPreferVisible( this );
 		if ( pPlayer && IsInPlayerSquad() && ( pPlayer->GetAbsOrigin().AsVector2D() - GetAbsOrigin().AsVector2D() ).LengthSqr() < Square( 25*12 ) && IsAllowedToSpeak( TLK_WATCHOUT ) )
 		{
 			if ( !pPlayer->FInViewCone( pAttacker ) )
@@ -3017,11 +3010,10 @@ float CNPC_PlayerCompanion::GetIdealSpeed() const
 float CNPC_PlayerCompanion::GetIdealAccel() const
 {
 	float multiplier = 1.0;
-	if ( AI_IsSinglePlayer() )
-	{
-		if ( m_bMovingAwayFromPlayer && (UTIL_PlayerByIndex(1)->GetAbsOrigin() - GetAbsOrigin()).Length2DSqr() < Square(3.0*12.0) )
-			multiplier = 2.0;
-	}
+	// TODO: can we check if the ai is already following someone and use that person instead?
+	// would need to make this not const
+	if ( m_bMovingAwayFromPlayer && (UTIL_GetNearestPlayer(GetAbsOrigin())->GetAbsOrigin() - GetAbsOrigin()).Length2DSqr() < Square(3.0*12.0) )
+		multiplier = 2.0;
 	return BaseClass::GetIdealAccel() * multiplier;
 }
 
@@ -3084,9 +3076,6 @@ bool CNPC_PlayerCompanion::ShouldAlwaysTransition( void )
 //-----------------------------------------------------------------------------
 void CNPC_PlayerCompanion::InputOutsideTransition( inputdata_t &inputdata )
 {
-	if ( !AI_IsSinglePlayer() )
-		return;
-
 	// Must want to do this
 	if ( ShouldAlwaysTransition() == false )
 		return;
@@ -3684,11 +3673,8 @@ bool CNPC_PlayerCompanion::IsNavigationUrgent( void )
 		// could not see the player but the player could in fact see them.  Now the NPC's facing is
 		// irrelevant and the player's viewcone is more authorative. -- jdw
 
-		CBasePlayer *pLocalPlayer = AI_GetSinglePlayer();
-		if ( pLocalPlayer->FInViewCone( EyePosition() ) )
-			return false;
-
-		return true;
+		// pLocalPlayer->FInViewCone( EyePosition() )
+		return UTIL_IsAnyPlayerLookingAtEntity(this);
 	}
 
 	return bBase;

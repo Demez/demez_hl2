@@ -1127,7 +1127,7 @@ CBaseEntity *CPropJeepEpisodic::OnFailedPhysGunPickup( Vector vPhysgunPos )
 	{
 		// Player's forward direction
 		Vector vecPlayerForward;
-		CBasePlayer *pPlayer = AI_GetSinglePlayer();
+		CBasePlayer *pPlayer = UTIL_GetLocalPlayer();
 		if ( pPlayer == NULL )
 			return NULL;
 
@@ -1594,7 +1594,8 @@ int	CPropJeepEpisodic::DrawDebugTextOverlays( void )
 void CPropJeepEpisodic::InputOutsideTransition( inputdata_t &inputdata )
 {
 	// Teleport into the new map
-	CBasePlayer *pPlayer = AI_GetSinglePlayer();
+	// TODO: would rather not have it just grab any player if possible
+	CBasePlayer *pPlayer = UTIL_GetNearestPlayer( GetAbsOrigin() );
 	Vector vecTeleportPos;
 	QAngle vecTeleportAngles;
 

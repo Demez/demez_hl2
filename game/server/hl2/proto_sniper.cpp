@@ -837,7 +837,7 @@ void CProtoSniper::PaintTarget( const Vector &vecTarget, float flPaintTime )
 //-----------------------------------------------------------------------------
 bool CProtoSniper::IsPlayerAllySniper()
 {
-	CBaseEntity *pPlayer = AI_GetSinglePlayer();
+	CBaseEntity *pPlayer = UTIL_GetNearestPlayer( GetAbsOrigin() );
 
 	return IRelationType( pPlayer ) == D_LI;
 }
@@ -1395,7 +1395,7 @@ int CProtoSniper::SelectSchedule ( void )
 		return SCHED_RELOAD;
 	}
 
-	if( !AI_GetSinglePlayer()->IsAlive() && m_bKilledPlayer )
+	if( AI_IsSinglePlayer() && !AI_GetSinglePlayer()->IsAlive() && m_bKilledPlayer )
 	{
 		if( HasCondition(COND_IN_PVS) )
 		{
@@ -2605,7 +2605,7 @@ Vector CProtoSniper::LeadTarget( CBaseEntity *pTarget )
 CBaseEntity *CProtoSniper::PickDeadPlayerTarget()
 {
 	const int iSearchSize = 32;
-	CBaseEntity *pTarget = AI_GetSinglePlayer();
+	CBaseEntity *pTarget = UTIL_GetNearestPlayerPreferVisible(this);
 	CBaseEntity *pEntities[ iSearchSize ];
 
 	int iNumEntities = UTIL_EntitiesInSphere( pEntities, iSearchSize, AI_GetSinglePlayer()->GetAbsOrigin(), 180.0f, 0 );

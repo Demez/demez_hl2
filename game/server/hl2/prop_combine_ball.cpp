@@ -706,7 +706,7 @@ void CPropCombineBall::WhizSoundThink()
 	pPhysicsObject->GetPosition( &vecPosition, NULL );
 	pPhysicsObject->GetVelocity( &vecVelocity, NULL );
 	
-	CBasePlayer *pPlayer = UTIL_GetLocalPlayer();
+	CBasePlayer *pPlayer = UTIL_GetNearestPlayer( GetAbsOrigin() );
 	if ( pPlayer )
 	{
 		Vector vecDelta;

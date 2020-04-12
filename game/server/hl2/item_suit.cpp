@@ -41,7 +41,7 @@ public:
 	}
 	bool MyTouch( CBasePlayer *pPlayer )
 	{
-		if ( pPlayer->IsSuitEquipped() )
+		if ( gpGlobals->maxClients == 1 && pPlayer->IsSuitEquipped() )
 			return FALSE;
 
 		if ( m_spawnflags & SF_SUIT_SHORTLOGON )

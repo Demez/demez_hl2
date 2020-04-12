@@ -596,7 +596,7 @@ void CPropVehiclePrisonerPod::InputEnterVehicle( inputdata_t &inputdata )
 	if ( pPassenger == NULL )
 	{
 		// Activator was not a player, just grab the singleplayer player.
-		pPassenger = UTIL_PlayerByIndex( 1 );
+		pPassenger = UTIL_GetNearestPlayer( GetAbsOrigin() );
 		if ( pPassenger == NULL )
 			return;
 	}
@@ -623,7 +623,7 @@ void CPropVehiclePrisonerPod::InputEnterVehicleImmediate( inputdata_t &inputdata
 	if ( pPassenger == NULL )
 	{
 		// Activator was not a player, just grab the singleplayer player.
-		pPassenger = UTIL_PlayerByIndex( 1 );
+		pPassenger = UTIL_GetNearestPlayer( GetAbsOrigin() );;
 		if ( pPassenger == NULL )
 			return;
 	}

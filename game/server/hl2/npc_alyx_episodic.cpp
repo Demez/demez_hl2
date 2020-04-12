@@ -143,6 +143,7 @@ ConVar npc_alyx_readiness( "npc_alyx_readiness", "1" );
 ConVar npc_alyx_force_stop_moving( "npc_alyx_force_stop_moving", "1" );
 ConVar npc_alyx_readiness_transitions( "npc_alyx_readiness_transitions", "1" );
 ConVar npc_alyx_crouch( "npc_alyx_crouch", "1" );
+ConVar npc_alyx_broken( "npc_alyx_broken", "0" );
 
 // global pointer to Alyx for fast lookups
 CEntityClassList<CNPC_Alyx> g_AlyxList;
@@ -641,7 +642,7 @@ void CNPC_Alyx::PrescheduleThink( void )
 		// be sure, we wait a bit to prevent this from happening.
 		if ( m_fStayBlindUntil < gpGlobals->curtime )
 		{
- 			CBasePlayer *pPlayer = UTIL_PlayerByIndex(1);
+ 			CBasePlayer *pPlayer = UTIL_GetNearestPlayerPreferVisible( this );
  			if ( pPlayer && (!CanBeBlindedByFlashlight( true ) || !pPlayer->IsIlluminatedByFlashlight(this, NULL ) || !PlayerFlashlightOnMyEyes( pPlayer )) &&
 				!BlindedByFlare() )
 			{
@@ -686,7 +687,7 @@ void CNPC_Alyx::SearchForInteractTargets()
 		return;
 	}
 
-	CBasePlayer *pPlayer = UTIL_PlayerByIndex(1);
+	CBasePlayer *pPlayer = UTIL_GetNearestPlayerPreferVisible( this );
 
 	if( !pPlayer )
 	{
@@ -730,7 +731,7 @@ void CNPC_Alyx::GatherConditions()
 	ClearCondition( COND_ALYX_PLAYER_FLASHLIGHT_EXPIRED );
 	ClearCondition( COND_ALYX_PLAYER_TURNED_ON_FLASHLIGHT );
 	ClearCondition( COND_ALYX_PLAYER_TURNED_OFF_FLASHLIGHT );
-	CBasePlayer *pPlayer = UTIL_PlayerByIndex(1);
+	CBasePlayer *pPlayer = UTIL_GetNearestPlayerPreferVisible( this );
 	if ( pPlayer )
 	{
 		bool bFlashlightState = pPlayer->FlashlightIsOn() != 0;
@@ -1552,17 +1553,15 @@ bool CNPC_Alyx::FInViewCone( CBaseEntity *pEntity )
 //-----------------------------------------------------------------------------
 bool CNPC_Alyx::CanSeeEntityInDarkness( CBaseEntity *pEntity )
 {
-	/*
 	// Alyx can see enemies that are right next to her
 	// Robin: Disabled, made her too effective, you could safely leave her alone.
-  	if ( pEntity->IsNPC() )
+  	if ( npc_alyx_broken.GetBool() && pEntity->IsNPC() )
 	{
 		if ( (pEntity->WorldSpaceCenter() - EyePosition()).LengthSqr() < (80*80) )
 			return true;
 	}
-	*/
 
-	CBasePlayer *pPlayer = UTIL_PlayerByIndex(1);
+	CBasePlayer *pPlayer = UTIL_GetNearestPlayerPreferVisible( this );
 	if ( pPlayer && pEntity != pPlayer )
 	{
 		if ( pPlayer->IsIlluminatedByFlashlight(pEntity, NULL ) )
@@ -3001,7 +3000,7 @@ void CNPC_Alyx::ModifyOrAppendCriteria( AI_CriteriaSet &set )
 	set.AppendCriteria( "darkness_mode", UTIL_VarArgs( "%d", HasCondition( COND_ALYX_IN_DARK ) ) );
 	set.AppendCriteria( "water_level", UTIL_VarArgs( "%d", GetWaterLevel() ) );
 
-	CHL2_Player *pPlayer = assert_cast<CHL2_Player*>( UTIL_PlayerByIndex( 1 ) );
+	CHL2_Player *pPlayer = assert_cast<CHL2_Player*>( UTIL_GetNearestPlayerPreferVisible( this ) );
 	set.AppendCriteria( "num_companions", UTIL_VarArgs( "%d", pPlayer ? pPlayer->GetNumSquadCommandables() : 0 ) );
 	set.AppendCriteria( "flashlight_on", UTIL_VarArgs( "%d", pPlayer ? pPlayer->FlashlightIsOn() : 0 ) );
 
