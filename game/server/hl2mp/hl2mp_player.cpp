@@ -310,7 +310,8 @@ void CHL2MP_Player::Spawn(void)
 
 		RemoveEffects( EF_NODRAW );
 		
-		GiveDefaultItems();
+		if (HL2MPRules()->IsDeathmatch())
+			GiveDefaultItems();
 	}
 
 	RemoveEffects( EF_NOINTERP );
@@ -1236,6 +1237,10 @@ void CHL2MP_Player::Event_Killed( const CTakeDamageInfo &info )
 	CreateRagdollEntity();
 
 	DetonateTripmines();
+
+	// drop all the weapons so the player can pick it up again later
+	// maybe use that suitcase idea synergy had?
+	Weapon_DropAll();
 
 	BaseClass::Event_Killed( subinfo );
 
