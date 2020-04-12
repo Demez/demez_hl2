@@ -36,8 +36,8 @@ void Host_Say( edict_t *pEdict, bool teamonly );
 extern CBaseEntity*	FindPickerEntityClass( CBasePlayer *pPlayer, char *classname );
 extern bool			g_fGameOver;
 
-ConVarRef deathmatch("deathmatch");
-ConVarRef coop("coop");
+ConVar	deathmatch("deathmatch", "0", FCVAR_NOTIFY, "Running a deathmatch server.");
+ConVar	coop("coop", "1", FCVAR_NOTIFY, "Cooperative play.");
 
 void FinishClientPutInServer( CHL2MP_Player *pPlayer, bool bLoadGame )
 {
