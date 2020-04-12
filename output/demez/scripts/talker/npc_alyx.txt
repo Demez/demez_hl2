@@ -27,6 +27,10 @@ response "AlyxDanger"
 	scene "scenes/npc/Alyx/getback02.vcd" respeakdelay 60 
 //	scene "scenes/npc/Alyx/watchout01.vcd"  WATCH OUT!!! 
 //	scene "scenes/npc/Alyx/watchout02.vcd" WATCH OUT!!! 
+
+	scene "scenes/npc/Alyx/getdown01.vcd"
+	scene "scenes/npc/Alyx/watchout01.vcd"
+	scene "scenes/npc/Alyx/watchout02.vcd"
 }
 rule AlyxDanger
 {
@@ -54,7 +58,8 @@ rule AlyxShot
 
 response AlyxEnemyDead
 {
-//   scene "scenes/npc/Alyx/brutal02.vcd" respeakdelay 300
+// was commented out
+   scene "scenes/npc/Alyx/brutal02.vcd" respeakdelay 300
 }
 
 rule AlyxEnemyDead
@@ -78,9 +83,10 @@ rule AlyxHideAndReload
 
 response AlyxTalkPlayerPushed
 {
-//	scene "scenes/npc/Alyx/excuseme01.vcd"
-//	scene "scenes/npc/Alyx/excuseme02.vcd"
-//   scene "scenes/npc/Alyx/excuseme03.vcd" 
+// were all commented out
+	scene "scenes/npc/Alyx/excuseme01.vcd"
+	scene "scenes/npc/Alyx/excuseme02.vcd"
+   scene "scenes/npc/Alyx/excuseme03.vcd" 
 }
 
 rule AlyxTalkPlayerPushed
