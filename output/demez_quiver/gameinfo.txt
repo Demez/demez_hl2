@@ -1,0 +1,38 @@
+"GameInfo"
+{
+	game 		"demez hl2 - quiver"
+	title 		"demez hl2"
+	type		multiplayer_only
+
+	FileSystem
+	{
+		SteamAppId		220	
+		SearchPaths
+		{
+			gamebin		|gameinfo_path|bin
+			
+			game		|gameinfo_path|custom/*
+			game		|gameinfo_path|../demez_base/custom/*
+			game		|gameinfo_path|../ep2/custom/*
+			game		|gameinfo_path|../episodic/custom/*
+			game		|gameinfo_path|../hl2mp/custom/*
+			game		|gameinfo_path|../hl2/custom/*
+			game		|gameinfo_path|../demez_base
+            
+            game		|gameinfo_path|../ep2/ep2_pak.vpk
+			game		|gameinfo_path|../episodic/ep1_pak.vpk
+			game		|gameinfo_path|../hl2/hl2_sound_vo_english.vpk
+			game		|gameinfo_path|../hl2/hl2_pak.vpk
+			game		|gameinfo_path|../hl2/hl2_textures.vpk
+			game		|gameinfo_path|../hl2/hl2_sound_misc.vpk
+			game		|gameinfo_path|../hl2/hl2_misc.vpk
+			
+			game		|gameinfo_path|../ep2
+			game		|gameinfo_path|../episodic
+			game		|gameinfo_path|../hl2
+            
+			core		|gameinfo_path|.
+			core		|gameinfo_path|../core
+		}
+	}
+}

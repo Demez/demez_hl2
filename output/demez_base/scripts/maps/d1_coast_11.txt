@@ -1,0 +1,20 @@
+#include "hl2_base"
+
+"d1_trainstation_05"
+{
+	// checked before everything else
+	"version"	"1"
+	"map_name"	"d1_trainstation_05"
+	
+	"spawn"
+	{
+		"items"		("item_suit", "weapon_pistol")
+	}
+}
+
+"d1_coast_11"
+{
+	
+}
+
+
