@@ -273,7 +273,11 @@ public:
 	void	ApplyGeneralDrag( void );
 	void	ApplySidewaysDrag( const Vector &vecRight );
 
-	void	TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr );
+	void	TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr
+#ifdef ENGINE_2013
+						, CDmgAccumulator* pAccumulator
+#endif
+	);
 
 	void	UpdateEnemyTarget( void );
 
@@ -2827,7 +2831,11 @@ void CNPC_CombineGunship::MakeTracer( const Vector &vecTracerSrc, const trace_t 
 //			*ptr - 
 // Output : int
 //-----------------------------------------------------------------------------
-void CNPC_CombineGunship::TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr )
+void CNPC_CombineGunship::TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr
+#ifdef ENGINE_2013
+									  , CDmgAccumulator* pAccumulator
+#endif
+)
 {
 	// Reflect bullets
 	if ( info.GetDamageType() & DMG_BULLET )
@@ -2862,7 +2870,11 @@ void CNPC_CombineGunship::TraceAttack( const CTakeDamageInfo &info, const Vector
 		return;
 	}
 
+#ifdef ENGINE_2013
+	BaseClass::TraceAttack( info, vecDir, ptr, pAccumulator );
+#else
 	BaseClass::TraceAttack( info, vecDir, ptr );
+#endif
 }
 
 //-----------------------------------------------------------------------------

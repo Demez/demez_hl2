@@ -1,28 +1,36 @@
 // ---------------------------------------------------------------
 // Demez Mod - Shared
+// kind of a mess here, oh well
 // ---------------------------------------------------------------
-macro GAMENAME "../../output/demez"
+macro DEMEZ_SRC_DIR ".."
 
-macro SRCDIR "../quiver/src"
-// macro SRCDIR "../.."
-// include "_$TYPE_base.qpc" "../quiver/src/game/$TYPE"
-include "../quiver/src/game/$TYPE/_$TYPE_base.qpc"
+include "base_scripts/engine_macros.qpc"
 
-macro GAME_FOLDER "demez"
-macro SHARED_DIR "$SRCDIR/game/shared"
-macro SHARED_GAME "$SHARED_DIR/$GAME_FOLDER"
+macro ENGINE_SRC "$DEMEZ_SRC_DIR/$ENGINE_FOLDER"
 
-// temp, keeping until i get around to adding this macro to qpc
-macro _ROOT_DIR_ABS "D:\projects\source\demez_hl2"
+macro SRCDIR "$DEMEZ_SRC_DIR/$ENGINE_FOLDER"         [$ENGINE_QUIVER || $ENGINE_2013]
+macro SRC_DIR "$DEMEZ_SRC_DIR/$ENGINE_FOLDER"        [$ENGINE_ASW || $ENGINE_CSGO]
 
-macro BASE_DEBUG_ARGS "-noborder -sw -novid -dev -game \"$_ROOT_DIR_ABS/output/demez\""
+macro GAMENAME "$DEMEZ_SRC_DIR/output/demez_$ENGINE_OUT_NAME"
+
+include "$DEMEZ_SRC_DIR/$ENGINE_FOLDER/game/$TYPE/_$TYPE_base.qpc" [$ENGINE_QUIVER || $ENGINE_2013]
+include "$DEMEZ_SRC_DIR/$ENGINE_FOLDER/game/$TYPE/$TYPE_base.qpc"  [$ENGINE_CSGO || $ENGINE_ASW]
+
+macro GAME_FOLDER		"demez"
+macro ENGINE_SHARED		"$ENGINE_SRC/game/shared"
+macro SHARED_GAME		"$ENGINE_SHARED/$GAME_FOLDER"
+
+macro FULL_GAME_NAME "$GAME_FOLDER_$ENGINE_OUT_NAME"
+
+macro BASE_DEBUG_ARGS "-noborder -sw -novid -dev -game \"$ROOT_DIR/output/$FULL_GAME_NAME\""
 
 configuration
 {
 	general
 	{
-		out_dir "./$CONFIG/$PLATFORM/$GAME_FOLDER/$TYPE"
-		int_dir "./$CONFIG/$PLATFORM/$GAME_FOLDER/$TYPE"
+		out_dir     "$GAMENAME/bin/$ENGINE_PLATFORM"
+		// out_dir     "$QPC_CONFIG/$PLATFORM/$FULL_GAME_NAME/$TYPE"
+		build_dir   "$QPC_CONFIG/$ENGINE_PLATFORM/$FULL_GAME_NAME/$TYPE"
 		
 		include_directories
 		{
@@ -31,14 +39,14 @@ configuration
 			"shared/hl2"
 			"shared/hl2mp"
 			
-			// "shared/weapons/hl2mp"
+			"shared/weapons/hl2mp"
 			
 			"$TYPE"
 			"$TYPE/hl2"
 			"$TYPE/hl2mp"
 			"$TYPE/episodic"
 			
-			"$SRCDIR/game/$TYPE"
+			"$ENGINE_SRC/game/$TYPE"
 		}
 	}
 
@@ -48,28 +56,32 @@ configuration
 		{
 			"HL2MP"
 			"HL2_EPISODIC"
+			
+			"ENGINE_QUIVER"   [$ENGINE_QUIVER]
+			"ENGINE_2013"     [$ENGINE_2013]
+			"ENGINE_ASW"      [$ENGINE_ASW]
+			"ENGINE_CSGO"     [$ENGINE_CSGO]
 		}
 	}
 	
-    // add to quiver later
     debug
     {
-        command     "$_ROOT_DIR_ABS\quiver/game/bin/$PLATFORM/quiver.exe"
-        working_dir "$SRCDIR/.."
-        arguments   "$BASE_DEBUG_ARGS"							[$RELEASE]
-        arguments   "-hushasserts -noassert $BASE_DEBUG_ARGS"	[$DEBUG]
+        command     "$ENGINE_EXE"
+        working_dir "$ENGINE_GAME"
+        arguments   "$BASE_DEBUG_ARGS"                          [$RELEASE]
+        arguments   "-hushasserts -noassert $BASE_DEBUG_ARGS"   [$DEBUG]
     }
 }
 
 files
 {
-	"$SHARED_DIR/predicted_viewmodel.cpp"
-	"$SHARED_DIR/predicted_viewmodel.h"
+	"$ENGINE_SHARED/predicted_viewmodel.cpp"
+	"$ENGINE_SHARED/predicted_viewmodel.h"
 	
 	// why server only wtf
-	// "$SHARED_DIR/ragdoll_shared.h"
-	// "$SHARED_DIR/solidsetdefaults.h"
-	// "$SHARED_DIR/touchlink.h"
+	// "$ENGINE_SHARED/ragdoll_shared.h"
+	// "$ENGINE_SHARED/solidsetdefaults.h"
+	// "$ENGINE_SHARED/touchlink.h"
 	
 	folder "Game"
 	{
@@ -96,7 +108,7 @@ files
 			"shared/episodic/*"
 		}
 		
-		"$SHARED_DIR/script_intro_shared.cpp"
+		"$ENGINE_SHARED/script_intro_shared.cpp"
 		
 		"shared/hl2/basehlcombatweapon_shared.*"
 		"shared/hl2/citadel_effects_shared.h"
@@ -113,7 +125,7 @@ files
 
 	folder "HL2MP"
 	{
-		/*folder "Weapons Base"
+		folder "Weapons Base"
 		{
 			"shared/weapons/hl2mp/weapon_hl2mpbase.cpp"
 			"shared/weapons/hl2mp/weapon_hl2mpbase.h"
@@ -132,16 +144,17 @@ files
 			"shared/weapons/hl2mp/weapon_crossbow.cpp"
 			"shared/weapons/hl2mp/weapon_crowbar.cpp"
 			"shared/weapons/hl2mp/weapon_frag.cpp"
-			"shared/weapons/hl2mp/weapon_physcannon.cpp"
-			"shared/weapons/hl2mp/weapon_physcannon.h"
+			// "shared/weapons/hl2mp/weapon_physcannon.cpp"
+			// "shared/weapons/hl2mp/weapon_physcannon.h"
 			"shared/weapons/hl2mp/weapon_pistol.cpp"
-			// "shared/weapons/hl2mp/weapon_rpg.cpp"
-			// "shared/weapons/hl2mp/weapon_rpg.h"
+			"shared/weapons/hl2mp/weapon_rpg.cpp"
+			"shared/weapons/hl2mp/weapon_rpg.h"
 			"shared/weapons/hl2mp/weapon_shotgun.cpp"
 			"shared/weapons/hl2mp/weapon_slam.cpp"
 			"shared/weapons/hl2mp/weapon_slam.h"
 			"shared/weapons/hl2mp/weapon_smg1.cpp"
-			// "shared/weapons/hl2mp/weapon_stunstick.cpp"
-		}*/
+			"shared/weapons/hl2mp/weapon_stunstick.cpp"
+			"shared/weapons/hl2mp/weapon_stunstick.h"
+		}
 	}
 }

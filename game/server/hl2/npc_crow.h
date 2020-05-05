@@ -148,7 +148,11 @@ public:
 
 	void InputFlyAway( inputdata_t &inputdata );
 	
-	void TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr );
+	void TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr
+#ifdef ENGINE_2013
+					 , CDmgAccumulator* pAccumulator
+#endif
+	);
 	void StartTargetHandling( CBaseEntity *pTargetEnt );
 
 	DEFINE_CUSTOM_AI;

@@ -95,7 +95,11 @@ public:
 	float	LengthOfLastCombat( void ) const;
 	// bool	IsNavigationUrgent();
 
-	void	TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr );
+	void	TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr
+#ifdef ENGINE_2013
+						, CDmgAccumulator* pAccumulator
+#endif
+	);
 	bool	CanBeHitByMeleeAttack( CBaseEntity *pAttacker );
 	int		OnTakeDamage_Alive( const CTakeDamageInfo &info );
 	bool	FCanCheckAttacks();

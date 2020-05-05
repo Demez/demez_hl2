@@ -83,7 +83,11 @@ public:
 	virtual bool ShouldMoveAndShoot();
 
 	// TraceAttack
-	virtual void TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr );
+	virtual void TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr
+#ifdef ENGINE_2013
+							 , CDmgAccumulator* pAccumulator
+#endif
+	);
 
 	// Speaking
 	virtual void SpeakSentence( int nSentenceType );

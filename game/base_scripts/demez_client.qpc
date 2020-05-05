@@ -1,10 +1,9 @@
 // ---------------------------------------------------------------
 // Demez Mod - Client
 // ---------------------------------------------------------------
-macro PROJECT_NAME "Client - Demez"
 macro TYPE "client"
 
-include "demez_shared.qpc"
+include "base_scripts/demez_shared.qpc"
 
 configuration
 {
@@ -14,10 +13,10 @@ configuration
 		{
 			"client/hl2mp/ui"
 			"./hl2mp"
-			"$SRCDIR/game/shared/hl2mp"
+			"$DEMEZ_SRC_DIR/game/shared/hl2mp"
 			"./hl2"
 			"./hl2/elements"
-			"$SRCDIR/game/shared/hl2"
+			"$DEMEZ_SRC_DIR/game/shared/hl2"
 		}
 	}
 
@@ -32,14 +31,17 @@ configuration
 
 files
 {
-	- "$SHARED_DIR/weapon_parse_default.cpp"
-	- "$SRCDIR/game/client/flashlighteffect.cpp"
-	
-	"$SRCDIR/game/client/c_team_objectiveresource.cpp"
-	"$SRCDIR/game/client/c_team_objectiveresource.h"
-	"$SRCDIR/game/client/hud_voicestatus.cpp"
-	"$SRCDIR/game/client/hud_squadstatus.cpp"
-	// "$SRCDIR/game/client/death.cpp"
+	folder "Base"
+	{
+		// - "../../game/shared/weapon_parse_default.cpp" [$ENGINE_QUIVER]
+		- "$SRCDIR/game/client/flashlighteffect.cpp"
+		
+		"$ENGINE_SRC/game/client/c_team_objectiveresource.cpp"
+		"$ENGINE_SRC/game/client/c_team_objectiveresource.h"
+		"$ENGINE_SRC/game/client/hud_voicestatus.cpp"
+		"$ENGINE_SRC/game/client/hud_squadstatus.cpp"
+		// "$SRCDIR/game/client/death.cpp"
+	}
 	
 	folder "Demez"
 	{
@@ -59,9 +61,10 @@ files
 	folder "Weapons"
 	{
 		"client/hl2/c_weapon__stubs_hl2.cpp"
+		// ok so the client on hl2mp needs this, for whatever reason stuff here isn't done in the shared file
 		"client/hl2/c_weapon_crossbow.cpp"
 		"client/hl2/c_weapon_physcannon.cpp"
-		"client/hl2/c_weapon_stunstick.cpp"
+		// "client/hl2/c_weapon_stunstick.cpp"
 	}
 	
 	folder "NPCs"
@@ -147,6 +150,9 @@ files
 		"client/hl2/hl_in_main.cpp"
 		"client/hl2/hl_prediction.cpp"
 		"client/hl2/ShieldProxy.cpp"
+		
+		"client/hl2/c_waterbullet.cpp"
+		"client/hl2/c_func_monitor.cpp"
 	}
 
 	folder "HL2MP"

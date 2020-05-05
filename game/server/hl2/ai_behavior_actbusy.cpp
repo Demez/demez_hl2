@@ -677,7 +677,7 @@ bool CAI_ActBusyBehavior::ShouldIgnoreSound( CSound *pSound )
 			return true;
 		}
 
-		if ( pBusyAnim && ( pBusyAnim->iBusyInterruptType == BA_INT_AMBUSH ) || ( pBusyAnim->iBusyInterruptType == BA_INT_COMBAT ) )
+		if ( pBusyAnim && ( ( pBusyAnim->iBusyInterruptType == BA_INT_AMBUSH ) || ( pBusyAnim->iBusyInterruptType == BA_INT_COMBAT ) ) )
 		{
 			/*
 			// Robin: First version ignored sounds in front of the NPC.
@@ -1500,7 +1500,7 @@ bool CAI_ActBusyBehavior::ShouldPlayerAvoid( void )
 	{
 		if ( IsCurSchedule ( SCHED_ACTBUSY_START_BUSYING ) )
 		{
-			if ( GetCurTask() && GetCurTask()->iTask == TASK_WAIT_FOR_MOVEMENT || GetOuter()->GetTask()->iTask == TASK_ACTBUSY_PLAY_ENTRY )
+			if ( ( GetCurTask() && GetCurTask()->iTask == TASK_WAIT_FOR_MOVEMENT ) || GetOuter()->GetTask()->iTask == TASK_ACTBUSY_PLAY_ENTRY )
 				return true;
 		}
 		else if ( IsCurSchedule(SCHED_ACTBUSY_STOP_BUSYING) )

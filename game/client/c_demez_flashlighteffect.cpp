@@ -5,7 +5,6 @@
 //===========================================================================//
 
 #include "cbase.h"
-// #include "c_demez_flashlighteffect.h"
 #include "flashlighteffect.h"
 #include "dlight.h"
 #include "iefx.h"
@@ -21,7 +20,11 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
+#ifdef ENGINE_QUIVER
 extern ConVar r_shadowmapresolution;
+#else
+extern ConVar r_flashlightdepthres;
+#endif
 
 static ConVar r_newflashlight( "r_newflashlight", "1", FCVAR_CHEAT, "" );
 static ConVar r_swingflashlight( "r_swingflashlight", "1", FCVAR_CHEAT );
@@ -35,7 +38,7 @@ static ConVar r_flashlightladderdist( "r_flashlightladderdist", "40.0", FCVAR_CH
 static ConVar r_flashlightnearoffsetscale( "r_flashlightnearoffsetscale", "1.0", FCVAR_CHEAT );
 static ConVar r_flashlightbacktraceoffset( "r_flashlightbacktraceoffset", "0.4", FCVAR_CHEAT );
 
-static ConVar r_flashlight_filtersize( "r_flashlight_filtersize", "0.5", FCVAR_CHEAT );
+static ConVar r_flashlight_filtersize( "r_flashlight_filtersize", "1.0", FCVAR_CHEAT );
 static ConVar r_flashlightconstant( "r_flashlightconstant", "0.0", FCVAR_CHEAT );
 
 static ConVar r_flashlightfov( "r_flashlightfov", "90.0", FCVAR_CHEAT );
@@ -91,7 +94,9 @@ CFlashlightEffect::~CFlashlightEffect()
 void CFlashlightEffect::TurnOn()
 {
 	m_bIsOn = true;
+#ifndef ENGINE_2013
 	m_flCurrentPullBackDist = 1.0f;
+#endif
 }
 
 
@@ -218,6 +223,7 @@ void CFlashlightEffect::UpdateLightNew(const Vector &vecPos, const Vector &vecFo
 		debugoverlay->AddLineOverlay( vOrigin, pmDirectionTrace.endpos, 255, 0, 0, false, 0 );
 	}
 
+#ifndef ENGINE_2013
 	float flDist = (pmDirectionTrace.endpos - vOrigin).Length();
 	if ( flDist < flDistCutoff )
 	{
@@ -244,6 +250,7 @@ void CFlashlightEffect::UpdateLightNew(const Vector &vecPos, const Vector &vecFo
 		m_flCurrentPullBackDist = Lerp( flDistDrag, m_flCurrentPullBackDist, 0.0f );
 	}
 	vOrigin = vOrigin - vDir * m_flCurrentPullBackDist;
+#endif
 
 	state.m_vecLightOrigin = vOrigin;
 
@@ -311,11 +318,20 @@ void CFlashlightEffect::UpdateLightNew(const Vector &vecPos, const Vector &vecFo
 	state.m_Color[2] = 1.0f;
 	state.m_Color[3] = r_flashlightambient.GetFloat();
 	//state.m_NearZ = r_flashlightnear.GetFloat() + m_flCurrentPullBackDist;	// Push near plane out so that we don't clip the world when the flashlight pulls back 
-	state.m_NearZ = r_flashlightnear.GetFloat() + r_flashlightnearoffsetscale.GetFloat() * m_flCurrentPullBackDist;	// Optionally Push near plane out so that we don't clip the world when the flashlight pulls back 
+	state.m_NearZ = r_flashlightnear.GetFloat() + r_flashlightnearoffsetscale.GetFloat()
+#ifndef ENGINE_2013
+		* m_flCurrentPullBackDist
+#endif
+		;	// Optionally Push near plane out so that we don't clip the world when the flashlight pulls back 
 	state.m_FarZ = r_flashlightfar.GetFloat();
 	//state.m_bEnableShadows = r_flashlightdepthtexture.GetBool();
 	state.m_bEnableShadows = true;
+
+#ifdef ENGINE_QUIVER
 	state.m_flShadowMapResolution = r_shadowmapresolution.GetInt();
+#else
+	state.m_flShadowMapResolution = r_flashlightdepthres.GetInt();
+#endif
 
 	state.m_flShadowFilterSize = r_flashlight_filtersize.GetFloat();
 
@@ -323,8 +339,11 @@ void CFlashlightEffect::UpdateLightNew(const Vector &vecPos, const Vector &vecFo
 	state.m_nSpotlightTextureFrame = 0;
 
 	state.m_flShadowAtten = r_flashlightshadowatten.GetFloat();
+
+#if defined(ENGINE_QUIVER) || defined(ENGINE_ASW)
 	state.m_flShadowSlopeScaleDepthBias = g_pMaterialSystemHardwareConfig->GetShadowSlopeScaleDepthBias();
 	state.m_flShadowDepthBias = g_pMaterialSystemHardwareConfig->GetShadowDepthBias();
+#endif
 
 	if( m_FlashlightHandle == CLIENTSHADOW_INVALID_HANDLE )
 	{

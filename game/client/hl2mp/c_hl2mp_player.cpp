@@ -12,6 +12,7 @@
 #include "hl2mp_gamerules.h"
 #include "in_buttons.h"
 #include "iviewrender_beams.h"			// flashlight beam
+#include "flashlighteffect.h"			// actual flashlight, convar toggle
 #include "r_efx.h"
 #include "dlight.h"
 
@@ -42,6 +43,8 @@ END_PREDICTION_DATA()
 
 static ConVar cl_playermodel( "cl_playermodel", "none", FCVAR_USERINFO | FCVAR_ARCHIVE | FCVAR_SERVER_CAN_EXECUTE, "Default Player Model");
 static ConVar cl_defaultweapon( "cl_defaultweapon", "weapon_physcannon", FCVAR_USERINFO | FCVAR_ARCHIVE, "Default Spawn Weapon");
+
+static ConVar demez_cl_flashlight( "demez_cl_flashlight", "1", FCVAR_ARCHIVE, "Use better flashlight or awful beam flashlight");
 
 void SpawnBlood (Vector vecSpot, const Vector &vecDir, int bloodColor, float flDamage);
 
@@ -367,7 +370,12 @@ void C_HL2MP_Player::AddEntity( void )
 
 	if( this != C_BasePlayer::GetLocalPlayer() )
 	{
-		if ( IsEffectActive( EF_DIMLIGHT ) )
+		if ( demez_cl_flashlight.GetBool() )
+		{
+			BaseClass::UpdateFlashlight();
+			return;
+		}
+		else if ( IsEffectActive( EF_DIMLIGHT ) )
 		{
 			int iAttachment = LookupAttachment( "anim_attachment_RH" );
 
@@ -709,7 +717,13 @@ void C_HL2MP_Player::CalcView( Vector &eyeOrigin, QAngle &eyeAngles, float &zNea
 		AngleVectors( eyeAngles, &vForward );
 
 		VectorNormalize( vForward );
+#ifdef ENGINE_QUIVER
 		VectorMA( origin, -CHASE_CAM_DISTANCE, vForward, eyeOrigin );
+#elif ENGINE_2013
+		VectorMA( origin, -CHASE_CAM_DISTANCE_MAX, vForward, eyeOrigin );
+#else
+#error "No CHASE_CAM_DISTANCE macro set for this"
+#endif
 
 		Vector WALL_MIN( -WALL_OFFSET, -WALL_OFFSET, -WALL_OFFSET );
 		Vector WALL_MAX( WALL_OFFSET, WALL_OFFSET, WALL_OFFSET );

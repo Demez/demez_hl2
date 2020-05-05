@@ -110,7 +110,11 @@ public:
 	virtual void MoanSound( envelopePoint_t *pEnvelope, int iEnvelopeSize );
 
 	virtual void Event_Killed( const CTakeDamageInfo &info );
-	virtual void TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr );
+	virtual void TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr
+#ifdef ENGINE_2013
+							 , CDmgAccumulator* pAccumulator
+#endif
+	);
 	virtual void RunTask( const Task_t *pTask );
 	virtual int  MeleeAttack1Conditions ( float flDot, float flDist );
 
@@ -508,9 +512,16 @@ bool CNPC_Zombine::HandleInteraction( int interactionType, void *data, CBaseComb
 	return BaseClass::HandleInteraction( interactionType, data, sourceEnt );
 }
 
-void CNPC_Zombine::TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr )
+void CNPC_Zombine::TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr
+#ifdef ENGINE_2013
+							   , CDmgAccumulator* pAccumulator )
+{
+	BaseClass::TraceAttack( info, vecDir, ptr, pAccumulator );
+#else
+)
 {
 	BaseClass::TraceAttack( info, vecDir, ptr );
+#endif
 
 	//Only knock grenades off their hands if it's a player doing the damage.
 	if ( info.GetAttacker() && info.GetAttacker()->IsNPC() )

@@ -416,14 +416,22 @@ int CNPC_BaseScanner::OnTakeDamage_Dying( const CTakeDamageInfo &info )
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
+#ifdef ENGINE_2013
+void CNPC_BaseScanner::TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr, CDmgAccumulator* pAccumulator )
+#else
 void CNPC_BaseScanner::TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr )
+#endif
 {
 	if ( info.GetDamageType() & DMG_BULLET)
 	{
 		g_pEffects->Ricochet(ptr->endpos,ptr->plane.normal);
 	}
 
+#ifdef ENGINE_2013
+	BaseClass::TraceAttack( info, vecDir, ptr, pAccumulator );
+#else
 	BaseClass::TraceAttack( info, vecDir, ptr );
+#endif
 }
 
 //-----------------------------------------------------------------------------

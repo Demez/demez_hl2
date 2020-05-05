@@ -1,10 +1,9 @@
 // ---------------------------------------------------------------
 // Demez Mod - Server
 // ---------------------------------------------------------------
-macro PROJECT_NAME "Server - Demez"
 macro TYPE "server"
 
-include "demez_shared.qpc"
+include "base_scripts/demez_shared.qpc"
 
 configuration
 {
@@ -32,51 +31,51 @@ configuration
 files
 {
 	folder "Base"
-	{
-		"$SRCDIR/game/server/ai_relationship.cpp"
-		"$SRCDIR/game/server/basegrenade_concussion.cpp"
-		"$SRCDIR/game/server/basegrenade_contact.cpp"
-		"$SRCDIR/game/server/basegrenade_timed.cpp"
-		"$SRCDIR/game/server/EntityFlame.h"
-		"$SRCDIR/game/server/hl2/Func_Monitor.cpp"
-		"$SRCDIR/game/server/h_cycler.cpp"
-		"$SRCDIR/game/server/h_cycler.h"
-		"$SRCDIR/game/server/monstermaker.cpp"
-		"$SRCDIR/game/server/monstermaker.h"
-		"$SRCDIR/game/server/physics_bone_follower.h"
-		"$SRCDIR/game/server/team_objectiveresource.cpp"
-		"$SRCDIR/game/server/team_objectiveresource.h"
-		"$SRCDIR/game/server/team_spawnpoint.cpp"
-		"$SRCDIR/game/server/team_spawnpoint.h"
+	{			
+		"$ENGINE_SRC/game/server/ai_relationship.cpp"
+		"$ENGINE_SRC/game/server/basegrenade_concussion.cpp"
+		"$ENGINE_SRC/game/server/basegrenade_contact.cpp"
+		"$ENGINE_SRC/game/server/basegrenade_timed.cpp"
+		"$ENGINE_SRC/game/server/EntityFlame.h"
+		"$ENGINE_SRC/game/server/hl2/Func_Monitor.cpp"
+		"$ENGINE_SRC/game/server/h_cycler.cpp"
+		"$ENGINE_SRC/game/server/h_cycler.h"
+		"$ENGINE_SRC/game/server/monstermaker.cpp"
+		"$ENGINE_SRC/game/server/monstermaker.h"
+		"$ENGINE_SRC/game/server/physics_bone_follower.h"
+		"$ENGINE_SRC/game/server/team_objectiveresource.cpp"
+		"$ENGINE_SRC/game/server/team_objectiveresource.h"
+		"$ENGINE_SRC/game/server/team_spawnpoint.cpp"
+		"$ENGINE_SRC/game/server/team_spawnpoint.h"
 		
-		"$SRCDIR/game/server/ai_eventresponse.cpp"
-		"$SRCDIR/game/server/ai_eventresponse.h"
-		"$SRCDIR/game/server/grenadethrown.cpp"
-		"$SRCDIR/game/server/grenadethrown.h"
-		// "$SRCDIR/game/server/logic_achievement.cpp"
-		"$SRCDIR/game/server/vehicle_choreo_generic.cpp"
+		"$ENGINE_SRC/game/server/ai_eventresponse.cpp"
+		"$ENGINE_SRC/game/server/ai_eventresponse.h"
+		"$ENGINE_SRC/game/server/grenadethrown.cpp"
+		"$ENGINE_SRC/game/server/grenadethrown.h"
+		// "$ENGINE_SRC/game/server/logic_achievement.cpp"
+		"$ENGINE_SRC/game/server/vehicle_choreo_generic.cpp"
 		
-		"$SRCDIR/game/shared/ragdoll_shared.h"
-		"$SRCDIR/game/shared/solidsetdefaults.h"
-		"$SRCDIR/game/shared/hl2/survival_gamerules.cpp"
-		"$SRCDIR/game/shared/vehicle_choreo_generic_shared.h"
-		"$SRCDIR/game/shared/touchlink.h"
+		"$ENGINE_SRC/game/shared/ragdoll_shared.h"
+		"$ENGINE_SRC/game/shared/solidsetdefaults.h"
+		"$ENGINE_SRC/game/shared/hl2/survival_gamerules.cpp"
+		"$ENGINE_SRC/game/shared/vehicle_choreo_generic_shared.h"
+		"$ENGINE_SRC/game/shared/touchlink.h"
 	
-		"$SRCDIR/game/shared/teamplayroundbased_gamerules.cpp"
+		"$ENGINE_SRC/game/shared/teamplayroundbased_gamerules.cpp"
 		
-		"$SRCDIR/game/server/BaseBludgeonWeapon.cpp"
-		"$SRCDIR/game/server/BaseBludgeonWeapon.h"
+		"$ENGINE_SRC/game/server/BaseBludgeonWeapon.cpp"
+		"$ENGINE_SRC/game/server/BaseBludgeonWeapon.h"
 			
 		folder "AI"
 		{
-			"$SRCDIR/game/server/ai_behavior_passenger.cpp"
-			"$SRCDIR/game/server/ai_behavior_passenger.h"
+			"$ENGINE_SRC/game/server/ai_behavior_passenger.cpp"
+			"$ENGINE_SRC/game/server/ai_behavior_passenger.h"
 		}
 			
 		folder "NPCs"
 		{
-			"$SRCDIR/game/server/npc_Talker.cpp"
-			"$SRCDIR/game/server/npc_Talker.h"
+			"$ENGINE_SRC/game/server/npc_Talker.cpp"
+			"$ENGINE_SRC/game/server/npc_Talker.h"
 		}
 	}
 	
@@ -175,17 +174,18 @@ files
 	
 	folder "Weapons"
 	{
-		"$SRCDIR/game/server/weapon_cubemap.cpp"
+		"$ENGINE_SRC/game/server/weapon_cubemap.cpp"
 		
-		"server/weapons/hl2/weapon_rpg.cpp"
-		"server/weapons/hl2/weapon_rpg.h"
+		// "server/weapons/hl2/weapon_rpg.cpp"
+		// "server/weapons/hl2/weapon_rpg.h"
 	
 		"server/weapons/hl2/weapon_alyxgun.cpp"
 		"server/weapons/hl2/weapon_alyxgun.h"
 		"server/weapons/hl2/weapon_annabelle.cpp"
 		"server/weapons/hl2/weapon_bugbait.cpp"
-		
 		"server/weapons/hl2/weapon_gauss.h"
+		"server/weapons/hl2/weapon_physcannon.cpp"
+		"server/weapons/hl2/weapon_physcannon.h"
 		
 		"server/hl2/grenade_ar2.cpp"
 		"server/hl2/grenade_ar2.h"
@@ -196,6 +196,7 @@ files
 		"server/hl2/grenade_spit.cpp"
 		"server/hl2/grenade_spit.h"
 		
+		/*
 		"server/weapons/hl2/weapon_ar2.cpp"
 		"server/weapons/hl2/weapon_ar2.h"
 		
@@ -206,13 +207,12 @@ files
 		"server/weapons/hl2/weapon_crowbar.cpp"
 		"server/weapons/hl2/weapon_crowbar.h"
 		"server/weapons/hl2/weapon_frag.cpp"
-		"server/weapons/hl2/weapon_physcannon.cpp"
-		"server/weapons/hl2/weapon_physcannon.h"
 		"server/weapons/hl2/weapon_pistol.cpp"
 		"server/weapons/hl2/weapon_shotgun.cpp"
 		"server/weapons/hl2/weapon_smg1.cpp"
 		"server/weapons/hl2/weapon_stunstick.cpp"
 		"server/weapons/hl2/weapon_stunstick.h"
+		*/
 	}
 	
 	folder "AI"
@@ -327,6 +327,8 @@ files
 
 		"server/hl2/func_bulletshield.cpp"
 		"server/hl2/func_bulletshield.h"
+		
+		"server/hl2/te_gaussexplosion.cpp"
 
 		folder "unused"
 		{

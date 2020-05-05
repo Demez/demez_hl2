@@ -25,8 +25,10 @@ public:
 	void Spawn( void );
 	void Precache( void );
 
+#ifndef ENGINE_2013
 	int OnTakeDamage_Alive( const CTakeDamageInfo &info );
-	
+#endif
+
 	void WarningThink( void );
 	void PowerupThink( void );
 	void BeamBreakThink( void );

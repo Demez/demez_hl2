@@ -111,7 +111,11 @@ public:
 	void			DampenForwardMotion( Vector &vecVehicleEyePos, QAngle &vecVehicleEyeAngles, float flFrameTime );
 	void			DampenUpMotion( Vector &vecVehicleEyePos, QAngle &vecVehicleEyeAngles, float flFrameTime );
 
-	virtual void	TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr );
+	virtual void	TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr
+#ifdef ENGINE_2013
+								, CDmgAccumulator* pAccumulator
+#endif
+	);
 	virtual int		OnTakeDamage( const CTakeDamageInfo &info );
 
 	void VPhysicsUpdate( IPhysicsObject *pPhysics );
@@ -818,7 +822,11 @@ Vector CPropAirboat::GetSmoothedVelocity( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CPropAirboat::TraceAttack( const CTakeDamageInfo &inputInfo, const Vector &vecDir, trace_t *ptr )
+void CPropAirboat::TraceAttack( const CTakeDamageInfo &inputInfo, const Vector &vecDir, trace_t *ptr
+#ifdef ENGINE_2013
+							   , CDmgAccumulator* pAccumulator
+#endif
+)
 {
 	CTakeDamageInfo info = inputInfo;
 	if ( ptr->hitbox != VEHICLE_HITBOX_DRIVER )
@@ -829,7 +837,11 @@ void CPropAirboat::TraceAttack( const CTakeDamageInfo &inputInfo, const Vector &
 		}
 	}
 
+#ifdef ENGINE_2013
+	BaseClass::TraceAttack( info, vecDir, ptr, pAccumulator );
+#else
 	BaseClass::TraceAttack( info, vecDir, ptr );
+#endif
 }
 
 //-----------------------------------------------------------------------------

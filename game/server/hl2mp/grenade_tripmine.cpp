@@ -229,6 +229,7 @@ void CTripmineGrenade::BeamBreakThink( void  )
 	SetNextThink( gpGlobals->curtime + 0.05f );
 }
 
+#ifndef ENGINE_2013
 int CTripmineGrenade::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 {
 	if (gpGlobals->curtime < m_flPowerUp && info.GetDamage() < m_iHealth)
@@ -242,6 +243,7 @@ int CTripmineGrenade::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 	}
 	return BaseClass::OnTakeDamage_Alive( info );
 }
+#endif
 
 //-----------------------------------------------------------------------------
 // Purpose:

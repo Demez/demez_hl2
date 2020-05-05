@@ -97,7 +97,13 @@ public:
 	void		Precache( void );
 	void		Spawn( void );
 	int			OnTakeDamage_Alive( const CTakeDamageInfo &info );
+
+#ifdef ENGINE_2013
+	void		TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr, CDmgAccumulator* pAccumulator );
+#else
 	void		TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr );
+#endif
+
 	void		BuildScheduleTestBits( void );
 	void		GatherConditions( void );
 	void		PrescheduleThink( void );

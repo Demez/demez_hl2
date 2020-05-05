@@ -7,7 +7,6 @@
 
 #include "cbase.h"
 #include "grenade_ar2.h"
-#include "weapon_ar2.h" // this is including server/hl2/weapon_ar2.h, just so it compiles, idk why it breaks with hl2mp weapon_ar2.h
 #include "soundent.h"
 #include "decals.h"
 #include "shake.h"
@@ -16,6 +15,7 @@
 #include "vstdlib/random.h"
 #include "engine/IEngineSound.h"
 #include "world.h"
+#include "weapon_ar2.h"
 
 #ifdef PORTAL
 	#include "portal_util_shared.h"

@@ -55,6 +55,14 @@ END_PREDICTION_DATA()
 
 ConVar sk_auto_reload_time( "sk_auto_reload_time", "3", FCVAR_REPLICATED );
 
+CBaseHLCombatWeapon::CBaseHLCombatWeapon()
+{
+	SetPredictionEligible( true );
+	AddSolidFlags( FSOLID_TRIGGER ); // Nothing collides with these but it gets touches.
+
+	m_flNextResetCheckTime = 0.0f;
+}
+
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -426,6 +434,35 @@ bool CBaseHLCombatWeapon::IsPredicted() const
 {
 	return true;
 }
+
+#ifdef CLIENT_DLL
+void CBaseHLCombatWeapon::OnDataChanged(DataUpdateType_t type)
+{
+	BaseClass::OnDataChanged(type);
+
+	if (GetPredictable() && !ShouldPredict())
+		ShutdownPredictable();
+}
+
+
+bool CBaseHLCombatWeapon::ShouldPredict()
+{
+	if (GetOwner() && GetOwner() == C_BasePlayer::GetLocalPlayer())
+		return true;
+
+	return BaseClass::ShouldPredict();
+}
+
+#include "c_te_effect_dispatch.h"
+
+#define NUM_MUZZLE_FLASH_TYPES 4
+
+bool CBaseHLCombatWeapon::OnFireEvent(C_BaseViewModel* pViewModel, const Vector& origin, const QAngle& angles, int event, const char* options)
+{
+	return BaseClass::OnFireEvent(pViewModel, origin, angles, event, options);
+}
+
+#endif
 
 void CBaseHLCombatWeapon::WeaponSound(WeaponSound_t sound_type, float soundtime /* = 0.0f */)
 {

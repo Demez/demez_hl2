@@ -1264,14 +1264,22 @@ void CBaseHelicopter::DrawDebugGeometryOverlays(void)
 // Input  :
 // Output : 
 //-----------------------------------------------------------------------------
-void CBaseHelicopter::TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr )
+void CBaseHelicopter::TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr
+#ifdef ENGINE_2013
+								  , CDmgAccumulator* pAccumulator
+#endif
+)
 {
 	// Take no damage from trace attacks unless it's blast damage. RadiusDamage() sometimes calls
 	// TraceAttack() as a means for delivering blast damage. Usually when the explosive penetrates
 	// the target. (RPG missiles do this sometimes).
 	if( info.GetDamageType() & (DMG_BLAST|DMG_AIRBOAT) )
 	{
+#ifdef ENGINE_2013
+		BaseClass::TraceAttack( info, vecDir, ptr, pAccumulator );
+#else
 		BaseClass::TraceAttack( info, vecDir, ptr );
+#endif
 	}
 }
 

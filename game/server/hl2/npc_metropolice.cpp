@@ -12,13 +12,15 @@
 #include "ai_tacticalservices.h"
 #include "npc_manhack.h"
 #include "npc_metropolice.h"
-#include "weapon_stunstick.h"
 #include "basegrenade_shared.h"
+#include "te_effect_dispatch.h"
+#include "effect_dispatch_data.h"
 #include "ai_route.h"
-#include "hl2_player.h"
+#include "hl2mp_player.h"
 #include "iservervehicle.h"
 #include "items.h"
-#include "hl2_gamerules.h"
+#include "weapon_stunstick.h"
+// #include "hl2mp_gamerules.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -3810,7 +3812,11 @@ bool CNPC_MetroPolice::IsHeavyDamage( const CTakeDamageInfo &info )
 //-----------------------------------------------------------------------------
 // TraceAttack
 //-----------------------------------------------------------------------------
-void CNPC_MetroPolice::TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr )
+void CNPC_MetroPolice::TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr
+#ifdef ENGINE_2013
+								   , CDmgAccumulator* pAccumulator
+#endif
+)
 {
 	// This is needed so we can keep track of the direction of the shot
 	// because we're going to use it to choose the flinch animation
@@ -3830,7 +3836,23 @@ void CNPC_MetroPolice::TraceAttack( const CTakeDamageInfo &info, const Vector &v
 		}
 	}
 
+	if ( ptr->hitgroup == HITGROUP_HEAD )
+	{
+		CEffectData data;
+		data.m_vOrigin = ptr->endpos;
+		data.m_vAngles = GetAbsAngles();
+		data.m_vNormal = (vecDir)* -1;
+
+		DispatchEffect( "HeadshotSpark", data );
+
+		EmitSound( "gore/bhit_helmet-1.wav" );
+	}
+
+#ifdef ENGINE_2013
+	BaseClass::TraceAttack( info, vecDir, ptr, pAccumulator );
+#else
 	BaseClass::TraceAttack( info, vecDir, ptr );
+#endif
 }
 
 //-----------------------------------------------------------------------------

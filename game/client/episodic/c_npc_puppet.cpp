@@ -22,7 +22,11 @@ public:
 	virtual void	ClientThink( void );
 	virtual void	OnDataChanged( DataUpdateType_t updateType );
 	virtual void	BuildTransformations( CStudioHdr *pStudioHdr, Vector *pos, Quaternion q[], const matrix3x4_t& cameraTransform, int boneMask, CBoneBitList &boneComputed );
+#ifdef ENGINE_2013
+	virtual	void	AccumulateLayers( IBoneSetup &boneSetup, Vector pos[], Quaternion q[], float currentTime );
+#else
 	virtual	void	AccumulateLayers( CStudioHdr *hdr, Vector pos[], Quaternion q[], float poseparam[], float currentTime, int boneMask );
+#endif
 
 	EHANDLE		m_hAnimationTarget;
 	int			m_nTargetAttachment;
@@ -104,7 +108,11 @@ void C_NPC_Puppet::ClientThink( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
+#ifdef ENGINE_2013
+void C_NPC_Puppet::AccumulateLayers( IBoneSetup &boneSetup, Vector pos[], Quaternion q[], float currentTime )
+#else
 void C_NPC_Puppet::AccumulateLayers( CStudioHdr *hdr, Vector pos[], Quaternion q[], float poseparam[], float currentTime, int boneMask )
+#endif
 {
 	if ( m_hAnimationTarget == NULL )
 		return;
@@ -150,7 +158,12 @@ void C_NPC_Puppet::AccumulateLayers( CStudioHdr *hdr, Vector pos[], Quaternion q
 					if (fWeight > 1)
 						fWeight = 1;
 
+#ifdef ENGINE_2013
+					boneSetup.AccumulatePose( pos, q, nSequence, fCycle, fWeight, currentTime, NULL );
+#elif ENGINE_QUIVER
 					AccumulatePose( hdr, NULL, pos, q, nSequence, fCycle, poseparam, boneMask, fWeight, currentTime );
+#endif
+					
 
 #if _DEBUG
 					if (Q_stristr( hdr->pszName(), r_sequence_debug.GetString()) != NULL)

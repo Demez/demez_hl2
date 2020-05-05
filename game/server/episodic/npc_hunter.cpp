@@ -1277,7 +1277,11 @@ public:
 	//---------------------------------
 	// Damage handling
 	//---------------------------------
-	void			TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr );
+	void			TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr
+#ifdef ENGINE_2013
+								, CDmgAccumulator* pAccumulator
+#endif
+	);
 	bool			IsHeavyDamage( const CTakeDamageInfo &info );
 	int				OnTakeDamage( const CTakeDamageInfo &info );
 	int				OnTakeDamage_Alive( const CTakeDamageInfo &info );
@@ -4845,9 +4849,9 @@ int CNPC_Hunter::MeleeAttack1Conditions ( float flDot, float flDist )
 				return MeleeAttack1ConditionsVsEnemyInVehicle( pCCEnemy, flDot );
 			}
 
-#if defined(HL2_DLL) && !defined(HL2MP)
+#if defined(HL2_DLL)
 			// If the player is holding an object, knock it down.
-			if ( GetEnemy()->IsPlayer() )
+			if ( !HL2MPRules()->IsDeathmatch() && GetEnemy()->IsPlayer() )
 			{
 				CBasePlayer *pPlayer = ToBasePlayer( GetEnemy() );
 
@@ -5329,7 +5333,11 @@ void CNPC_Hunter::DeathSound( const CTakeDamageInfo &info )
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void CNPC_Hunter::TraceAttack( const CTakeDamageInfo &inputInfo, const Vector &vecDir, trace_t *ptr )
+void CNPC_Hunter::TraceAttack( const CTakeDamageInfo &inputInfo, const Vector &vecDir, trace_t *ptr
+#ifdef ENGINE_2013
+							  , CDmgAccumulator* pAccumulator
+#endif
+)
 {
 	CTakeDamageInfo info = inputInfo;
 
@@ -5388,7 +5396,11 @@ void CNPC_Hunter::TraceAttack( const CTakeDamageInfo &inputInfo, const Vector &v
 		DispatchParticleEffect( "blood_impact_synth_01_arc_parent", PATTACH_POINT_FOLLOW, this, gm_nHeadCenterAttachment );
 	}
 
+#ifdef ENGINE_2013
+	BaseClass::TraceAttack( info, vecDir, ptr, pAccumulator );
+#else
 	BaseClass::TraceAttack( info, vecDir, ptr );
+#endif
 }
 
 

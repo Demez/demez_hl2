@@ -23,6 +23,8 @@
 #include "basegrenade_shared.h"
 #include "vstdlib/random.h"
 #include "engine/IEngineSound.h"
+#include "te_effect_dispatch.h"
+#include "effect_dispatch_data.h"
 #include "globals.h"
 #include "grenade_frag.h"
 #include "ndebugoverlay.h"
@@ -1439,6 +1441,34 @@ void CNPC_Combine::AnnounceEnemyType( CBaseEntity *pEnemy )
 	}
 
 	m_Sentences.Speak( pSentenceName, SENTENCE_PRIORITY_HIGH );
+}
+
+//-----------------------------------------------------------------------------
+// TraceAttack
+//-----------------------------------------------------------------------------
+void CNPC_Combine::TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr
+#ifdef ENGINE_2013
+							   , CDmgAccumulator* pAccumulator
+#endif
+)
+{
+	if ( ptr->hitgroup == HITGROUP_HEAD )
+	{
+		CEffectData data;
+		data.m_vOrigin = ptr->endpos;
+		data.m_vAngles = GetAbsAngles();
+		data.m_vNormal = (vecDir)* -1;
+
+		DispatchEffect( "HeadshotSpark", data );
+
+		EmitSound( "gore/bhit_helmet-1.wav" );
+	}
+
+#ifdef ENGINE_2013
+	BaseClass::TraceAttack( info, vecDir, ptr, pAccumulator );
+#else
+	BaseClass::TraceAttack( info, vecDir, ptr );
+#endif
 }
 
 void CNPC_Combine::AnnounceEnemyKill( CBaseEntity *pEnemy )

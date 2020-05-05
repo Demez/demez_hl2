@@ -70,7 +70,11 @@ public:
 
 	virtual void	CreateServerVehicle( void );
 	virtual Vector	BodyTarget( const Vector &posSrc, bool bNoisy = true );
-	virtual void	TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr );
+	virtual void	TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr
+#ifdef ENGINE_2013
+								, CDmgAccumulator* pAccumulator
+#endif
+	);
 	virtual int		OnTakeDamage( const CTakeDamageInfo &info );
 	virtual float	PassengerDamageModifier( const CTakeDamageInfo &info );
 

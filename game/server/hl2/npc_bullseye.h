@@ -36,7 +36,11 @@ public:
 	void	DecalTrace( trace_t *pTrace, char const *decalName );
 	void	ImpactTrace( trace_t *pTrace, int iDamageType, char *pCustomImpactName );
 	bool	IsLightDamage( const CTakeDamageInfo &info );
+#ifdef ENGINE_2013
+	void	TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr, CDmgAccumulator* pAccumulator );
+#else
 	void	TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr );
+#endif
 	int		OnTakeDamage( const CTakeDamageInfo &info );
 	bool	UsePerfectAccuracy( void ) { return m_bPerfectAccuracy; }
 

@@ -254,7 +254,13 @@ public:
 	virtual void	UpdateEfficiency( bool bInPVS )	{ SetEfficiency( ( GetSleepState() != AISS_AWAKE ) ? AIE_DORMANT : AIE_NORMAL ); SetMoveEfficiency( AIME_NORMAL ); }
 	virtual void	PrescheduleThink( void );
 	virtual void	GatherConditions( void );
+
+#ifdef ENGINE_2013
+	virtual void	TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr, CDmgAccumulator *pAccumulator );
+#else
 	virtual void	TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr );
+#endif
+
 	virtual void	StartTask( const Task_t *pTask );
 	virtual void	RunTask( const Task_t *pTask );
 	virtual void	StopLoopingSounds();
@@ -2278,7 +2284,11 @@ int CNPC_AntlionGuard::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 //			*ptr - 
 //			bitsDamageType - 
 //-----------------------------------------------------------------------------
+#ifdef ENGINE_2013
+void CNPC_AntlionGuard::TraceAttack( const CTakeDamageInfo &inputInfo, const Vector &vecDir, trace_t *ptr, CDmgAccumulator *pAccumulator )
+#else
 void CNPC_AntlionGuard::TraceAttack( const CTakeDamageInfo &inputInfo, const Vector &vecDir, trace_t *ptr )
+#endif
 {
 	CTakeDamageInfo info = inputInfo;
 
@@ -2298,7 +2308,11 @@ void CNPC_AntlionGuard::TraceAttack( const CTakeDamageInfo &inputInfo, const Vec
 		info.SetDamage( 1.0f );
 	}
 
+#ifdef ENGINE_2013
+	BaseClass::TraceAttack( info, vecDir, ptr, pAccumulator );
+#else
 	BaseClass::TraceAttack( info, vecDir, ptr );
+#endif
 }
 
 //-----------------------------------------------------------------------------

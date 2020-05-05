@@ -242,7 +242,11 @@ public:
 	}
 
 	int		OnTakeDamage( const CTakeDamageInfo &info );
-	void	TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr );
+	void	TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr
+#ifdef ENGINE_2013
+						, CDmgAccumulator* pAccumulator
+#endif
+	);
 
 	Class_T	Classify() 
 	{ 
@@ -2814,7 +2818,11 @@ float CNPC_RollerMine::VehicleHeading( CBaseEntity *pVehicle )
 //			&vecDir - 
 //			*ptr - 
 //-----------------------------------------------------------------------------
-void CNPC_RollerMine::TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr )
+void CNPC_RollerMine::TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr
+#ifdef ENGINE_2013
+								  , CDmgAccumulator* pAccumulator
+#endif
+)
 {
 	if ( info.GetDamageType() & (DMG_BULLET | DMG_CLUB) )
 	{
@@ -2830,11 +2838,19 @@ void CNPC_RollerMine::TraceAttack( const CTakeDamageInfo &info, const Vector &ve
 			newInfo.SetDamageForce( info.GetDamageForce() * 20 );
 		}
 
-		BaseClass::TraceAttack( newInfo, vecDir, ptr );
+#ifdef ENGINE_2013
+	BaseClass::TraceAttack( newInfo, vecDir, ptr, pAccumulator );
+#else
+	BaseClass::TraceAttack( newInfo, vecDir, ptr );
+#endif
 		return;
 	}
 
+#ifdef ENGINE_2013
+	BaseClass::TraceAttack( info, vecDir, ptr, pAccumulator );
+#else
 	BaseClass::TraceAttack( info, vecDir, ptr );
+#endif
 }
 
 //-----------------------------------------------------------------------------

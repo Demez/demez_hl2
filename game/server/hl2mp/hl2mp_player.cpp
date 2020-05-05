@@ -115,10 +115,11 @@ CHL2MP_Player::CHL2MP_Player() : m_PlayerAnimState( this )
 
     m_bEnterObserver = false;
 	m_bReady = false;
+	m_bChangedLevel = false;
 
 	BaseClass::ChangeTeam( 0 );
 	
-//	UseClientSideAnimation();
+	UseClientSideAnimation();
 }
 
 CHL2MP_Player::~CHL2MP_Player( void )
@@ -241,6 +242,31 @@ void CHL2MP_Player::GiveDefaultItems( void )
 	}
 }
 
+// Save all the items, weapons, and ammo the player has, used in respawning
+void CHL2MP_Player::SaveCurrentWeapons( void )
+{
+	for ( int i = 0 ; i < WeaponCount() ; i++ )
+	{
+		CBaseCombatWeapon* pWeapon = GetWeapon(i);
+
+		if ( pWeapon )
+		{
+			m_hSavedWeapons[i] = pWeapon;
+		}
+	}
+}
+
+void CHL2MP_Player::GivePreviousWeapons( void )
+{
+
+}
+
+// lazy way of giving the player the correct items for hl2 and episode 1/2 maps
+void CHL2MP_Player::HACK_GiveDefaultItems( void )
+{
+
+}
+
 void CHL2MP_Player::PickDefaultSpawnTeam( void )
 {
 	if ( GetTeamNumber() == 0 )
@@ -310,7 +336,7 @@ void CHL2MP_Player::Spawn(void)
 
 		RemoveEffects( EF_NODRAW );
 		
-		if (HL2MPRules()->IsDeathmatch())
+		if (HL2MPRules()->IsDeathmatch() || !m_bChangedLevel)
 			GiveDefaultItems();
 	}
 
@@ -601,7 +627,13 @@ void CHL2MP_Player::FireBullets ( const FireBulletsInfo_t &info )
 
 	if ( pWeapon )
 	{
-		modinfo.m_iPlayerDamage = modinfo.m_iDamage = pWeapon->GetHL2MPWpnData().m_iPlayerDamage;
+		modinfo.m_iPlayerDamage = modinfo.
+#ifdef ENGINE_2013
+			m_flDamage
+#else	
+			m_iDamage
+#endif
+			= pWeapon->GetHL2MPWpnData().m_iPlayerDamage;
 	}
 
 	NoteWeaponFired();
@@ -1240,7 +1272,8 @@ void CHL2MP_Player::Event_Killed( const CTakeDamageInfo &info )
 
 	// drop all the weapons so the player can pick it up again later
 	// maybe use that suitcase idea synergy had?
-	Weapon_DropAll();
+	// Weapon_DropAll();
+	DestroyViewModels();
 
 	BaseClass::Event_Killed( subinfo );
 

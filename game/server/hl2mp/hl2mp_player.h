@@ -89,6 +89,10 @@ public:
 	void CreateRagdollEntity( void );
 	void GiveAllItems( void );
 	void GiveDefaultItems( void );
+	void GivePreviousWeapons( void );
+	void SaveCurrentWeapons( void );
+	
+	void HACK_GiveDefaultItems( void );	// lazy way of giving the player the correct items for hl2 and episode 1/2 maps
 
 	void NoteWeaponFired( void );
 
@@ -128,6 +132,8 @@ public:
 	virtual bool StartObserverMode( int mode );
 	virtual void StopObserverMode( void );
 
+	bool	JoinedFromChangeLevel() { return m_bChangedLevel; }
+
 
 	Vector m_vecTotalBulletForce;	//Accumulator for bullet force in a single frame
 
@@ -162,6 +168,10 @@ private:
 
     bool m_bEnterObserver;
 	bool m_bReady;
+	bool m_bChangedLevel;
+
+	// keep all items the player has
+	CHandle<CBaseCombatWeapon>		m_hSavedWeapons[MAX_WEAPONS];
 };
 
 inline CHL2MP_Player *ToHL2MPPlayer( CBaseEntity *pEntity )

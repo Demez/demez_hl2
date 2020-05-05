@@ -1,0 +1,45 @@
+"GameInfo"
+{
+	game 		"demez hl2 - 2013"
+	title 		"demez hl2"
+	title2 		"source 2013 mp"
+	type		multiplayer_only
+
+	FileSystem
+	{
+		SteamAppId		220
+		SearchPaths
+		{
+			game+mod		|gameinfo_path|custom/*
+			
+			game+mod		|gameinfo_path|.
+			
+			gamebin			|gameinfo_path|bin
+			
+			game+mod		|gameinfo_path|../demez_base/custom/*
+			
+			// game+mod		|gameinfo_path|../ep2/custom/*
+			// game+mod		|gameinfo_path|../episodic/custom/*
+			// game+mod		|gameinfo_path|../hl2mp/custom/*
+			// game+mod		|gameinfo_path|../hl2/custom/*
+			
+			game+mod		|gameinfo_path|../demez_base
+            
+            game+mod		|gameinfo_path|../ep2/ep2_pak.vpk
+			game+mod		|gameinfo_path|../episodic/ep1_pak.vpk
+			
+			game+mod		|gameinfo_path|../hl2/hl2_sound_vo_english.vpk
+			game+mod		|gameinfo_path|../hl2/hl2_pak.vpk
+			game+mod		|gameinfo_path|../hl2/hl2_textures.vpk
+			game+mod		|gameinfo_path|../hl2/hl2_sound_misc.vpk
+			game+mod		|gameinfo_path|../hl2/hl2_misc.vpk
+			
+			game+mod		|gameinfo_path|../ep2
+			game+mod		|gameinfo_path|../episodic
+			game+mod		|gameinfo_path|../hl2
+            
+			platform		platform
+			platform		platform/platform_misc.vpk
+		}
+	}
+}

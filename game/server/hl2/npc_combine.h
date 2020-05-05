@@ -22,6 +22,8 @@
 #include "ai_sentence.h"
 #include "ai_baseactor.h"
 
+#include "basecombatweapon_shared.h"
+
 // Used when only what combine to react to what the spotlight sees
 #define SF_COMBINE_NO_LOOK	(1 << 16)
 #define SF_COMBINE_NO_GRENADEDROP ( 1 << 17 )
@@ -55,6 +57,13 @@ public:
 	virtual float	GetJumpGravity() const		{ return 1.8f; }
 
 	virtual Vector  GetCrouchEyeOffset( void );
+
+	// TraceAttack
+	virtual void    TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr
+#ifdef ENGINE_2013
+								, CDmgAccumulator* pAccumulator
+#endif
+	);
 
 	void Event_Killed( const CTakeDamageInfo &info );
 

@@ -744,7 +744,6 @@ int CNPC_PlayerCompanion::SelectSchedule()
 		}
 	}
 
-	// yeah throw another exception please
 	return BaseClass::SelectSchedule();
 }
 
@@ -1560,12 +1559,10 @@ bool CNPC_PlayerCompanion::IsReadinessCapable()
 	if ( GlobalEntity_GetState("gordon_precriminal") == GLOBAL_ON )
 		return false;
 
-#ifndef HL2_EPISODIC
 	// Allow episodic companions to use readiness even if unarmed. This allows for the panicked 
 	// citizens in ep1_c17_05 (sjb)
-	if( !GetActiveWeapon() )
+	if( /*!hl2_episodic.GetBool() &&*/ !GetActiveWeapon() )
 		return false;
-#endif
 
 	if( GetActiveWeapon() && LookupActivity("ACT_IDLE_AIM_RIFLE_STIMULATED") == ACT_INVALID )
 		return false;

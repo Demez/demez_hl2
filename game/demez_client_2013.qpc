@@ -1,0 +1,4 @@
+macro PROJECT_NAME "Client - Demez 2013"
+macro ENGINE_2013 "1"
+
+include "base_scripts/demez_client.qpc"

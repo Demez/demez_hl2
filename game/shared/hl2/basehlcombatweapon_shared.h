@@ -24,6 +24,8 @@
 
 class CHL2MP_Player;
 
+extern ConVar sk_auto_reload_time;
+
 class CBaseHLCombatWeapon : public CBaseCombatWeapon
 {
 #if !defined( CLIENT_DLL )
@@ -37,9 +39,12 @@ private:
 #endif
 
 	DECLARE_CLASS( CBaseHLCombatWeapon, CBaseCombatWeapon );
+
 public:
 	DECLARE_NETWORKCLASS();
 	DECLARE_PREDICTABLE();
+
+	CBaseHLCombatWeapon();
 
 	virtual bool	WeaponShouldBeLowered( void );
 
@@ -66,6 +71,12 @@ public:
 
 	// All predicted weapons need to implement and return true
 	virtual bool	IsPredicted() const;
+#ifdef CLIENT_DLL
+	virtual bool	ShouldPredict();
+	virtual void	OnDataChanged( DataUpdateType_t type );
+
+	virtual bool	OnFireEvent( C_BaseViewModel *pViewModel, const Vector& origin, const QAngle& angles, int event, const char *options );
+#endif
 
 	Vector			GetOriginalSpawnOrigin(void) { return m_vOriginalSpawnOrigin; }
 	QAngle			GetOriginalSpawnAngles(void) { return m_vOriginalSpawnAngles; }
