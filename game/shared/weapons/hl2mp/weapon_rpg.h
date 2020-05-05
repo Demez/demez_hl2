@@ -12,7 +12,15 @@
 #pragma once
 #endif
 
-#include "basehlcombatweapon.h"
+#include "weapon_hl2mpbasehlmpcombatweapon.h"
+
+#ifdef CLIENT_DLL
+
+	#include "iviewrender_beams.h"
+
+#endif
+
+#ifndef CLIENT_DLL
 #include "Sprite.h"
 #include "npcevent.h"
 #include "beam_shared.h"
@@ -64,10 +72,8 @@ public:
 
 	static CMissile *Create( const Vector &vecOrigin, const QAngle &vecAngles, edict_t *pentOwner );
 
-	void CreateDangerSounds( bool bState ){ m_bCreateDangerSounds = bState; }
-
-	static void AddCustomDetonator( CBaseEntity *pEntity, float radius, float height = -1 );
-	static void RemoveCustomDetonator( CBaseEntity *pEntity );
+	static void AddCustomDetonator(CBaseEntity* pEntity, float radius, float height = -1);
+	static void RemoveCustomDetonator(CBaseEntity* pEntity);
 
 protected:
 	virtual void DoExplosion();	
@@ -165,19 +171,26 @@ private:
 //-----------------------------------------------------------------------------
 CAPCMissile *FindAPCMissileInCone( const Vector &vecOrigin, const Vector &vecDirection, float flAngle );
 
+#endif
 
 //-----------------------------------------------------------------------------
 // RPG
 //-----------------------------------------------------------------------------
-class CWeaponRPG : public CBaseHLCombatWeapon
+
+#ifdef CLIENT_DLL
+#define CWeaponRPG C_WeaponRPG
+#endif
+
+class CWeaponRPG : public CBaseHL2MPCombatWeapon
 {
-	DECLARE_CLASS( CWeaponRPG, CBaseHLCombatWeapon );
+	DECLARE_CLASS( CWeaponRPG, CBaseHL2MPCombatWeapon );
 public:
 
 	CWeaponRPG();
 	~CWeaponRPG();
 
-	DECLARE_SERVERCLASS();
+	DECLARE_NETWORKCLASS(); 
+	DECLARE_PREDICTABLE();
 
 	void	Precache( void );
 
@@ -194,6 +207,8 @@ public:
 	bool	WeaponShouldBeLowered( void );
 	bool	Lower( void );
 
+	bool	CanHolster( void );
+
 	virtual void Drop( const Vector &vecVelocity );
 
 	int		GetMinBurst() { return 1; }
@@ -201,10 +216,6 @@ public:
 	float	GetMinRestTime() { return 4.0; }
 	float	GetMaxRestTime() { return 4.0; }
 
-	bool	WeaponLOSCondition( const Vector &ownerPos, const Vector &targetPos, bool bSetConditions );
-	int		WeaponRangeAttack1Condition( float flDot, float flDist );
-
-	void	Operator_HandleAnimEvent( animevent_t *pEvent, CBaseCombatCharacter *pOperator );
 	void	StartGuiding( void );
 	void	StopGuiding( void );
 	void	ToggleGuiding( void );
@@ -219,38 +230,58 @@ public:
 	void	CreateLaserPointer( void );
 	void	UpdateLaserPosition( Vector vecMuzzlePos = vec3_origin, Vector vecEndPos = vec3_origin );
 	Vector	GetLaserPosition( void );
-	void	StartLaserEffects( void );
-	void	StopLaserEffects( void );
-	void	UpdateLaserEffects( void );
 
 	// NPC RPG users cheat and directly set the laser pointer's origin
 	void	UpdateNPCLaserPosition( const Vector &vecTarget );
 	void	SetNPCLaserPosition( const Vector &vecTarget );
 	const Vector &GetNPCLaserPosition( void );
-
-	int		CapabilitiesGet( void ) { return bits_CAP_WEAPON_RANGE_ATTACK1; }
-
-	virtual const Vector& GetBulletSpread( void )
-	{
-		static Vector cone = VECTOR_CONE_3DEGREES;
-		return cone;
-	}
 	
+#ifdef CLIENT_DLL
+
+	// We need to render opaque and translucent pieces
+	virtual RenderGroup_t	GetRenderGroup( void ) {	return RENDER_GROUP_TWOPASS;	}
+
+	virtual void	NotifyShouldTransmit( ShouldTransmitState_t state );
+	virtual int		DrawModel( int flags );
+	virtual void	ViewModelDrawn( C_BaseViewModel *pBaseViewModel );
+	virtual bool	IsTranslucent( void );
+
+	void			InitBeam( void );
+	void			GetWeaponAttachment( int attachmentId, Vector &outVector, Vector *dir = NULL );
+	void			DrawEffects( void );
+//	void			DrawLaserDot( void );
+
+	CMaterialReference	m_hSpriteMaterial;	// Used for the laser glint
+	CMaterialReference	m_hBeamMaterial;	// Used for the laser beam
+	Beam_t				*m_pBeam;			// Laser beam temp entity
+
+#else
+	void			Operator_HandleAnimEvent( animevent_t *pEvent, CBaseCombatCharacter *pOperator );
+
+#endif	//CLIENT_DLL
+
 	CBaseEntity *GetMissile( void ) { return m_hMissile; }
 
+#ifndef CLIENT_DLL
 	DECLARE_ACTTABLE();
-	DECLARE_DATADESC();
+#endif
 	
 protected:
 
-	bool				m_bInitialStateUpdate;
-	bool				m_bGuiding;
-	bool				m_bHideGuiding;		//User to override the player's wish to guide under certain circumstances
-	Vector				m_vecNPCLaserDot;
+	CNetworkVar( bool, m_bInitialStateUpdate );
+	CNetworkVar( bool, m_bGuiding );
+	CNetworkVar( bool, m_bHideGuiding );
+
+	CNetworkHandle( CBaseEntity,	m_hMissile );
+	CNetworkVar(	Vector,			m_vecLaserDot );
+
+#ifndef CLIENT_DLL
 	CHandle<CLaserDot>	m_hLaserDot;
-	CHandle<CMissile>	m_hMissile;
-	CHandle<CSprite>	m_hLaserMuzzleSprite;
-	CHandle<CBeam>		m_hLaserBeam;
+#endif
+
+private:
+	
+	CWeaponRPG( const CWeaponRPG & );
 };
 
 #endif // WEAPON_RPG_H

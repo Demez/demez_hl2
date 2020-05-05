@@ -160,6 +160,8 @@ public:
 	bool	IsDeathmatch( void )	{ return !m_bCoOpEnabled;		}
 	bool	IsCoOp( void )			{ return m_bCoOpEnabled;		}
 
+	bool	MegaPhyscannonActive( void ) { return m_bMegaPhysgun;	}
+
 	void	CheckAllPlayersReady( void );
 	
 private:
@@ -167,6 +169,8 @@ private:
 	CNetworkVar( bool, m_bTeamPlayEnabled );
 	CNetworkVar( bool, m_bCoOpEnabled );
 	CNetworkVar( float, m_flGameStartTime );
+	CNetworkVar( bool, m_bMegaPhysgun );
+
 	CUtlVector<EHANDLE> m_hRespawnableItemsAndWeapons;
 	float m_tmNextPeriodicThink;
 	float m_flRestartGameTime;

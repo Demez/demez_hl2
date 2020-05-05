@@ -1,59 +1,72 @@
 //========= Copyright © 1996-2005, Valve Corporation, All rights reserved. ============//
 //
-// Purpose: A shotgun.
-//
-//			Primary attack: single barrel shot.
-//			Secondary attack: double barrel shot.
+// Purpose: 
 //
 //=============================================================================//
 
 #include "cbase.h"
-#include "NPCEvent.h"
-#include "basehlcombatweapon_shared.h"
-#include "basecombatcharacter.h"
-#include "AI_BaseNPC.h"
-#include "player.h"
-#include "gamerules.h"		// For g_pGameRules
+#include "npcevent.h"
 #include "in_buttons.h"
-#include "soundent.h"
-#include "vstdlib/random.h"
-#include "gamestats.h"
 
-// memdbgon must be the last include file in a .cpp file!!!
-#include "tier0/memdbgon.h"
+#include "gamerules.h"		// For g_pGameRules
+#include "vstdlib/random.h"
+
+#ifdef CLIENT_DLL
+	#include "c_hl2mp_player.h"
+#else
+	#include "hl2mp_player.h"
+	#include "basecombatcharacter.h"
+	#include "AI_BaseNPC.h"
+	#include "player.h"
+	#include "soundent.h"
+#endif
+
+#include "weapon_hl2mpbasehlmpcombatweapon.h"
+
+#ifdef CLIENT_DLL
+#define CWeaponShotgun C_WeaponShotgun
+#endif
 
 extern ConVar sk_auto_reload_time;
 extern ConVar sk_plr_num_shotgun_pellets;
 
-class CWeaponShotgun : public CBaseHLCombatWeapon
+class CWeaponShotgun : public CBaseHL2MPCombatWeapon
 {
-	DECLARE_DATADESC();
 public:
-	DECLARE_CLASS( CWeaponShotgun, CBaseHLCombatWeapon );
+	DECLARE_CLASS( CWeaponShotgun, CBaseHL2MPCombatWeapon );
 
-	DECLARE_SERVERCLASS();
+	DECLARE_NETWORKCLASS(); 
+	DECLARE_PREDICTABLE();
 
 private:
-	bool	m_bNeedPump;		// When emptied completely
-	bool	m_bDelayedFire1;	// Fire primary when finished reloading
-	bool	m_bDelayedFire2;	// Fire secondary when finished reloading
+	CNetworkVar( bool,	m_bNeedPump );		// When emptied completely
+	CNetworkVar( bool,	m_bDelayedFire1 );	// Fire primary when finished reloading
+	CNetworkVar( bool,	m_bDelayedFire2 );	// Fire secondary when finished reloading
+	CNetworkVar( bool,	m_bDelayedReload );	// Reload when finished pump
 
 public:
 	void	Precache( void );
 
+#ifdef GAME_DLL
 	int CapabilitiesGet( void ) { return bits_CAP_WEAPON_RANGE_ATTACK1; }
+	void FireNPCPrimaryAttack( CBaseCombatCharacter *pOperator, bool bUseWeaponAngles );
+	void Operator_ForceNPCFire( CBaseCombatCharacter  *pOperator, bool bSecondary );
+	void Operator_HandleAnimEvent( animevent_t *pEvent, CBaseCombatCharacter *pOperator );
+#endif
 
 	virtual const Vector& GetBulletSpread( void )
 	{
 		static Vector vitalAllyCone = VECTOR_CONE_3DEGREES;
 		static Vector cone = VECTOR_CONE_10DEGREES;
 
+#ifdef GAME_DLL
 		if( GetOwner() && (GetOwner()->Classify() == CLASS_PLAYER_ALLY_VITAL) )
 		{
 			// Give Alyx's shotgun blasts more a more directed punch. She needs
 			// to be at least as deadly as she would be with her pistol to stay interesting (sjb)
 			return vitalAllyCone;
 		}
+#endif
 
 		return cone;
 	}
@@ -79,31 +92,56 @@ public:
 	void SecondaryAttack( void );
 	void DryFire( void );
 
-	void FireNPCPrimaryAttack( CBaseCombatCharacter *pOperator, bool bUseWeaponAngles );
-	void Operator_ForceNPCFire( CBaseCombatCharacter  *pOperator, bool bSecondary );
-	void Operator_HandleAnimEvent( animevent_t *pEvent, CBaseCombatCharacter *pOperator );
-
+#ifndef CLIENT_DLL
 	DECLARE_ACTTABLE();
+#endif
 
 	CWeaponShotgun(void);
+
+private:
+	CWeaponShotgun( const CWeaponShotgun & );
 };
 
-IMPLEMENT_SERVERCLASS_ST(CWeaponShotgun, DT_WeaponShotgun)
-END_SEND_TABLE()
+IMPLEMENT_NETWORKCLASS_ALIASED( WeaponShotgun, DT_WeaponShotgun )
+
+BEGIN_NETWORK_TABLE( CWeaponShotgun, DT_WeaponShotgun )
+#ifdef CLIENT_DLL
+	RecvPropBool( RECVINFO( m_bNeedPump ) ),
+	RecvPropBool( RECVINFO( m_bDelayedFire1 ) ),
+	RecvPropBool( RECVINFO( m_bDelayedFire2 ) ),
+	RecvPropBool( RECVINFO( m_bDelayedReload ) ),
+#else
+	SendPropBool( SENDINFO( m_bNeedPump ) ),
+	SendPropBool( SENDINFO( m_bDelayedFire1 ) ),
+	SendPropBool( SENDINFO( m_bDelayedFire2 ) ),
+	SendPropBool( SENDINFO( m_bDelayedReload ) ),
+#endif
+END_NETWORK_TABLE()
+
+#ifdef CLIENT_DLL
+BEGIN_PREDICTION_DATA( CWeaponShotgun )
+	DEFINE_PRED_FIELD( m_bNeedPump, FIELD_BOOLEAN, FTYPEDESC_INSENDTABLE ),
+	DEFINE_PRED_FIELD( m_bDelayedFire1, FIELD_BOOLEAN, FTYPEDESC_INSENDTABLE ),
+	DEFINE_PRED_FIELD( m_bDelayedFire2, FIELD_BOOLEAN, FTYPEDESC_INSENDTABLE ),
+	DEFINE_PRED_FIELD( m_bDelayedReload, FIELD_BOOLEAN, FTYPEDESC_INSENDTABLE ),
+END_PREDICTION_DATA()
+#endif
 
 LINK_ENTITY_TO_CLASS( weapon_shotgun, CWeaponShotgun );
 PRECACHE_WEAPON_REGISTER(weapon_shotgun);
 
-BEGIN_DATADESC( CWeaponShotgun )
-
-	DEFINE_FIELD( m_bNeedPump, FIELD_BOOLEAN ),
-	DEFINE_FIELD( m_bDelayedFire1, FIELD_BOOLEAN ),
-	DEFINE_FIELD( m_bDelayedFire2, FIELD_BOOLEAN ),
-
-END_DATADESC()
-
+#ifndef CLIENT_DLL
 acttable_t	CWeaponShotgun::m_acttable[] = 
 {
+	{ ACT_HL2MP_IDLE,					ACT_HL2MP_IDLE_SHOTGUN,					false },
+	{ ACT_HL2MP_RUN,					ACT_HL2MP_RUN_SHOTGUN,					false },
+	{ ACT_HL2MP_IDLE_CROUCH,			ACT_HL2MP_IDLE_CROUCH_SHOTGUN,			false },
+	{ ACT_HL2MP_WALK_CROUCH,			ACT_HL2MP_WALK_CROUCH_SHOTGUN,			false },
+	{ ACT_HL2MP_GESTURE_RANGE_ATTACK,	ACT_HL2MP_GESTURE_RANGE_ATTACK_SHOTGUN,	false },
+	{ ACT_HL2MP_GESTURE_RELOAD,			ACT_HL2MP_GESTURE_RELOAD_SHOTGUN,		false },
+	{ ACT_HL2MP_JUMP,					ACT_HL2MP_JUMP_SHOTGUN,					false },
+	// { ACT_RANGE_ATTACK1,				ACT_RANGE_ATTACK_SHOTGUN,				false },
+
 	{ ACT_IDLE,						ACT_IDLE_SMG1,					true },	// FIXME: hook to shotgun unique
 
 	{ ACT_RANGE_ATTACK1,			ACT_RANGE_ATTACK_SHOTGUN,			true },
@@ -153,11 +191,14 @@ acttable_t	CWeaponShotgun::m_acttable[] =
 
 IMPLEMENT_ACTTABLE(CWeaponShotgun);
 
+#endif
+
 void CWeaponShotgun::Precache( void )
 {
 	CBaseCombatWeapon::Precache();
 }
 
+#ifdef GAME_DLL
 //-----------------------------------------------------------------------------
 // Purpose: 
 // Input  : *pOperator - 
@@ -217,7 +258,7 @@ void CWeaponShotgun::Operator_HandleAnimEvent( animevent_t *pEvent, CBaseCombatC
 			break;
 	}
 }
-
+#endif
 
 //-----------------------------------------------------------------------------
 // Purpose:	When we shipped HL2, the shotgun weapon did not override the
@@ -233,10 +274,12 @@ void CWeaponShotgun::Operator_HandleAnimEvent( animevent_t *pEvent, CBaseCombatC
 //-----------------------------------------------------------------------------
 float CWeaponShotgun::GetMinRestTime()
 {
+#ifdef GAME_DLL
 	if( hl2_episodic.GetBool() && GetOwner() && GetOwner()->Classify() == CLASS_COMBINE )
 	{
 		return 1.2f;
 	}
+#endif
 	
 	return BaseClass::GetMinRestTime();
 }
@@ -245,10 +288,12 @@ float CWeaponShotgun::GetMinRestTime()
 //-----------------------------------------------------------------------------
 float CWeaponShotgun::GetMaxRestTime()
 {
+#ifdef GAME_DLL
 	if( hl2_episodic.GetBool() && GetOwner() && GetOwner()->Classify() == CLASS_COMBINE )
 	{
 		return 1.5f;
 	}
+#endif
 
 	return BaseClass::GetMaxRestTime();
 }
@@ -259,10 +304,12 @@ float CWeaponShotgun::GetMaxRestTime()
 //-----------------------------------------------------------------------------
 float CWeaponShotgun::GetFireRate()
 {
+#ifdef GAME_DLL
 	if( hl2_episodic.GetBool() && GetOwner() && GetOwner()->Classify() == CLASS_COMBINE )
 	{
 		return 0.8f;
 	}
+#endif
 
 	return 0.7;
 }
@@ -274,6 +321,9 @@ float CWeaponShotgun::GetFireRate()
 //-----------------------------------------------------------------------------
 bool CWeaponShotgun::StartReload( void )
 {
+	if ( m_bNeedPump )
+		return false;
+
 	CBaseCombatCharacter *pOwner  = GetOwner();
 	
 	if ( pOwner == NULL )
@@ -285,15 +335,6 @@ bool CWeaponShotgun::StartReload( void )
 	if (m_iClip1 >= GetMaxClip1())
 		return false;
 
-	// If shotgun totally emptied then a pump animation is needed
-	
-	//NOTENOTE: This is kinda lame because the player doesn't get strong feedback on when the reload has finished,
-	//			without the pump.  Technically, it's incorrect, but it's good for feedback...
-
-	if (m_iClip1 <= 0)
-	{
-		m_bNeedPump = true;
-	}
 
 	int j = min(1, pOwner->GetAmmoCount(m_iPrimaryAmmoType));
 
@@ -412,6 +453,12 @@ void CWeaponShotgun::Pump( void )
 		return;
 	
 	m_bNeedPump = false;
+
+	if ( m_bDelayedReload )
+	{
+		m_bDelayedReload = false;
+		StartReload();
+	}
 	
 	WeaponSound( SPECIAL1 );
 
@@ -457,24 +504,25 @@ void CWeaponShotgun::PrimaryAttack( void )
 
 	SendWeaponAnim( ACT_VM_PRIMARYATTACK );
 
-	// player "shoot" animation
-	pPlayer->SetAnimation( PLAYER_ATTACK1 );
-
 	// Don't fire again until fire animation has completed
 	m_flNextPrimaryAttack = gpGlobals->curtime + SequenceDuration();
 	m_iClip1 -= 1;
 
+	// player "shoot" animation
+	pPlayer->SetAnimation( PLAYER_ATTACK1 );
+
 	Vector	vecSrc		= pPlayer->Weapon_ShootPosition( );
-	Vector	vecAiming	= pPlayer->GetAutoaimVector( AUTOAIM_SCALE_DEFAULT );	
+	Vector	vecAiming	= pPlayer->GetAutoaimVector( AUTOAIM_10DEGREES );	
 
-	pPlayer->SetMuzzleFlashTime( gpGlobals->curtime + 1.0 );
-	
+	FireBulletsInfo_t info( 7, vecSrc, vecAiming, GetBulletSpread(), MAX_TRACE_LENGTH, m_iPrimaryAmmoType );
+	info.m_pAttacker = pPlayer;
+
 	// Fire the bullets, and force the first shot to be perfectly accuracy
-	pPlayer->FireBullets( sk_plr_num_shotgun_pellets.GetInt(), vecSrc, vecAiming, GetBulletSpread(), MAX_TRACE_LENGTH, m_iPrimaryAmmoType, 0, -1, -1, 0, NULL, true, true );
+	pPlayer->FireBullets( info );
 	
-	pPlayer->ViewPunch( QAngle( random->RandomFloat( -2, -1 ), random->RandomFloat( -2, 2 ), 0 ) );
-
-	CSoundEnt::InsertSound( SOUND_COMBAT, GetAbsOrigin(), SOUNDENT_VOLUME_SHOTGUN, 0.2, GetOwner() );
+	QAngle punch;
+	punch.Init( SharedRandomFloat( "shotgunpax", -2, -1 ), SharedRandomFloat( "shotgunpay", -2, 2 ), 0 );
+	pPlayer->ViewPunch( punch );
 
 	if (!m_iClip1 && pPlayer->GetAmmoCount(m_iPrimaryAmmoType) <= 0)
 	{
@@ -482,14 +530,7 @@ void CWeaponShotgun::PrimaryAttack( void )
 		pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0); 
 	}
 
-	if( m_iClip1 )
-	{
-		// pump so long as some rounds are left.
-		m_bNeedPump = true;
-	}
-
-	m_iPrimaryAttacks++;
-	gamestats->Event_WeaponFired( pPlayer, true, GetClassname() );
+	m_bNeedPump = true;
 }
 
 //-----------------------------------------------------------------------------
@@ -515,23 +556,22 @@ void CWeaponShotgun::SecondaryAttack( void )
 
 	SendWeaponAnim( ACT_VM_SECONDARYATTACK );
 
-	// player "shoot" animation
-	pPlayer->SetAnimation( PLAYER_ATTACK1 );
-
 	// Don't fire again until fire animation has completed
 	m_flNextPrimaryAttack = gpGlobals->curtime + SequenceDuration();
 	m_iClip1 -= 2;	// Shotgun uses same clip for primary and secondary attacks
 
+	// player "shoot" animation
+	pPlayer->SetAnimation( PLAYER_ATTACK1 );
+
 	Vector vecSrc	 = pPlayer->Weapon_ShootPosition();
-	Vector vecAiming = pPlayer->GetAutoaimVector( AUTOAIM_SCALE_DEFAULT );	
+	Vector vecAiming = pPlayer->GetAutoaimVector( AUTOAIM_10DEGREES );	
 
-	// Fire the bullets
-	pPlayer->FireBullets( 12, vecSrc, vecAiming, GetBulletSpread(), MAX_TRACE_LENGTH, m_iPrimaryAmmoType, 0, -1, -1, 0, NULL, false, false );
-	pPlayer->ViewPunch( QAngle(random->RandomFloat( -5, 5 ),0,0) );
+	FireBulletsInfo_t info( 12, vecSrc, vecAiming, GetBulletSpread(), MAX_TRACE_LENGTH, m_iPrimaryAmmoType );
+	info.m_pAttacker = pPlayer;
 
-	pPlayer->SetMuzzleFlashTime( gpGlobals->curtime + 1.0 );
-
-	CSoundEnt::InsertSound( SOUND_COMBAT, GetAbsOrigin(), SOUNDENT_VOLUME_SHOTGUN, 0.2 );
+	// Fire the bullets, and force the first shot to be perfectly accuracy
+	pPlayer->FireBullets( info );
+	pPlayer->ViewPunch( QAngle(SharedRandomFloat( "shotgunsax", -5, 5 ),0,0) );
 
 	if (!m_iClip1 && pPlayer->GetAmmoCount(m_iPrimaryAmmoType) <= 0)
 	{
@@ -539,16 +579,9 @@ void CWeaponShotgun::SecondaryAttack( void )
 		pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0); 
 	}
 
-	if( m_iClip1 )
-	{
-		// pump so long as some rounds are left.
-		m_bNeedPump = true;
-	}
-
-	m_iSecondaryAttacks++;
-	gamestats->Event_WeaponFired( pPlayer, false, GetClassname() );
+	m_bNeedPump = true;
 }
-	
+
 //-----------------------------------------------------------------------------
 // Purpose: Override so shotgun can do mulitple reloads in a row
 //-----------------------------------------------------------------------------
@@ -560,17 +593,22 @@ void CWeaponShotgun::ItemPostFrame( void )
 		return;
 	}
 
+	if ( m_bNeedPump && ( pOwner->m_nButtons & IN_RELOAD ) )
+	{
+		m_bDelayedReload = true;
+	}
+
 	if (m_bInReload)
 	{
 		// If I'm primary firing and have one round stop reloading and fire
-		if ((pOwner->m_nButtons & IN_ATTACK ) && (m_iClip1 >=1))
+		if ((pOwner->m_nButtons & IN_ATTACK ) && (m_iClip1 >=1) && !m_bNeedPump )
 		{
 			m_bInReload		= false;
 			m_bNeedPump		= false;
 			m_bDelayedFire1 = true;
 		}
-		// If I'm secondary firing and have one round stop reloading and fire
-		else if ((pOwner->m_nButtons & IN_ATTACK2 ) && (m_iClip1 >=2))
+		// If I'm secondary firing and have two rounds stop reloading and fire
+		else if ((pOwner->m_nButtons & IN_ATTACK2 ) && (m_iClip1 >=2) && !m_bNeedPump )
 		{
 			m_bInReload		= false;
 			m_bNeedPump		= false;

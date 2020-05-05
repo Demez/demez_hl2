@@ -656,6 +656,7 @@ float CGrabController::ComputeError()
 
 void CGrabController::ComputeMaxSpeed( CBaseEntity *pEntity, IPhysicsObject *pPhysics )
 {
+#ifndef CLIENT_DLL
 	m_shadow.maxSpeed = 1000;
 	m_shadow.maxAngular = DEFAULT_MAX_ANGULAR;
 
@@ -681,6 +682,7 @@ void CGrabController::ComputeMaxSpeed( CBaseEntity *pEntity, IPhysicsObject *pPh
 
 	m_shadow.maxSpeed = Lerp( flLerpFactor, m_shadow.maxSpeed, maxSpeed );
 	m_shadow.maxAngular = Lerp( flLerpFactor, m_shadow.maxAngular, maxAngular );
+#endif
 }
 
 
@@ -715,14 +717,16 @@ void CGrabController::AttachEntity( CBasePlayer *pPlayer, CBaseEntity *pEntity, 
 {
 	// play the impact sound of the object hitting the player
 	// used as feedback to let the player know he picked up the object
-	int hitMaterial = pPhys->GetMaterialIndex();
-	int playerMaterial = pPlayer->VPhysicsGetObject() ? pPlayer->VPhysicsGetObject()->GetMaterialIndex() : hitMaterial;
-	PhysicsImpactSound( pPlayer, pPhys, CHAN_STATIC, hitMaterial, playerMaterial, 1.0, 64 );
+#ifndef CLIENT_DLL
+	PhysicsImpactSound( pPlayer, pPhys, CHAN_STATIC, pPhys->GetMaterialIndex(), pPlayer->VPhysicsGetObject()->GetMaterialIndex(), 1.0, 64 );
+#endif
 	Vector position;
 	QAngle angles;
 	pPhys->GetPosition( &position, &angles );
 	// If it has a preferred orientation, use that instead.
+#ifndef CLIENT_DLL
 	Pickup_GetPreferredCarryAngles( pEntity, pPlayer, pPlayer->EntityToWorldTransform(), angles );
+#endif
 
 //	ComputeMaxSpeed( pEntity, pPhys );
 
@@ -794,6 +798,7 @@ void CGrabController::AttachEntity( CBasePlayer *pPlayer, CBaseEntity *pEntity, 
 		VectorITransform( pEntity->WorldSpaceCenter(), pEntity->EntityToWorldTransform(), m_attachedPositionObjectSpace );
 	}
 
+#ifndef CLIENT_DLL
 	// If it's a prop, see if it has desired carry angles
 	CPhysicsProp *pProp = dynamic_cast<CPhysicsProp *>(pEntity);
 	if ( pProp )
@@ -806,6 +811,10 @@ void CGrabController::AttachEntity( CBasePlayer *pPlayer, CBaseEntity *pEntity, 
 		m_bHasPreferredCarryAngles = false;
 		m_flDistanceOffset = 0;
 	}
+#else
+
+	m_bHasPreferredCarryAngles = false;
+#endif
 
 	m_bAllowObjectOverhead = IsObjectAllowedOverhead( pEntity );
 }
@@ -826,7 +835,6 @@ static void ClampPhysicsVelocity( IPhysicsObject *pPhys, float linearLimit, floa
 
 void CGrabController::DetachEntity( bool bClearVelocity )
 {
-	Assert(!PhysIsInCallback());
 	CBaseEntity *pEntity = GetAttached();
 	if ( pEntity )
 	{
@@ -834,6 +842,7 @@ void CGrabController::DetachEntity( bool bClearVelocity )
 		pEntity->SetBlocksLOS( m_bCarriedEntityBlocksLOS );
 		IPhysicsObject *pList[VPHYSICS_MAX_OBJECT_LIST_COUNT];
 		int count = pEntity->VPhysicsGetObjectList( pList, ARRAYSIZE(pList) );
+
 		for ( int i = 0; i < count; i++ )
 		{
 			IPhysicsObject *pPhys = pList[i];
@@ -852,14 +861,19 @@ void CGrabController::DetachEntity( bool bClearVelocity )
 			}
 			else
 			{
+#ifndef CLIENT_DLL
 				ClampPhysicsVelocity( pPhys, hl2_normspeed.GetFloat() * 1.5f, 2.0f * 360.0f );
+#endif
 			}
 
 		}
 	}
 
 	m_attachedEntity = NULL;
-	physenv->DestroyMotionController( m_controller );
+	if ( physenv )
+	{
+		physenv->DestroyMotionController( m_controller );
+	}
 	m_controller = NULL;
 }
 
@@ -893,7 +907,11 @@ IMotionEvent::simresult_e CGrabController::Simulate( IPhysicsMotionController *p
 		m_contactAmount = Approach( 1.0f, m_contactAmount, deltaTime*2.0f );
 	}
 	shadowParams.maxAngular = m_shadow.maxAngular * m_contactAmount * m_contactAmount * m_contactAmount;
+#ifndef CLIENT_DLL
 	m_timeToArrive = pObject->ComputeShadowControl( shadowParams, m_timeToArrive, deltaTime );
+#else
+	m_timeToArrive = pObject->ComputeShadowControl( shadowParams, (TICK_INTERVAL*2), deltaTime );
+#endif
 	
 	// Slide along the current contact points to fix bouncing problems
 	Vector velocity;
@@ -1004,6 +1022,7 @@ END_DATADESC()
 //-----------------------------------------------------------------------------
 void CPlayerPickupController::Init( CBasePlayer *pPlayer, CBaseEntity *pObject )
 {
+#ifndef CLIENT_DLL
 	// Holster player's weapon
 	if ( pPlayer->GetActiveWeapon() )
 	{
@@ -1014,7 +1033,8 @@ void CPlayerPickupController::Init( CBasePlayer *pPlayer, CBaseEntity *pObject )
 		}
 	}
 
-	CHL2_Player *pOwner = (CHL2_Player *)ToBasePlayer( pPlayer );
+
+	CHL2MP_Player *pOwner = (CHL2MP_Player *)ToBasePlayer( pPlayer );
 	if ( pOwner )
 	{
 		pOwner->EnableSprint( false );
@@ -1033,13 +1053,13 @@ void CPlayerPickupController::Init( CBasePlayer *pPlayer, CBaseEntity *pObject )
 	m_grabController.SetAngleAlignment( DOT_30DEGREE );
 	m_pPlayer = pPlayer;
 	IPhysicsObject *pPhysics = pObject->VPhysicsGetObject();
-	
-	Pickup_OnPhysGunPickup( pObject, m_pPlayer, PICKED_UP_BY_PLAYER );
+	Pickup_OnPhysGunPickup( pObject, m_pPlayer );
 	
 	m_grabController.AttachEntity( pPlayer, pObject, pPhysics, false, vec3_origin, false );
 	
 	m_pPlayer->m_Local.m_iHideHUD |= HIDEHUD_WEAPONSELECTION;
 	m_pPlayer->SetUseEntity( this );
+#endif
 }
 
 
@@ -1049,6 +1069,7 @@ void CPlayerPickupController::Init( CBasePlayer *pPlayer, CBaseEntity *pObject )
 //-----------------------------------------------------------------------------
 void CPlayerPickupController::Shutdown( bool bThrown )
 {
+#ifndef CLIENT_DLL
 	CBaseEntity *pObject = m_grabController.GetAttached();
 
 	bool bClearVelocity = false;
@@ -1066,7 +1087,7 @@ void CPlayerPickupController::Shutdown( bool bThrown )
 
 	if ( m_pPlayer )
 	{
-		CHL2_Player *pOwner = (CHL2_Player *)ToBasePlayer( m_pPlayer );
+		CHL2MP_Player *pOwner = (CHL2MP_Player *)ToBasePlayer( m_pPlayer );
 		if ( pOwner )
 		{
 			pOwner->EnableSprint( true );
@@ -1087,6 +1108,9 @@ void CPlayerPickupController::Shutdown( bool bThrown )
 		m_pPlayer->m_Local.m_iHideHUD &= ~HIDEHUD_WEAPONSELECTION;
 	}
 	Remove();
+
+#endif
+	
 }
 
 
@@ -1158,6 +1182,9 @@ bool CPlayerPickupController::IsHoldingEntity( CBaseEntity *pEnt )
 
 void PlayerPickupObject( CBasePlayer *pPlayer, CBaseEntity *pObject )
 {
+	
+#ifndef CLIENT_DLL
+	
 	//Don't pick up if we don't have a phys object.
 	if ( pObject->VPhysicsGetObject() == NULL )
 		 return;
@@ -1168,6 +1195,9 @@ void PlayerPickupObject( CBasePlayer *pPlayer, CBaseEntity *pObject )
 		return;
 
 	pController->Init( pPlayer, pObject );
+
+#endif
+
 }
 
 //-----------------------------------------------------------------------------
@@ -1259,11 +1289,15 @@ protected:
 	// Pickup and throw objects.
 	bool	CanPickupObject( CBaseEntity *pTarget );
 	void	CheckForTarget( void );
+	
+#ifndef CLIENT_DLL
+	bool	AttachObject( CBaseEntity *pObject, const Vector &vPosition );
 	FindObjectResult_t		FindObject( void );
 	void					FindObjectTrace( CBasePlayer *pPlayer, trace_t *pTraceResult );
 	CBaseEntity *MegaPhysCannonFindObjectInCone( const Vector &vecOrigin, const Vector &vecDir, float flCone, float flCombineBallCone, bool bOnlyCombineBalls );
 	CBaseEntity *FindObjectInCone( const Vector &vecOrigin, const Vector &vecDir, float flCone );
-	bool	AttachObject( CBaseEntity *pObject, const Vector &vPosition );
+#endif	// !CLIENT_DLL
+
 	void	UpdateObject( void );
 	void	DetachObject( bool playSound = true, bool wasLaunched = false );
 	void	LaunchObject( const Vector &vecDir, float flForce );
@@ -1439,7 +1473,7 @@ enum
 //-----------------------------------------------------------------------------
 bool PlayerHasMegaPhysCannon()
 {
-	return ( HL2GameRules()->MegaPhyscannonActive() == true );
+	return ( HL2MPRules()->MegaPhyscannonActive() == true );
 }
 
 
@@ -1547,6 +1581,55 @@ void CWeaponPhysCannon::UpdateOnRemove(void)
 	BaseClass::UpdateOnRemove();
 }
 
+#ifdef CLIENT_DLL
+void CWeaponPhysCannon::OnDataChanged( DataUpdateType_t type )
+{
+	BaseClass::OnDataChanged( type );
+
+	if ( type == DATA_UPDATE_CREATED )
+	{
+		SetNextClientThink( CLIENT_THINK_ALWAYS );
+
+		C_BaseAnimating::AutoAllowBoneAccess boneaccess( true, false );
+		StartEffects();
+	}
+
+	if ( GetOwner() == NULL )
+	{
+		if ( m_hAttachedObject )
+		{
+			m_hAttachedObject->VPhysicsDestroyObject();
+		}
+
+		if ( m_hOldAttachedObject )
+		{
+			m_hOldAttachedObject->VPhysicsDestroyObject();
+		}
+	}
+
+	// Update effect state when out of parity with the server
+	if ( m_nOldEffectState != m_EffectState )
+	{
+		DoEffect( m_EffectState );
+		m_nOldEffectState = m_EffectState;
+	}
+
+	// Update element state when out of parity
+	if ( m_bOldOpen != m_bOpen )
+	{
+		if ( m_bOpen )
+		{
+			m_ElementParameter.InitFromCurrent( 1.0f, 0.2f, INTERP_SPLINE );
+		}
+		else
+		{	
+			m_ElementParameter.InitFromCurrent( 0.0f, 0.5f, INTERP_SPLINE );
+		}
+
+		m_bOldOpen = (bool) m_bOpen;
+	}
+}
+#endif
 
 //-----------------------------------------------------------------------------
 // Sprite scale factor 
@@ -1640,7 +1723,10 @@ bool CWeaponPhysCannon::DropIfEntityHeld( CBaseEntity *pTarget )
 void CWeaponPhysCannon::Drop( const Vector &vecVelocity )
 {
 	ForceDrop();
-	BaseClass::Drop( vecVelocity );
+
+#ifndef CLIENT_DLL
+	UTIL_Remove( this );
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -2725,7 +2811,7 @@ bool CGrabController::UpdateObject( CBasePlayer *pPlayer, float flError )
 	QAngle playerAngles = pPlayer->EyeAngles();
 	AngleVectors( playerAngles, &forward, &right, &up );
 
-	if ( HL2GameRules()->MegaPhyscannonActive() )
+	if ( HL2MPRules()->MegaPhyscannonActive() )
 	{
 		Vector los = ( pEntity->WorldSpaceCenter() - pPlayer->Weapon_ShootPosition() );
 		VectorNormalize( los );

@@ -13,51 +13,54 @@
 
 #ifndef	WEAPONSLAM_H
 #define	WEAPONSLAM_H
-#ifndef HL2MP
 
 #include "basegrenade_shared.h"
-#include "basehlcombatweapon.h"
+#include "weapon_hl2mpbasehlmpcombatweapon.h"
 
-enum SlamState_t
+enum
 {
 	SLAM_TRIPMINE_READY,
 	SLAM_SATCHEL_THROW,
 	SLAM_SATCHEL_ATTACH,
 };
 
-class CWeapon_SLAM : public CBaseHLCombatWeapon
+#ifdef CLIENT_DLL
+#define CWeapon_SLAM C_Weapon_SLAM
+#endif
+
+class CWeapon_SLAM : public CBaseHL2MPCombatWeapon
 {
 public:
-	DECLARE_CLASS( CWeapon_SLAM, CBaseHLCombatWeapon );
+	DECLARE_CLASS( CWeapon_SLAM, CBaseHL2MPCombatWeapon );
 
-	DECLARE_SERVERCLASS();
+	DECLARE_NETWORKCLASS(); 
+	DECLARE_PREDICTABLE();
 
-	SlamState_t			m_tSlamState;
-	bool				m_bDetonatorArmed;
-	bool				m_bNeedDetonatorDraw;
-	bool				m_bNeedDetonatorHolster;
-	bool				m_bNeedReload;
-	bool				m_bClearReload;
-	bool				m_bThrowSatchel;
-	bool				m_bAttachSatchel;
-	bool				m_bAttachTripmine;
+	CNetworkVar( int,	m_tSlamState );
+	CNetworkVar( bool,				m_bDetonatorArmed );
+	CNetworkVar( bool,				m_bNeedDetonatorDraw);
+	CNetworkVar( bool,				m_bNeedDetonatorHolster);
+	CNetworkVar( bool,				m_bNeedReload);
+	CNetworkVar( bool,				m_bClearReload);
+	CNetworkVar( bool,				m_bThrowSatchel);
+	CNetworkVar( bool,				m_bAttachSatchel);
+	CNetworkVar( bool,				m_bAttachTripmine);
 	float				m_flWallSwitchTime;
 
 	void				Spawn( void );
 	void				Precache( void );
 
-	int					CapabilitiesGet( void ) { return bits_CAP_WEAPON_RANGE_ATTACK1; }
 	void				PrimaryAttack( void );
 	void				SecondaryAttack( void );
 	void				WeaponIdle( void );
-	void				WeaponSwitch( void );
+	void				Weapon_Switch( void );
 	void				SLAMThink( void );
 	
 	void				SetPickupTouch( void );
 	void				SlamTouch( CBaseEntity *pOther );	// default weapon touch
 	void				ItemPostFrame( void );	
 	bool				Reload( void );
-	void				SetSlamState( SlamState_t newState );
+	void				SetSlamState( int newState );
 	bool				CanAttachSLAM(void);		// In position where can attach SLAM?
 	bool				AnyUndetonatedCharges(void);
 	void				StartTripmineAttach( void );
@@ -75,9 +78,14 @@ public:
 
 	CWeapon_SLAM();
 
+#ifndef CLIENT_DLL
 	DECLARE_ACTTABLE();
 	DECLARE_DATADESC();
+#endif
+
+private:
+	CWeapon_SLAM( const CWeapon_SLAM & );
 };
 
-#endif  //HL2MP
+
 #endif	//WEAPONSLAM_H

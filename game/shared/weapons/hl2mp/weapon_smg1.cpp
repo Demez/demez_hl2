@@ -5,34 +5,49 @@
 //=============================================================================//
 
 #include "cbase.h"
-#include "basehlcombatweapon.h"
 #include "NPCevent.h"
-#include "basecombatcharacter.h"
-#include "AI_BaseNPC.h"
-#include "player.h"
-#include "game.h"
 #include "in_buttons.h"
-#include "grenade_ar2.h"
-#include "AI_Memory.h"
-#include "soundent.h"
 #include "rumble_shared.h"
-#include "gamestats.h"
+
+#ifdef CLIENT_DLL
+	#include "c_hl2mp_player.h"
+	#include "c_ai_basenpc.h"
+#else
+	#include "basecombatcharacter.h"
+	#include "AI_BaseNPC.h"
+	#include "player.h"
+	#include "game.h"
+	#include "AI_Memory.h"
+	#include "soundent.h"
+	#include "gamestats.h"
+	#include "grenade_ar2.h"
+	#include "hl2mp_player.h"
+	#include "basegrenade_shared.h"
+#endif
+
+#include "weapon_hl2mpbase.h"
+#include "weapon_hl2mpbase_machinegun.h"
+
+#ifdef CLIENT_DLL
+#define CWeaponSMG1 C_WeaponSMG1
+#endif
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-extern ConVar    sk_plr_dmg_smg1_grenade;	
+#define SMG1_GRENADE_DAMAGE 100.0f
+#define SMG1_GRENADE_RADIUS 250.0f
 
-class CWeaponSMG1 : public CHLSelectFireMachineGun
+class CWeaponSMG1 : public CHL2MPMachineGun
 {
-	DECLARE_DATADESC();
 public:
-	DECLARE_CLASS( CWeaponSMG1, CHLSelectFireMachineGun );
+	DECLARE_CLASS( CWeaponSMG1, CHL2MPMachineGun );
 
 	CWeaponSMG1();
 
-	DECLARE_SERVERCLASS();
-	
+	DECLARE_NETWORKCLASS(); 
+	DECLARE_PREDICTABLE();
+
 	void	Precache( void );
 	void	AddViewKick( void );
 	void	SecondaryAttack( void );
@@ -44,8 +59,7 @@ public:
 	bool	Reload( void );
 
 	float	GetFireRate( void ) { return 0.075f; }	// 13.3hz
-	int		CapabilitiesGet( void ) { return bits_CAP_WEAPON_RANGE_ATTACK1; }
-	int		WeaponRangeAttack2Condition( float flDot, float flDist );
+
 	Activity	GetPrimaryAttackActivity( void );
 
 	virtual const Vector& GetBulletSpread( void )
@@ -55,93 +69,110 @@ public:
 	}
 
 	const WeaponProficiencyInfo_t *GetProficiencyValues();
+	
+#ifdef GAME_DLL
+	int		CapabilitiesGet(void) { return bits_CAP_WEAPON_RANGE_ATTACK1; }
+	int		WeaponRangeAttack2Condition(float flDot, float flDist);
+	void	FireNPCPrimaryAttack( CBaseCombatCharacter *pOperator, Vector &vecShootOrigin, Vector &vecShootDir );
+	void	Operator_ForceNPCFire( CBaseCombatCharacter  *pOperator, bool bSecondary );
+	void	Operator_HandleAnimEvent( animevent_t *pEvent, CBaseCombatCharacter *pOperator );
+#endif
 
-	void FireNPCPrimaryAttack( CBaseCombatCharacter *pOperator, Vector &vecShootOrigin, Vector &vecShootDir );
-	void Operator_ForceNPCFire( CBaseCombatCharacter  *pOperator, bool bSecondary );
-	void Operator_HandleAnimEvent( animevent_t *pEvent, CBaseCombatCharacter *pOperator );
-
+#ifndef CLIENT_DLL
 	DECLARE_ACTTABLE();
+#endif
 
 protected:
 
 	Vector	m_vecTossVelocity;
 	float	m_flNextGrenadeCheck;
+	
+private:
+	CWeaponSMG1( const CWeaponSMG1 & );
 };
 
-IMPLEMENT_SERVERCLASS_ST(CWeaponSMG1, DT_WeaponSMG1)
-END_SEND_TABLE()
+IMPLEMENT_NETWORKCLASS_ALIASED( WeaponSMG1, DT_WeaponSMG1 )
+
+BEGIN_NETWORK_TABLE( CWeaponSMG1, DT_WeaponSMG1 )
+END_NETWORK_TABLE()
+
+BEGIN_PREDICTION_DATA( CWeaponSMG1 )
+END_PREDICTION_DATA()
 
 LINK_ENTITY_TO_CLASS( weapon_smg1, CWeaponSMG1 );
 PRECACHE_WEAPON_REGISTER(weapon_smg1);
 
-BEGIN_DATADESC( CWeaponSMG1 )
-
-	DEFINE_FIELD( m_vecTossVelocity, FIELD_VECTOR ),
-	DEFINE_FIELD( m_flNextGrenadeCheck, FIELD_TIME ),
-
-END_DATADESC()
-
+#ifndef CLIENT_DLL
 acttable_t	CWeaponSMG1::m_acttable[] = 
 {
-	{ ACT_RANGE_ATTACK1,			ACT_RANGE_ATTACK_SMG1,			true },
-	{ ACT_RELOAD,					ACT_RELOAD_SMG1,				true },
-	{ ACT_IDLE,						ACT_IDLE_SMG1,					true },
-	{ ACT_IDLE_ANGRY,				ACT_IDLE_ANGRY_SMG1,			true },
+	{ ACT_HL2MP_IDLE,					ACT_HL2MP_IDLE_SMG1,					false },
+	{ ACT_HL2MP_RUN,					ACT_HL2MP_RUN_SMG1,						false },
+	{ ACT_HL2MP_IDLE_CROUCH,			ACT_HL2MP_IDLE_CROUCH_SMG1,				false },
+	{ ACT_HL2MP_WALK_CROUCH,			ACT_HL2MP_WALK_CROUCH_SMG1,				false },
+	{ ACT_HL2MP_GESTURE_RANGE_ATTACK,	ACT_HL2MP_GESTURE_RANGE_ATTACK_SMG1,	false },
+	{ ACT_HL2MP_GESTURE_RELOAD,			ACT_HL2MP_GESTURE_RELOAD_SMG1,			false },
+	{ ACT_HL2MP_JUMP,					ACT_HL2MP_JUMP_SMG1,					false },
+//	{ ACT_RANGE_ATTACK1,				ACT_RANGE_ATTACK_SMG1,					false },
 
-	{ ACT_WALK,						ACT_WALK_RIFLE,					true },
-	{ ACT_WALK_AIM,					ACT_WALK_AIM_RIFLE,				true  },
+// hl2 act table
+	{ ACT_RANGE_ATTACK1,				ACT_RANGE_ATTACK_SMG1,			true },
+	{ ACT_RELOAD,						ACT_RELOAD_SMG1,				true },
+	{ ACT_IDLE,							ACT_IDLE_SMG1,					true },
+	{ ACT_IDLE_ANGRY,					ACT_IDLE_ANGRY_SMG1,			true },
+
+	{ ACT_WALK,							ACT_WALK_RIFLE,					true },
+	{ ACT_WALK_AIM,						ACT_WALK_AIM_RIFLE,				true  },
 	
 // Readiness activities (not aiming)
-	{ ACT_IDLE_RELAXED,				ACT_IDLE_SMG1_RELAXED,			false },//never aims
-	{ ACT_IDLE_STIMULATED,			ACT_IDLE_SMG1_STIMULATED,		false },
-	{ ACT_IDLE_AGITATED,			ACT_IDLE_ANGRY_SMG1,			false },//always aims
+	{ ACT_IDLE_RELAXED,					ACT_IDLE_SMG1_RELAXED,			false },//never aims
+	{ ACT_IDLE_STIMULATED,				ACT_IDLE_SMG1_STIMULATED,		false },
+	{ ACT_IDLE_AGITATED,				ACT_IDLE_ANGRY_SMG1,			false },//always aims
 
-	{ ACT_WALK_RELAXED,				ACT_WALK_RIFLE_RELAXED,			false },//never aims
-	{ ACT_WALK_STIMULATED,			ACT_WALK_RIFLE_STIMULATED,		false },
-	{ ACT_WALK_AGITATED,			ACT_WALK_AIM_RIFLE,				false },//always aims
+	{ ACT_WALK_RELAXED,					ACT_WALK_RIFLE_RELAXED,			false },//never aims
+	{ ACT_WALK_STIMULATED,				ACT_WALK_RIFLE_STIMULATED,		false },
+	{ ACT_WALK_AGITATED,				ACT_WALK_AIM_RIFLE,				false },//always aims
 
-	{ ACT_RUN_RELAXED,				ACT_RUN_RIFLE_RELAXED,			false },//never aims
-	{ ACT_RUN_STIMULATED,			ACT_RUN_RIFLE_STIMULATED,		false },
-	{ ACT_RUN_AGITATED,				ACT_RUN_AIM_RIFLE,				false },//always aims
+	{ ACT_RUN_RELAXED,					ACT_RUN_RIFLE_RELAXED,			false },//never aims
+	{ ACT_RUN_STIMULATED,				ACT_RUN_RIFLE_STIMULATED,		false },
+	{ ACT_RUN_AGITATED,					ACT_RUN_AIM_RIFLE,				false },//always aims
 
 // Readiness activities (aiming)
-	{ ACT_IDLE_AIM_RELAXED,			ACT_IDLE_SMG1_RELAXED,			false },//never aims	
-	{ ACT_IDLE_AIM_STIMULATED,		ACT_IDLE_AIM_RIFLE_STIMULATED,	false },
-	{ ACT_IDLE_AIM_AGITATED,		ACT_IDLE_ANGRY_SMG1,			false },//always aims
+	{ ACT_IDLE_AIM_RELAXED,				ACT_IDLE_SMG1_RELAXED,			false },//never aims	
+	{ ACT_IDLE_AIM_STIMULATED,			ACT_IDLE_AIM_RIFLE_STIMULATED,	false },
+	{ ACT_IDLE_AIM_AGITATED,			ACT_IDLE_ANGRY_SMG1,			false },//always aims
 
-	{ ACT_WALK_AIM_RELAXED,			ACT_WALK_RIFLE_RELAXED,			false },//never aims
-	{ ACT_WALK_AIM_STIMULATED,		ACT_WALK_AIM_RIFLE_STIMULATED,	false },
-	{ ACT_WALK_AIM_AGITATED,		ACT_WALK_AIM_RIFLE,				false },//always aims
+	{ ACT_WALK_AIM_RELAXED,				ACT_WALK_RIFLE_RELAXED,			false },//never aims
+	{ ACT_WALK_AIM_STIMULATED,			ACT_WALK_AIM_RIFLE_STIMULATED,	false },
+	{ ACT_WALK_AIM_AGITATED,			ACT_WALK_AIM_RIFLE,				false },//always aims
 
-	{ ACT_RUN_AIM_RELAXED,			ACT_RUN_RIFLE_RELAXED,			false },//never aims
-	{ ACT_RUN_AIM_STIMULATED,		ACT_RUN_AIM_RIFLE_STIMULATED,	false },
-	{ ACT_RUN_AIM_AGITATED,			ACT_RUN_AIM_RIFLE,				false },//always aims
+	{ ACT_RUN_AIM_RELAXED,				ACT_RUN_RIFLE_RELAXED,			false },//never aims
+	{ ACT_RUN_AIM_STIMULATED,			ACT_RUN_AIM_RIFLE_STIMULATED,	false },
+	{ ACT_RUN_AIM_AGITATED,				ACT_RUN_AIM_RIFLE,				false },//always aims
 //End readiness activities
 
-	{ ACT_WALK_AIM,					ACT_WALK_AIM_RIFLE,				true },
-	{ ACT_WALK_CROUCH,				ACT_WALK_CROUCH_RIFLE,			true },
-	{ ACT_WALK_CROUCH_AIM,			ACT_WALK_CROUCH_AIM_RIFLE,		true },
-	{ ACT_RUN,						ACT_RUN_RIFLE,					true },
-	{ ACT_RUN_AIM,					ACT_RUN_AIM_RIFLE,				true },
-	{ ACT_RUN_CROUCH,				ACT_RUN_CROUCH_RIFLE,			true },
-	{ ACT_RUN_CROUCH_AIM,			ACT_RUN_CROUCH_AIM_RIFLE,		true },
-	{ ACT_GESTURE_RANGE_ATTACK1,	ACT_GESTURE_RANGE_ATTACK_SMG1,	true },
-	{ ACT_RANGE_ATTACK1_LOW,		ACT_RANGE_ATTACK_SMG1_LOW,		true },
-	{ ACT_COVER_LOW,				ACT_COVER_SMG1_LOW,				false },
-	{ ACT_RANGE_AIM_LOW,			ACT_RANGE_AIM_SMG1_LOW,			false },
-	{ ACT_RELOAD_LOW,				ACT_RELOAD_SMG1_LOW,			false },
-	{ ACT_GESTURE_RELOAD,			ACT_GESTURE_RELOAD_SMG1,		true },
+	// { ACT_WALK_AIM,						ACT_WALK_AIM_RIFLE,				true },
+	{ ACT_WALK_CROUCH,					ACT_WALK_CROUCH_RIFLE,			true },
+	{ ACT_WALK_CROUCH_AIM,				ACT_WALK_CROUCH_AIM_RIFLE,		true },
+	{ ACT_RUN,							ACT_RUN_RIFLE,					true },
+	{ ACT_RUN_AIM,						ACT_RUN_AIM_RIFLE,				true },
+	{ ACT_RUN_CROUCH,					ACT_RUN_CROUCH_RIFLE,			true },
+	{ ACT_RUN_CROUCH_AIM,				ACT_RUN_CROUCH_AIM_RIFLE,		true },
+	{ ACT_GESTURE_RANGE_ATTACK1,		ACT_GESTURE_RANGE_ATTACK_SMG1,	true },
+	{ ACT_RANGE_ATTACK1_LOW,			ACT_RANGE_ATTACK_SMG1_LOW,		true },
+	{ ACT_COVER_LOW,					ACT_COVER_SMG1_LOW,				false },
+	{ ACT_RANGE_AIM_LOW,				ACT_RANGE_AIM_SMG1_LOW,			false },
+	{ ACT_RELOAD_LOW,					ACT_RELOAD_SMG1_LOW,			false },
+	{ ACT_GESTURE_RELOAD,				ACT_GESTURE_RELOAD_SMG1,		true },
 };
 
 IMPLEMENT_ACTTABLE(CWeaponSMG1);
+#endif
 
 //=========================================================
 CWeaponSMG1::CWeaponSMG1( )
 {
 	m_fMinRange1		= 0;// No minimum range. 
 	m_fMaxRange1		= 1400;
-
-	m_bAltFiresUnderwater = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -149,7 +180,9 @@ CWeaponSMG1::CWeaponSMG1( )
 //-----------------------------------------------------------------------------
 void CWeaponSMG1::Precache( void )
 {
+#ifndef CLIENT_DLL
 	UTIL_PrecacheOther("grenade_ar2");
+#endif
 
 	BaseClass::Precache();
 }
@@ -159,11 +192,13 @@ void CWeaponSMG1::Precache( void )
 //-----------------------------------------------------------------------------
 void CWeaponSMG1::Equip( CBaseCombatCharacter *pOwner )
 {
+#ifdef GAME_DLL
 	if( pOwner->Classify() == CLASS_PLAYER_ALLY )
 	{
 		m_fMaxRange1 = 3000;
 	}
 	else
+#endif
 	{
 		m_fMaxRange1 = 1400;
 	}
@@ -174,13 +209,14 @@ void CWeaponSMG1::Equip( CBaseCombatCharacter *pOwner )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
+#ifdef GAME_DLL
 void CWeaponSMG1::FireNPCPrimaryAttack( CBaseCombatCharacter *pOperator, Vector &vecShootOrigin, Vector &vecShootDir )
 {
 	// FIXME: use the returned number of bullets to account for >10hz firerate
 	WeaponSoundRealtime( SINGLE_NPC );
 
 	CSoundEnt::InsertSound( SOUND_COMBAT|SOUND_CONTEXT_GUNFIRE, pOperator->GetAbsOrigin(), SOUNDENT_VOLUME_MACHINEGUN, 0.2, pOperator, SOUNDENT_CHANNEL_WEAPON, pOperator->GetEnemy() );
-	pOperator->FireBullets( 1, vecShootOrigin, vecShootDir, VECTOR_CONE_PRECALCULATED,
+	pOperator->FireBullets(1, vecShootOrigin, vecShootDir, VECTOR_CONE_PRECALCULATED,
 		MAX_TRACE_LENGTH, m_iPrimaryAmmoType, 2, entindex(), 0 );
 
 	pOperator->DoMuzzleFlash();
@@ -221,7 +257,6 @@ void CWeaponSMG1::Operator_HandleAnimEvent( animevent_t *pEvent, CBaseCombatChar
 			}
 
 			CAI_BaseNPC *npc = pOperator->MyNPCPointer();
-			ASSERT( npc != NULL );
 			vecShootDir = npc->GetActualShootTrajectory( vecShootOrigin );
 
 			FireNPCPrimaryAttack( pOperator, vecShootOrigin, vecShootDir );
@@ -260,6 +295,7 @@ void CWeaponSMG1::Operator_HandleAnimEvent( animevent_t *pEvent, CBaseCombatChar
 		break;
 	}
 }
+#endif
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -344,7 +380,7 @@ void CWeaponSMG1::SecondaryAttack( void )
 	// MUST call sound before removing a round from the clip of a CMachineGun
 	BaseClass::WeaponSound( WPN_DOUBLE );
 
-	pPlayer->RumbleEffect( RUMBLE_357, 0, RUMBLE_FLAGS_NONE );
+	// pPlayer->RumbleEffect( RUMBLE_357, 0, RUMBLE_FLAGS_NONE );
 
 	Vector vecSrc = pPlayer->Weapon_ShootPosition();
 	Vector	vecThrow;
@@ -352,20 +388,19 @@ void CWeaponSMG1::SecondaryAttack( void )
 	AngleVectors( pPlayer->EyeAngles() + pPlayer->GetPunchAngle(), &vecThrow );
 	VectorScale( vecThrow, 1000.0f, vecThrow );
 	
+#ifndef CLIENT_DLL
 	//Create the grenade
-	QAngle angles;
-	VectorAngles( vecThrow, angles );
-	CGrenadeAR2 *pGrenade = (CGrenadeAR2*)Create( "grenade_ar2", vecSrc, angles, pPlayer );
+	CGrenadeAR2 *pGrenade = (CGrenadeAR2*)Create( "grenade_ar2", vecSrc, vec3_angle, pPlayer );
 	pGrenade->SetAbsVelocity( vecThrow );
 
 	pGrenade->SetLocalAngularVelocity( RandomAngle( -400, 400 ) );
 	pGrenade->SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_BOUNCE ); 
 	pGrenade->SetThrower( GetOwner() );
-	pGrenade->SetDamage( sk_plr_dmg_smg1_grenade.GetFloat() );
+	pGrenade->SetDamage( SMG1_GRENADE_DAMAGE );
+	pGrenade->SetDamageRadius( SMG1_GRENADE_RADIUS );
+#endif
 
 	SendWeaponAnim( ACT_VM_SECONDARYATTACK );
-
-	CSoundEnt::InsertSound( SOUND_COMBAT, GetAbsOrigin(), 1000, 0.2, GetOwner(), SOUNDENT_CHANNEL_WEAPON );
 
 	// player "shoot" animation
 	pPlayer->SetAnimation( PLAYER_ATTACK1 );
@@ -380,10 +415,11 @@ void CWeaponSMG1::SecondaryAttack( void )
 	m_flNextSecondaryAttack = gpGlobals->curtime + 1.0f;
 
 	// Register a muzzleflash for the AI.
+#ifdef GAME_DLL
 	pPlayer->SetMuzzleFlashTime( gpGlobals->curtime + 0.5 );	
 
-	m_iSecondaryAttacks++;
-	gamestats->Event_WeaponFired( pPlayer, false, GetClassname() );
+	// m_iSecondaryAttacks++;
+#endif
 }
 
 #define	COMBINE_MIN_GRENADE_CLEAR_DIST 256
@@ -394,6 +430,7 @@ void CWeaponSMG1::SecondaryAttack( void )
 //			flDist - 
 // Output : int
 //-----------------------------------------------------------------------------
+#ifdef GAME_DLL
 int CWeaponSMG1::WeaponRangeAttack2Condition( float flDot, float flDist )
 {
 	CAI_BaseNPC *npcOwner = GetOwner()->MyNPCPointer();
@@ -493,6 +530,7 @@ int CWeaponSMG1::WeaponRangeAttack2Condition( float flDot, float flDist )
 		return COND_WEAPON_SIGHT_OCCLUDED;
 	}
 }
+#endif
 
 //-----------------------------------------------------------------------------
 const WeaponProficiencyInfo_t *CWeaponSMG1::GetProficiencyValues()

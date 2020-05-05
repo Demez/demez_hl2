@@ -8,6 +8,7 @@
 #include "npcevent.h"
 #include "in_buttons.h"
 #include "weapon_rpg.h"
+#include "rumble_shared.h"
 
 #ifdef CLIENT_DLL
 	#include "c_hl2mp_player.h"
@@ -27,6 +28,8 @@
 	#include "util.h"
 	#include "in_buttons.h"
 	#include "shake.h"
+	#include "AI_BaseNPC.h"
+	#include "AI_Squad.h"
 	#include "te_effect_dispatch.h"
 	#include "triggers.h"
 	#include "smoke_trail.h"
@@ -36,15 +39,21 @@
 
 #include "debugoverlay_shared.h"
 
+#ifdef HL2_DLL
+	extern int g_interactionPlayerLaunchedRPG;
+#endif
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
 #define	RPG_SPEED	1500
 
+ConVar rpg_missle_use_custom_detonators( "rpg_missle_use_custom_detonators", "1" );
+
 #ifndef CLIENT_DLL
 const char *g_pLaserDotThink = "LaserThinkContext";
 
-static ConVar sk_apc_missile_damage("sk_apc_missile_damage", "15");
+static ConVar sk_apc_missile_damage( "sk_apc_missile_damage", "15" );
 #define APC_MISSILE_DAMAGE	sk_apc_missile_damage.GetFloat()
 
 #endif
@@ -127,6 +136,7 @@ BEGIN_DATADESC( CMissile )
 	DEFINE_FIELD( m_flMarkDeadTime,			FIELD_TIME ),
 	DEFINE_FIELD( m_flGracePeriodEndsAt,	FIELD_TIME ),
 	DEFINE_FIELD( m_flDamage,				FIELD_FLOAT ),
+	DEFINE_FIELD( m_bCreateDangerSounds,	FIELD_BOOLEAN ),
 	
 	// Function Pointers
 	DEFINE_FUNCTION( MissileTouch ),
@@ -147,6 +157,7 @@ class CWeaponRPG;
 CMissile::CMissile()
 {
 	m_hRocketTrail = NULL;
+	m_bCreateDangerSounds = false;
 }
 
 CMissile::~CMissile()
@@ -186,6 +197,7 @@ void CMissile::Spawn( void )
 	SetThink( &CMissile::IgniteThink );
 	
 	SetNextThink( gpGlobals->curtime + 0.3f );
+	SetDamage( 200.0f );
 
 	m_takedamage = DAMAGE_YES;
 	m_iHealth = m_iMaxHealth = 100;
@@ -412,7 +424,11 @@ void CMissile::MissileTouch( CBaseEntity *pOther )
 	
 	// Don't touch triggers (but DO hit weapons)
 	if ( pOther->IsSolidFlagSet(FSOLID_TRIGGER|FSOLID_VOLUME_CONTENTS) && pOther->GetCollisionGroup() != COLLISION_GROUP_WEAPON )
-		return;
+	{
+		// Some NPCs are triggers that can take damage (like antlion grubs). We should hit them.
+		if ( ( pOther->m_takedamage == DAMAGE_NO ) || ( pOther->m_takedamage == DAMAGE_EVENTS_ONLY ) )
+			return;
+	}
 
 	Explode();
 }
@@ -471,8 +487,13 @@ void CMissile::IgniteThink( void )
 	{
 		CBasePlayer *pPlayer = ToBasePlayer( m_hOwner->GetOwner() );
 
-		color32 white = { 255,225,205,64 };
-		UTIL_ScreenFade( pPlayer, white, 0.1f, 0.0f, FFADE_IN );
+		if ( pPlayer )
+		{
+			color32 white = { 255,225,205,64 };
+			UTIL_ScreenFade( pPlayer, white, 0.1f, 0.0f, FFADE_IN );
+
+			pPlayer->RumbleEffect( RUMBLE_RPG_MISSILE, 0, RUMBLE_FLAG_RESTART );
+		}
 	}
 
 	CreateSmokeTrail();
@@ -584,6 +605,50 @@ void CMissile::SeekThink( void )
 		}
 	}
 
+	if( hl2_episodic.GetBool() )
+	{
+		if( flBestDist <= ( GetAbsVelocity().Length() * 2.5f ) && FVisible( pBestDot->GetAbsOrigin() ) )
+		{
+			// Scare targets
+			CSoundEnt::InsertSound( SOUND_DANGER, pBestDot->GetAbsOrigin(), CMissile::EXPLOSION_RADIUS, 0.2f, pBestDot, SOUNDENT_CHANNEL_REPEATED_DANGER, NULL );
+		}
+	}
+
+	if ( rpg_missle_use_custom_detonators.GetBool() )
+	{
+		for ( int i = gm_CustomDetonators.Count() - 1; i >=0; --i )
+		{
+			CustomDetonator_t &detonator = gm_CustomDetonators[i];
+			if ( !detonator.hEntity )
+			{
+				gm_CustomDetonators.FastRemove( i );
+			}
+			else
+			{
+				const Vector &vPos = detonator.hEntity->CollisionProp()->WorldSpaceCenter();
+				if ( detonator.halfHeight > 0 )
+				{
+					if ( fabsf( vPos.z - GetAbsOrigin().z ) < detonator.halfHeight )
+					{
+						if ( ( GetAbsOrigin().AsVector2D() - vPos.AsVector2D() ).LengthSqr() < detonator.radiusSq )
+						{
+							Explode();
+							return;
+						}
+					}
+				}
+				else
+				{
+					if ( ( GetAbsOrigin() - vPos ).LengthSqr() < detonator.radiusSq )
+					{
+						Explode();
+						return;
+					}
+				}
+			}
+		}
+	}
+
 	//If we have a dot target
 	if ( pBestDot == NULL )
 	{
@@ -605,6 +670,16 @@ void CMissile::SeekThink( void )
 	Vector	vTargetDir;
 	VectorSubtract( targetPos, GetAbsOrigin(), vTargetDir );
 	float flDist = VectorNormalize( vTargetDir );
+
+	if( pLaserDot->GetTargetEntity() != NULL && flDist <= 240.0f && hl2_episodic.GetBool() )
+	{
+		// Prevent the missile circling the Strider like a Halo in ep1_c17_06. If the missile gets within 20
+		// feet of a Strider, tighten up the turn speed of the missile so it can break the halo and strike. (sjb 4/27/2006)
+		// if( pLaserDot->GetTargetEntity()->ClassMatches( "npc_strider" ) )
+		{
+			flHomingSpeed *= 1.75f;
+		}
+	}
 
 	Vector	vDir	= GetAbsVelocity();
 	float	flSpeed	= VectorNormalize( vDir );
@@ -643,6 +718,14 @@ void CMissile::SeekThink( void )
 
 	// Think as soon as possible
 	SetNextThink( gpGlobals->curtime );
+
+	if ( hl2_episodic.GetBool() && m_bCreateDangerSounds == true )
+	{
+		trace_t tr;
+		UTIL_TraceLine( GetAbsOrigin(), GetAbsOrigin() + GetAbsVelocity() * 0.5, MASK_SOLID, this, COLLISION_GROUP_NONE, &tr );
+
+		CSoundEnt::InsertSound( SOUND_DANGER, tr.endpos, 100, 0.2, this, SOUNDENT_CHANNEL_REPEATED_DANGER );
+	}
 }
 
 
@@ -671,6 +754,33 @@ CMissile *CMissile::Create( const Vector &vecOrigin, const QAngle &vecAngles, ed
 	return pMissile;
 }
 
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+CUtlVector<CMissile::CustomDetonator_t> CMissile::gm_CustomDetonators;
+
+void CMissile::AddCustomDetonator(CBaseEntity* pEntity, float radius, float height)
+{
+	int i = gm_CustomDetonators.AddToTail();
+	gm_CustomDetonators[i].hEntity = pEntity;
+	gm_CustomDetonators[i].radiusSq = Square(radius);
+	gm_CustomDetonators[i].halfHeight = height * 0.5f;
+}
+
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void CMissile::RemoveCustomDetonator(CBaseEntity* pEntity)
+{
+	for (int i = 0; i < gm_CustomDetonators.Count(); i++)
+	{
+		if (gm_CustomDetonators[i].hEntity == pEntity)
+		{
+			gm_CustomDetonators.FastRemove(i);
+			break;
+		}
+	}
+}
 
 
 //-----------------------------------------------------------------------------
@@ -868,6 +978,7 @@ BEGIN_DATADESC( CAPCMissile )
 	DEFINE_THINKFUNC( BeginSeekThink ),
 	DEFINE_THINKFUNC( AugerStartThink ),
 	DEFINE_THINKFUNC( ExplodeThink ),
+	DEFINE_THINKFUNC( APCSeekThink ),
 
 	DEFINE_FUNCTION( APCMissileTouch ),
 
@@ -912,6 +1023,7 @@ void CAPCMissile::Init()
 	CreateSmokeTrail();
 	SetTouch( &CAPCMissile::APCMissileTouch );
 	m_flLastHomingSpeed = APC_HOMING_SPEED;
+	// CreateDangerSounds( true );
 }
 
 
@@ -984,8 +1096,37 @@ void CAPCMissile::ExplodeDelay( float flDelay )
 void CAPCMissile::BeginSeekThink( void )
 {
  	RemoveSolidFlags( FSOLID_NOT_SOLID );
-	SetThink( &CAPCMissile::SeekThink );
+	SetThink( &CAPCMissile::APCSeekThink );
 	SetNextThink( gpGlobals->curtime );
+}
+
+void CAPCMissile::APCSeekThink( void )
+{
+	BaseClass::SeekThink();
+
+	bool bFoundDot = false;
+
+	//If we can't find a dot to follow around then just send me wherever I'm facing so I can blow up in peace.
+	for( CLaserDot *pEnt = GetLaserDotList(); pEnt != NULL; pEnt = pEnt->m_pNext )
+	{
+		if ( !pEnt->IsOn() )
+			continue;
+
+		if ( pEnt->GetOwnerEntity() != GetOwnerEntity() )
+			continue;
+
+		bFoundDot = true;
+	}
+
+	if ( bFoundDot == false )
+	{
+		Vector	vDir	= GetAbsVelocity();
+		VectorNormalize ( vDir );
+
+		SetAbsVelocity( vDir * 800 );
+
+		SetThink( NULL );
+	}
 }
 
 void CAPCMissile::ExplodeThink()
@@ -1036,8 +1177,11 @@ void CAPCMissile::DoExplosion( void )
 	}
 	else
 	{
-		ExplosionCreate( GetAbsOrigin(), GetAbsAngles(), GetOwnerEntity(), 
-			APC_MISSILE_DAMAGE, 100, true, 20000 );
+#ifdef HL2_EPISODIC
+		ExplosionCreate( GetAbsOrigin(), GetAbsAngles(), this, APC_MISSILE_DAMAGE, 100, true, 20000 );
+#else
+		ExplosionCreate( GetAbsOrigin(), GetAbsAngles(), GetOwnerEntity(), APC_MISSILE_DAMAGE, 100, true, 20000 );
+#endif
 	}
 }
 
@@ -1315,7 +1459,21 @@ acttable_t	CWeaponRPG::m_acttable[] =
 	{ ACT_HL2MP_GESTURE_RANGE_ATTACK,	ACT_HL2MP_GESTURE_RANGE_ATTACK_RPG,	false },
 	{ ACT_HL2MP_GESTURE_RELOAD,			ACT_HL2MP_GESTURE_RELOAD_RPG,		false },
 	{ ACT_HL2MP_JUMP,					ACT_HL2MP_JUMP_RPG,					false },
-	{ ACT_RANGE_ATTACK1,				ACT_RANGE_ATTACK_RPG,				false },
+	// { ACT_RANGE_ATTACK1,				ACT_RANGE_ATTACK_RPG,				false },
+	
+	{ ACT_RANGE_ATTACK1, ACT_RANGE_ATTACK_RPG, true },
+
+	{ ACT_IDLE_RELAXED,				ACT_IDLE_RPG_RELAXED,			true },
+	{ ACT_IDLE_STIMULATED,			ACT_IDLE_ANGRY_RPG,				true },
+	{ ACT_IDLE_AGITATED,			ACT_IDLE_ANGRY_RPG,				true },
+
+	{ ACT_IDLE,						ACT_IDLE_RPG,					true },
+	{ ACT_IDLE_ANGRY,				ACT_IDLE_ANGRY_RPG,				true },
+	{ ACT_WALK,						ACT_WALK_RPG,					true },
+	{ ACT_WALK_CROUCH,				ACT_WALK_CROUCH_RPG,			true },
+	{ ACT_RUN,						ACT_RUN_RPG,					true },
+	{ ACT_RUN_CROUCH,				ACT_RUN_CROUCH_RPG,				true },
+	{ ACT_COVER_LOW,				ACT_COVER_LOW_RPG,				true },
 };
 
 IMPLEMENT_ACTTABLE(CWeaponRPG);
@@ -1394,6 +1552,76 @@ void CWeaponRPG::Activate( void )
 		}
 	}
 }
+
+
+#ifdef GAME_DLL
+//-----------------------------------------------------------------------------
+// Purpose: 
+// Input  : *pEvent - 
+//			*pOperator - 
+//-----------------------------------------------------------------------------
+void CWeaponRPG::Operator_HandleAnimEvent( animevent_t *pEvent, CBaseCombatCharacter *pOperator )
+{
+	switch( pEvent->event )
+	{
+		case EVENT_WEAPON_SMG1:
+		{
+			if ( m_hMissile != NULL )
+				return;
+
+			Vector	muzzlePoint;
+			QAngle	vecAngles;
+
+			muzzlePoint = GetOwner()->Weapon_ShootPosition();
+
+			CAI_BaseNPC *npc = pOperator->MyNPCPointer();
+			ASSERT( npc != NULL );
+
+			Vector vecShootDir = npc->GetActualShootTrajectory( muzzlePoint );
+
+			// look for a better launch location
+			Vector altLaunchPoint;
+			if (GetAttachment( "missile", altLaunchPoint ))
+			{
+				// check to see if it's relativly free
+				trace_t tr;
+				AI_TraceHull( altLaunchPoint, altLaunchPoint + vecShootDir * (10.0f*12.0f), Vector( -24, -24, -24 ), Vector( 24, 24, 24 ), MASK_NPCSOLID, NULL, &tr );
+
+				if( tr.fraction == 1.0)
+				{
+					muzzlePoint = altLaunchPoint;
+				}
+			}
+
+			VectorAngles( vecShootDir, vecAngles );
+
+			m_hMissile = CMissile::Create( muzzlePoint, vecAngles, GetOwner()->edict() );		
+			// what the fuck
+			// m_hMissile->m_hOwner = this;
+
+			// NPCs always get a grace period
+			// m_hMissile->SetGracePeriod( 0.5 );
+
+			pOperator->DoMuzzleFlash();
+
+			WeaponSound( SINGLE_NPC );
+
+			// Make sure our laserdot is off
+			m_bGuiding = false;
+
+			if ( m_hLaserDot )
+			{
+				m_hLaserDot->TurnOff();
+			}
+		}
+		break;
+
+		default:
+			BaseClass::Operator_HandleAnimEvent( pEvent, pOperator );
+			break;
+	}
+}
+#endif
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -1481,6 +1709,37 @@ void CWeaponRPG::PrimaryAttack( void )
 
 	// player "shoot" animation
 	pPlayer->SetAnimation( PLAYER_ATTACK1 );
+	
+	// Check to see if we should trigger any RPG firing triggers
+#ifdef GAME_DLL
+	int iCount = g_hWeaponFireTriggers.Count();
+	for ( int i = 0; i < iCount; i++ )
+	{
+		if ( g_hWeaponFireTriggers[i]->IsTouching( pOwner ) )
+		{
+			if ( FClassnameIs( g_hWeaponFireTriggers[i], "trigger_rpgfire" ) )
+			{
+				g_hWeaponFireTriggers[i]->ActivateMultiTrigger( pOwner );
+			}
+		}
+	}
+
+	/*if( hl2_episodic.GetBool() )
+	{
+		CAI_BaseNPC **ppAIs = g_AI_Manager.AccessAIs();
+		int nAIs = g_AI_Manager.NumAIs();
+
+		string_t iszStriderClassname = AllocPooledString( "npc_strider" );
+
+		for ( int i = 0; i < nAIs; i++ )
+		{
+			if( ppAIs[ i ]->m_iClassname == iszStriderClassname )
+			{
+				ppAIs[ i ]->DispatchInteraction( g_interactionPlayerLaunchedRPG, NULL, m_hMissile );
+			}
+		}
+	}*/
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -1556,7 +1815,7 @@ void CWeaponRPG::ItemPostFrame( void )
 	}
 
 	// Supress our guiding effects if we're lowered
-	if ( GetIdealActivity() == ACT_VM_IDLE_LOWERED )
+	if ( GetIdealActivity() == ACT_VM_IDLE_LOWERED || GetIdealActivity() == ACT_VM_RELOAD )
 	{
 		SuppressGuiding();
 	}
