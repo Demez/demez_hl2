@@ -127,9 +127,10 @@ modeswitchsave.tga
 # --------------------------------------------
 # Directory Junctions
 
-/game/ep2
-/game/episodic
-/game/hl2
+output/ep2
+output/episodic
+output/hl2
+output/hl2mp
 
 # --------------------------------------------
 # General
@@ -144,10 +145,6 @@ modeswitchsave.tga
 *.vpc_crc
 *.asi
 *.lnk
-
-/src/lib/public/tier0.lib
-/src/lib/public/tier1.lib
-/src/lib/public/vstdlib.lib
 
 \.vscode/
 /game/bin/win32/*.vdf

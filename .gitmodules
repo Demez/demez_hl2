@@ -1,4 +1,10 @@
-[submodule "quiver"]
-	path = quiver
-	url = https://github.com/quiverteam/Engine.git
+[submodule "branches/2013"]
+	path = branches/2013
+	url = https://github.com/Demez/demez_source_2013
+[submodule "qpc"]
+	path = qpc
+	url = https://github.com/quiverteam/QuiverProjectCreator
+[submodule "branches/quiver"]
+	path = branches/quiver
+	url = https://github.com/quiverteam/Engine
 	branch = upcoming
