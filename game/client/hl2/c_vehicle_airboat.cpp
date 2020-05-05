@@ -12,7 +12,7 @@
 #include "cbase.h"
 #include "c_prop_vehicle.h"
 #include "datacache/imdlcache.h"
-#include "c_demez_flashlighteffect.h"
+#include "flashlighteffect.h"
 #include "movevars_shared.h"
 #include "ammodef.h"
 #include "SpriteTrail.h"
