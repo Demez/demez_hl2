@@ -88,7 +88,7 @@ DECLARE_HUDELEMENT( CHudDeathNotice );
 CHudDeathNotice::CHudDeathNotice( const char *pElementName ) :
 	CHudElement( pElementName ), BaseClass( NULL, "HudDeathNotice" )
 {
-	vgui::Panel *pParent = g_pClientMode->GetViewport();
+	vgui::Panel *pParent = GetClientMode()->GetViewport();
 	SetParent( pParent );
 
 	m_iconD_headshot = NULL;
@@ -119,7 +119,11 @@ void CHudDeathNotice::Init( void )
 //-----------------------------------------------------------------------------
 void CHudDeathNotice::VidInit( void )
 {
-	m_iconD_skull = gHUD.GetIcon( "d_skull" );
+#if ENGINE_NEW
+	m_iconD_skull = HudIcons().GetIcon( "d_skull" );
+#else
+	m_iconD_skull = GetHud().GetIcon( "d_skull" );
+#endif
 	m_DeathNotices.Purge();
 }
 
@@ -247,7 +251,12 @@ void CHudDeathNotice::Paint()
 void CHudDeathNotice::RetireExpiredDeathNotices( void )
 {
 	// Loop backwards because we might remove one
+#if ENGINE_NEW
+	int iSize = m_DeathNotices.Count();
+#else
 	int iSize = m_DeathNotices.Size();
+#endif
+
 	for ( int i = iSize-1; i >= 0; i-- )
 	{
 		if ( m_DeathNotices[i].flDisplayTime < gpGlobals->curtime )
@@ -310,7 +319,11 @@ void CHudDeathNotice::FireGameEvent( IGameEvent * event )
 	deathMsg.iSuicide = ( !killer || killer == victim );
 
 	// Try and find the death identifier in the icon list
+#if ENGINE_NEW
+	deathMsg.iconDeath = HudIcons().GetIcon( fullkilledwith );
+#else
 	deathMsg.iconDeath = gHUD.GetIcon( fullkilledwith );
+#endif
 
 	if ( !deathMsg.iconDeath || deathMsg.iSuicide )
 	{

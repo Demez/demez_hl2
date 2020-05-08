@@ -269,12 +269,20 @@ void C_HL2MP_Player::ClientThink( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
+#if ENGINE_NEW
+int C_HL2MP_Player::DrawModel( int flags, const RenderableInstance_t &instance )
+#else
 int C_HL2MP_Player::DrawModel( int flags )
+#endif
 {
 	if ( !m_bReadyToDraw )
 		return 0;
 
-    return BaseClass::DrawModel(flags);
+#if ENGINE_NEW
+    return BaseClass::DrawModel( flags, instance );
+#else
+    return BaseClass::DrawModel( flags );
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -544,7 +552,7 @@ float C_HL2MP_Player::GetFOV( void )
 	int min_fov = GetMinFOV();
 	
 	// Don't let it go too low
-	flFOVOffset = max( min_fov, flFOVOffset );
+	flFOVOffset = MAX( min_fov, flFOVOffset );
 
 	return flFOVOffset;
 }
@@ -717,7 +725,7 @@ void C_HL2MP_Player::CalcView( Vector &eyeOrigin, QAngle &eyeAngles, float &zNea
 		AngleVectors( eyeAngles, &vForward );
 
 		VectorNormalize( vForward );
-#ifdef ENGINE_QUIVER
+#if ENGINE_QUIVER || ENGINE_ASW
 		VectorMA( origin, -CHASE_CAM_DISTANCE, vForward, eyeOrigin );
 #elif ENGINE_2013
 		VectorMA( origin, -CHASE_CAM_DISTANCE_MAX, vForward, eyeOrigin );

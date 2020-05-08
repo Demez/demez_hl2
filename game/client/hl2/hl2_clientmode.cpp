@@ -17,7 +17,17 @@ ConVar default_fov("default_fov", "90", FCVAR_ARCHIVE | FCVAR_USERINFO, "Sets th
 ConVar demez_fov("demez_fov", "90", FCVAR_ARCHIVE | FCVAR_USERINFO, "Sets the base field-of-view.");
 
 // The current client mode. Always ClientModeNormal in HL.
-IClientMode *g_pClientMode = NULL;
+#if ENGINE_NEW
+	static IClientMode *g_pClientMode[ MAX_SPLITSCREEN_PLAYERS ];
+	IClientMode *GetClientMode()
+	{
+		ASSERT_LOCAL_PLAYER_RESOLVABLE();
+		return g_pClientMode[ GET_ACTIVE_SPLITSCREEN_SLOT() ];
+	}
+
+#else
+	IClientMode *g_pClientMode = NULL;
+#endif
 
 #define SCREEN_FILE		"scripts/vgui_screens.txt"
 
@@ -45,7 +55,15 @@ CHLModeManager::~CHLModeManager( void )
 
 void CHLModeManager::Init( void )
 {
+#if ENGINE_NEW
+	for (int i = 0; i < MAX_SPLITSCREEN_PLAYERS; ++i)
+	{
+		ACTIVE_SPLITSCREEN_PLAYER_GUARD(i);
+		g_pClientMode[i] = GetClientModeNormal();
+	}
+#else
 	g_pClientMode = GetClientModeNormal();
+#endif
 	PanelMetaClassMgr()->LoadMetaClassDefinitionFile( SCREEN_FILE );
 }
 
@@ -63,12 +81,12 @@ void CHLModeManager::CreateMove( float flInputSampleTime, CUserCmd *cmd )
 
 void CHLModeManager::LevelInit( const char *newmap )
 {
-	g_pClientMode->LevelInit( newmap );
+	GetClientMode()->LevelInit( newmap );
 }
 
 void CHLModeManager::LevelShutdown( void )
 {
-	g_pClientMode->LevelShutdown();
+	GetClientMode()->LevelShutdown();
 }
 
 

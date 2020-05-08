@@ -79,6 +79,15 @@ files
 		}
 	}
 	
+	/*folder "Demez Base"
+	{
+		"server/demez/demez_util.cpp"
+		"server/demez/demez_util.h"
+		
+		"server/demez/ai/ai_demeznpc.cpp"
+		"server/demez/ai/ai_demeznpc.h"
+	}*/
+	
 	folder "Game Base"
 	{
 		"server/hl2/hl2_ai_network.cpp"
@@ -267,13 +276,6 @@ files
 
 			"server/episodic/weapon_striderbuster.cpp"
 			"server/episodic/weapon_striderbuster.h"
-			"server/episodic/ep1_gamestats.h"
-			"server/episodic/ep2_gamestats.h"
-			"server/episodic/ep1_gamestats.cpp"	\
-			"server/episodic/ep2_gamestats.cpp"
-			{
-				precompiled_header "none"
-			}
 		}
 		
 		"server/hl2/antlion_dust.cpp"

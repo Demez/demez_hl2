@@ -97,7 +97,7 @@ float C_BaseHLPlayer::GetFOV()
 	float flFOVOffset = BaseClass::GetFOV() + GetZoom();
 	
 	// Don't let it go too low
-	flFOVOffset = max(default_fov.GetInt(), flFOVOffset );
+	flFOVOffset = MAX(default_fov.GetInt(), flFOVOffset );
 
 	return flFOVOffset;
 }
@@ -148,7 +148,11 @@ void C_BaseHLPlayer::Zoom( float FOVOffset, float time )
 // Input  : flags - 
 // Output : int
 //-----------------------------------------------------------------------------
-int C_BaseHLPlayer::DrawModel( int flags )
+int C_BaseHLPlayer::DrawModel( int flags
+#if ENGINE_NEW
+							  , const RenderableInstance_t &instance
+#endif
+)
 {
 	// Not pitch for player
 	QAngle saveAngles = GetLocalAngles();
@@ -158,7 +162,11 @@ int C_BaseHLPlayer::DrawModel( int flags )
 
 	SetLocalAngles( useAngles );
 
-	int iret = BaseClass::DrawModel( flags );
+	int iret = BaseClass::DrawModel( flags
+#if ENGINE_NEW
+									, instance
+#endif
+	);
 
 	SetLocalAngles( saveAngles );
 
@@ -264,7 +272,7 @@ void C_BaseHLPlayer::PerformClientSideObstacleAvoidance( float flFrameTime, CUse
 
 	if ( curspeed > 150.0f )
 	{
-		curspeed = min( 2048.0f, curspeed );
+		curspeed = MIN( 2048.0f, curspeed );
 		factor = ( 1.0f + ( curspeed - 150.0f ) / 150.0f );
 
 		//engine->Con_NPrintf( slot++, "scaleup (%f) to radius %f\n", factor, radius * factor );
@@ -516,7 +524,7 @@ void C_BaseHLPlayer::PerformClientSideObstacleAvoidance( float flFrameTime, CUse
 		flSideScale = fabs( cl_sidespeed.GetFloat() ) / fabs( pCmd->sidemove );
 	}
 	
-	float flScale = min( flForwardScale, flSideScale );
+	float flScale = MIN( flForwardScale, flSideScale );
 	pCmd->forwardmove *= flScale;
 	pCmd->sidemove *= flScale;
 

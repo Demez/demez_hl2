@@ -33,8 +33,8 @@ files
 {
 	folder "Base"
 	{
-		// - "../../game/shared/weapon_parse_default.cpp" [$ENGINE_QUIVER]
-		- "$SRCDIR/game/client/flashlighteffect.cpp"
+		- "$ENGINE_SRC_DIR/game/shared/weapon_parse_default.cpp" [!$ENGINE_2013]
+		- "$ENGINE_SRC_DIR/game/client/flashlighteffect.cpp"
 		
 		"$ENGINE_SRC/game/client/c_team_objectiveresource.cpp"
 		"$ENGINE_SRC/game/client/c_team_objectiveresource.h"
@@ -45,9 +45,9 @@ files
 	
 	folder "Demez"
 	{
-		"client/c_demez_flashlighteffect.*"
+		"client/c_demez_flashlighteffect.cpp"
 	}
-	
+		
 	folder "Game"
 	{
 		"client/hl2/c_basehlplayer.cpp"

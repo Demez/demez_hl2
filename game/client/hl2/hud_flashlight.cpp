@@ -16,6 +16,7 @@
 #include <vgui_controls/AnimationController.h>
 #include <vgui/ISurface.h>
 #include "c_basehlplayer.h"
+#include "engine_defines.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -63,7 +64,7 @@ DECLARE_HUDELEMENT( CHudFlashlight );
 //-----------------------------------------------------------------------------
 CHudFlashlight::CHudFlashlight( const char *pElementName ) : CHudElement( pElementName ), BaseClass( NULL, "HudFlashlight" )
 {
-	vgui::Panel *pParent = g_pClientMode->GetViewport();
+	vgui::Panel *pParent = GetClientMode()->GetViewport();
 	SetParent( pParent );
 
 	SetHiddenBits( HIDEHUD_HEALTH | HIDEHUD_PLAYERDEAD | HIDEHUD_NEEDSUIT );
@@ -83,7 +84,7 @@ void CHudFlashlight::ApplySchemeSettings( vgui::IScheme *pScheme )
 //-----------------------------------------------------------------------------
 void CHudFlashlight::Reset( void )
 {
-	g_pClientMode->GetViewportAnimationController()->StartAnimationSequence( "SuitFlashlightOn" ); 
+	GetClientMode()->GetViewportAnimationController()->StartAnimationSequence( "SuitFlashlightOn" ); 
 }
 
 //-----------------------------------------------------------------------------
@@ -125,7 +126,7 @@ void CHudFlashlight::Paint()
 	int enabledChunks = (int)((float)chunkCount * (pPlayer->m_HL2Local.m_flFlashBattery * 1.0f/100.0f) + 0.5f );
 
 	Color clrFlashlight;
-	clrFlashlight = ( enabledChunks < ( chunkCount / 4 ) ) ? gHUD.m_clrCaution : gHUD.m_clrNormal;
+	clrFlashlight = ( enabledChunks < ( chunkCount / 4 ) ) ? GetHud().m_clrCaution : GetHud().m_clrNormal;
 	clrFlashlight[3] = ( bIsOn ) ? 255: 32;
 
 	// Pick the right character given our current state

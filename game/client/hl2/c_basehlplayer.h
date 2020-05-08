@@ -15,6 +15,7 @@
 
 #include "c_baseplayer.h"
 #include "c_hl2_playerlocaldata.h"
+#include "engine_defines.h"
 
 class C_BaseHLPlayer : public C_BasePlayer
 {
@@ -38,7 +39,11 @@ public:
 	bool				IsFlashlightActive( void ) { return m_HL2Local.m_bitsActiveDevices & bits_SUIT_DEVICE_FLASHLIGHT; }
 	bool				IsBreatherActive( void ) { return m_HL2Local.m_bitsActiveDevices & bits_SUIT_DEVICE_BREATHER; }
 
-	virtual int			DrawModel( int flags );
+	virtual int			DrawModel( int flags
+#if ENGINE_NEW
+								  , const RenderableInstance_t &instance
+#endif
+	);
 
 	LadderMove_t		*GetLadderMove() { return &m_HL2Local.m_LadderMove; }
 	virtual void		ExitLadder();

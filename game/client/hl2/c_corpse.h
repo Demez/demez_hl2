@@ -10,6 +10,8 @@
 #pragma once
 #endif
 
+#include "engine_defines.h"
+
 class C_Corpse : public C_BaseAnimating
 {
 public:
@@ -18,7 +20,11 @@ public:
 
 						C_Corpse( void );
 
-	virtual int			DrawModel( int flags );
+	virtual int			DrawModel( int flags
+#if ENGINE_NEW
+								  , const RenderableInstance_t &instance
+#endif
+	);
 
 public:
 	// The player whom we are copying our data from

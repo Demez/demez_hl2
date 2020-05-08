@@ -6,8 +6,6 @@ macro DEMEZ_SRC_DIR ".."
 
 include "base_scripts/engine_macros.qpc"
 
-macro ENGINE_SRC "$DEMEZ_SRC_DIR/$ENGINE_FOLDER"
-
 macro SRCDIR "$DEMEZ_SRC_DIR/$ENGINE_FOLDER"         [$ENGINE_QUIVER || $ENGINE_2013]
 macro SRC_DIR "$DEMEZ_SRC_DIR/$ENGINE_FOLDER"        [$ENGINE_ASW || $ENGINE_CSGO]
 
@@ -75,6 +73,8 @@ configuration
 
 files
 {
+	"shared/engine_defines.h"
+		
 	"$ENGINE_SHARED/predicted_viewmodel.cpp"
 	"$ENGINE_SHARED/predicted_viewmodel.h"
 	

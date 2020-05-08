@@ -11,6 +11,7 @@
 #endif
 
 #include "utlmap.h"
+#include "engine_defines.h"
 
 extern bool IsAlyxInInjuredMode( void );
 

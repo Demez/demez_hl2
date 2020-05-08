@@ -15,6 +15,7 @@
 #include "clientmode_shared.h"
 #include <vgui_controls/EditablePanel.h>
 #include <vgui/Cursor.h>
+#include "engine_defines.h"
 
 class CHudViewport;
 

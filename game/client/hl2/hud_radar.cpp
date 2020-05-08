@@ -15,6 +15,7 @@
 #include "mapoverview.h"
 #include "hud_radar.h"
 #include "iclientvehicle.h"
+#include "engine_defines.h"
 
 #define RADAR_DOT_NORMAL		0
 #define RADAR_IGNORE_Z			(1<<6)	//always draw this item as if it was at the same Z as the player
@@ -194,10 +195,10 @@ void CHudRadar::SetVisible(bool state)
 {
 	BaseClass::SetVisible(state);
 
-	if( g_pMapOverview  &&  g_pMapOverview->GetMode() == CMapOverview::MAP_MODE_RADAR )
+	if( GetMapOverView() && GetMapOverView()->GetMode() == CMapOverview::MAP_MODE_RADAR )
 	{
 		// We are the hud element still, but he is in charge of the new style now.
-		g_pMapOverview->SetVisible( state );		
+		GetMapOverView()->SetVisible( state );		
 	}
 }
 

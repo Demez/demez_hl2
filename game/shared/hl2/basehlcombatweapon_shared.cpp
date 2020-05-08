@@ -606,7 +606,11 @@ void CBaseHLCombatWeapon::FireBullets(const FireBulletsInfo_t& info)
 {
 	FireBulletsInfo_t modinfo = info;
 
+#if ENGINE_NEW
+	modinfo.m_flPlayerDamage = GetHL2MPWpnData().m_iPlayerDamage;
+#else
 	modinfo.m_iPlayerDamage = GetHL2MPWpnData().m_iPlayerDamage;
+#endif
 
 	BaseClass::FireBullets(modinfo);
 }

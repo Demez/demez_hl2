@@ -28,6 +28,8 @@ extern IGameUIFuncs *gameuifuncs; // for key binding details
 
 #include <game/client/iviewport.h>
 
+#include "engine_defines.h"
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 

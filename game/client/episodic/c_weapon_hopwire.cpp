@@ -337,7 +337,11 @@ class C_GrenadeHopwire : public C_BaseGrenade
 public:
 	C_GrenadeHopwire( void );
 
-	virtual int		DrawModel( int flags );
+	virtual int		DrawModel( int flags
+#if ENGINE_ASW || ENGINE_CSGO
+							  , const RenderableInstance_t &instance
+#endif
+	);
 
 	virtual void	OnDataChanged( DataUpdateType_t updateType );
 	virtual void	ReceiveMessage( int classID, bf_read &msg );
@@ -411,11 +415,19 @@ void C_GrenadeHopwire::OnDataChanged( DataUpdateType_t updateType )
 // Purpose: 
 // Input  : flags - 
 //-----------------------------------------------------------------------------
-int	C_GrenadeHopwire::DrawModel( int flags )
+int	C_GrenadeHopwire::DrawModel( int flags
+#if ENGINE_ASW || ENGINE_CSGO
+	, const RenderableInstance_t &instance
+#endif
+)
 {
 	if ( m_ExplosionEffect.IsActive() )
 		return 1;
 
-	return BaseClass::DrawModel( flags );
+	return BaseClass::DrawModel( flags
+#if ENGINE_ASW || ENGINE_CSGO
+								, instance
+#endif
+	);
 }
 

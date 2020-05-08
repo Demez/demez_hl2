@@ -18,6 +18,7 @@
 #include "gamerules.h"
 #include "teamplay_gamerules.h"
 #include "gamevars_shared.h"
+#include "engine_defines.h"
 
 #ifndef CLIENT_DLL
 #include "hl2mp_player.h"

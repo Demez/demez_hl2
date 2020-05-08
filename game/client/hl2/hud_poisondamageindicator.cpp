@@ -20,6 +20,7 @@
 #include "materialsystem/imaterialvar.h"
 #include "ieffects.h"
 #include "hudelement.h"
+#include "engine_defines.h"
 
 using namespace vgui;
 
@@ -60,7 +61,7 @@ DECLARE_HUDELEMENT( CHudPoisonDamageIndicator );
 //-----------------------------------------------------------------------------
 CHudPoisonDamageIndicator::CHudPoisonDamageIndicator( const char *pElementName ) : CHudElement( pElementName ), BaseClass(NULL, "HudPoisonDamageIndicator")
 {
-	vgui::Panel *pParent = g_pClientMode->GetViewport();
+	vgui::Panel *pParent = GetClientMode()->GetViewport();
 	SetParent( pParent );
 	
 	SetHiddenBits( HIDEHUD_HEALTH | HIDEHUD_PLAYERDEAD | HIDEHUD_NEEDSUIT );
@@ -111,11 +112,11 @@ void CHudPoisonDamageIndicator::OnThink()
 	if (m_bDamageIndicatorVisible)
 	{
 		SetVisible(true);
-		g_pClientMode->GetViewportAnimationController()->StartAnimationSequence( "PoisonDamageTaken" );
+		GetClientMode()->GetViewportAnimationController()->StartAnimationSequence( "PoisonDamageTaken" );
 	}
 	else
 	{
-		g_pClientMode->GetViewportAnimationController()->StartAnimationSequence( "PoisonDamageCured" );
+		GetClientMode()->GetViewportAnimationController()->StartAnimationSequence( "PoisonDamageCured" );
 	}
 }
 

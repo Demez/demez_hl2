@@ -22,8 +22,11 @@ C_Corpse::C_Corpse()
 	m_nReferencePlayer = 0;
 }
 
-
-int C_Corpse::DrawModel( int flags )
+int C_Corpse::DrawModel( int flags
+#if ENGINE_NEW
+						, const RenderableInstance_t &instance
+#endif
+)
 {
 	int drawn = 0;
 	if ( m_nReferencePlayer <= 0 || 

@@ -33,8 +33,13 @@ public:
 	void ClientThink( void );
 
 	static C_HL2MP_Player* GetLocalHL2MPPlayer();
-	
-	virtual int DrawModel( int flags );
+
+#if ENGINE_NEW
+	virtual int	DrawModel( int flags, const RenderableInstance_t &instance );
+#else
+	virtual int	DrawModel( int flags );
+#endif
+
 	virtual void AddEntity( void );
 
 	QAngle GetAnimEyeAngles( void ) { return m_angEyeAngles; }
@@ -55,7 +60,13 @@ public:
 	virtual float GetMinFOV()	const { return 5.0f; }
 	virtual Vector GetAutoaimVector( float flDelta );
 	virtual void NotifyShouldTransmit( ShouldTransmitState_t state );
+
+#if ENGINE_ASW || ENGINE_CSGO
+	virtual bool CreateLightEffects( void ) {}
+#else
 	virtual void CreateLightEffects( void ) {}
+#endif
+
 	virtual bool ShouldReceiveProjectedTextures( int flags );
 	virtual void PostDataUpdate( DataUpdateType_t updateType );
 	virtual void PlayStepSound( Vector &vecOrigin, surfacedata_t *psurface, float fvol, bool force );

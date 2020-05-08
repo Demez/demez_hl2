@@ -7,6 +7,7 @@
 
 #include "cbase.h"
 #include "backgroundpanel.h"
+#include "engine_defines.h"
 
 #include <vgui/IVGui.h>
 #include <vgui/IScheme.h>
@@ -326,6 +327,11 @@ void ResizeWindowControls( EditablePanel *pWindow, int tall, int wide, int offse
 	CUtlVector<Panel *> resizedPanels;
 	CUtlVector<Panel *> movedPanels;
 
+// stfu!!!
+#if ENGINE_NEW
+	#define Size() Count()
+#endif
+
 	// Resize to account for 1.25 aspect ratio (1280x1024) screens
 	{
 		for ( int i = 0; i < panelList->Size(); ++i )
@@ -335,6 +341,7 @@ void ResizeWindowControls( EditablePanel *pWindow, int tall, int wide, int offse
 			Panel *panel = handle.Get();
 
 			bool found = false;
+
 			for ( int j = 0; j < resizedPanels.Size(); ++j )
 			{
 				if (panel == resizedPanels[j])

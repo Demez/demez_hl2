@@ -54,7 +54,7 @@ protected:
 	{
 		BaseClass::ApplySchemeSettings( pScheme );
 
-		gHUD.InitColors( pScheme );
+		GetHud().InitColors( pScheme );
 
 		SetPaintBackgroundEnabled( false );
 	}

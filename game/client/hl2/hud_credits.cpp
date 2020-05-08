@@ -18,6 +18,7 @@
 #include <vgui/ILocalize.h>
 #include "KeyValues.h"
 #include "filesystem.h"
+#include "engine_defines.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -174,7 +175,7 @@ DECLARE_HUD_MESSAGE( CHudCredits, LogoTimeMsg );
 //-----------------------------------------------------------------------------
 CHudCredits::CHudCredits( const char *pElementName ) : CHudElement( pElementName ), BaseClass( NULL, "HudCredits" )
 {
-	vgui::Panel *pParent = g_pClientMode->GetViewport();
+	vgui::Panel *pParent = GetClientMode()->GetViewport();
 	SetParent( pParent );
 }
 
@@ -329,7 +330,7 @@ void CHudCredits::DrawOutroCreditsName( void )
 					}
 				}
 
-				cColor[3] = max( 0, m_Alpha );
+				cColor[3] = MAX( 0, m_Alpha );
 			}
 		}
 		else
@@ -375,7 +376,7 @@ void CHudCredits::DrawLogo( void )
 		{
 			float flDeltaTime = ( m_flFadeTime - gpGlobals->curtime );
 
-			m_Alpha = max( 0, RemapValClamped( flDeltaTime, 5.0f, 0, -128, 255 ) );
+			m_Alpha = MAX( 0, RemapValClamped( flDeltaTime, 5.0f, 0, -128, 255 ) );
 
 			if ( flDeltaTime <= 0.0f )
 			{

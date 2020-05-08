@@ -14,6 +14,7 @@
 #include <vgui_controls/AnimationController.h>
 #include <vgui/ILocalize.h>
 #include <vgui/ISurface.h>
+#include "engine_defines.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -108,14 +109,21 @@ void CHudAmmo::Reset()
 //-----------------------------------------------------------------------------
 // Purpose: called every frame to get ammo info from the weapon
 //-----------------------------------------------------------------------------
-void CHudAmmo::UpdatePlayerAmmo( C_BasePlayer *player )
+void CHudAmmo::UpdatePlayerAmmo( C_BasePlayer *pPlayer )
 {
+	if ( !pPlayer )
+	{
+		SetPaintEnabled(false);
+		SetPaintBackgroundEnabled(false);
+		return;
+	}
+
 	// Clear out the vehicle entity
 	m_hCurrentVehicle = NULL;
 
-	C_BaseCombatWeapon *wpn = GetActiveWeapon();
+	C_BaseCombatWeapon *wpn = pPlayer->GetActiveWeapon();
 
-	if ( !wpn || !player || !wpn->UsesPrimaryAmmo() )
+	if ( !wpn || !wpn->UsesPrimaryAmmo() )
 	{
 		SetPaintEnabled(false);
 		SetPaintBackgroundEnabled(false);
@@ -134,13 +142,13 @@ void CHudAmmo::UpdatePlayerAmmo( C_BasePlayer *player )
 	if (ammo1 < 0)
 	{
 		// we don't use clip ammo, just use the total ammo count
-		ammo1 = player->GetAmmoCount(wpn->GetPrimaryAmmoType());
+		ammo1 = pPlayer->GetAmmoCount(wpn->GetPrimaryAmmoType());
 		ammo2 = 0;
 	}
 	else
 	{
 		// we use clip ammo, so the second ammo is the total ammo
-		ammo2 = player->GetAmmoCount(wpn->GetPrimaryAmmoType());
+		ammo2 = pPlayer->GetAmmoCount(wpn->GetPrimaryAmmoType());
 	}
 
 	if (wpn == m_hCurrentActiveWeapon)
@@ -159,7 +167,7 @@ void CHudAmmo::UpdatePlayerAmmo( C_BasePlayer *player )
 		if (wpn->UsesClipsForAmmo1())
 		{
 			SetShouldDisplaySecondaryValue(true);
-			g_pClientMode->GetViewportAnimationController()->StartAnimationSequence("WeaponUsesClips");
+			GetClientMode()->GetViewportAnimationController()->StartAnimationSequence("WeaponUsesClips");
 		}
 		else
 		{
@@ -429,8 +437,10 @@ protected:
 	virtual void OnThink()
 	{
 		// set whether or not the panel draws based on if we have a weapon that supports secondary ammo
-		C_BaseCombatWeapon *wpn = GetActiveWeapon();
 		C_BasePlayer *player = C_BasePlayer::GetLocalPlayer();
+		if ( player == NULL )
+			return;
+		C_BaseCombatWeapon *wpn = player->GetActiveWeapon();
 		IClientVehicle *pVehicle = player ? player->GetVehicle() : NULL;
 		if (!wpn || !player || pVehicle)
 		{
@@ -450,8 +460,10 @@ protected:
 
 	void UpdateAmmoState()
 	{
-		C_BaseCombatWeapon *wpn = GetActiveWeapon();
 		C_BasePlayer *player = C_BasePlayer::GetLocalPlayer();
+		if ( player == NULL )
+		 	return;
+		C_BaseCombatWeapon *wpn = player->GetActiveWeapon();
 
 		if (player && wpn && wpn->UsesSecondaryAmmo())
 		{

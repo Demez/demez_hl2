@@ -1,0 +1,4 @@
+macro PROJECT_NAME "Client - Demez ASW"
+macro ENGINE_ASW "1"
+
+include "base_scripts/demez_client.qpc"

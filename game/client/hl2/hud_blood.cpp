@@ -24,10 +24,10 @@ void BloodSplatCallback( const CEffectData & data )
 	y = YRES(240);
 
 	// Draw the ammo label
-	CHudTexture	*pSplat = gHUD.GetIcon( "hud_blood1" );
+	CHudTexture	*pSplat = GetHud().GetIcon( "hud_blood1" );
 	
   // FIXME:  This can only occur during vgui::Paint() stuff
-	pSplat->DrawSelf( x, y, gHUD.m_clrNormal);
+	pSplat->DrawSelf( x, y, GetHud().m_clrNormal);
 */
 }
 

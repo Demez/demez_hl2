@@ -22,7 +22,7 @@ public:
 	virtual void	ClientThink( void );
 	virtual void	OnDataChanged( DataUpdateType_t updateType );
 	virtual void	BuildTransformations( CStudioHdr *pStudioHdr, Vector *pos, Quaternion q[], const matrix3x4_t& cameraTransform, int boneMask, CBoneBitList &boneComputed );
-#ifdef ENGINE_2013
+#if ENGINE_2013 || ENGINE_ASW
 	virtual	void	AccumulateLayers( IBoneSetup &boneSetup, Vector pos[], Quaternion q[], float currentTime );
 #else
 	virtual	void	AccumulateLayers( CStudioHdr *hdr, Vector pos[], Quaternion q[], float poseparam[], float currentTime, int boneMask );
@@ -108,7 +108,7 @@ void C_NPC_Puppet::ClientThink( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-#ifdef ENGINE_2013
+#if ENGINE_2013 || ENGINE_ASW
 void C_NPC_Puppet::AccumulateLayers( IBoneSetup &boneSetup, Vector pos[], Quaternion q[], float currentTime )
 #else
 void C_NPC_Puppet::AccumulateLayers( CStudioHdr *hdr, Vector pos[], Quaternion q[], float poseparam[], float currentTime, int boneMask )
