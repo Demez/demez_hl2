@@ -24,9 +24,6 @@
 
 		#define GetAnimEvent( pEvent ) pEvent->Event()
 
-		// haha funny
-		// #define Activity ActivityDemez
-
 	#endif
 
 #elif ENGINE_QUIVER || ENGINE_2013

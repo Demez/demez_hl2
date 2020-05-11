@@ -2,6 +2,11 @@
 // Base Stuff for different source branches
 // =================================================
 
+macro ENGINE_QUIVER "0" [!$ENGINE_QUIVER]
+macro ENGINE_2013   "0" [!$ENGINE_2013]
+macro ENGINE_ASW    "0" [!$ENGINE_ASW]
+macro ENGINE_CSGO   "0" [!$ENGINE_CSGO]
+
 macro ENGINE_FOLDER "branches/quiver/src"   [$ENGINE_QUIVER]
 macro ENGINE_FOLDER "branches/2013/src"     [$ENGINE_2013]
 macro ENGINE_FOLDER "branches/asw/src"      [$ENGINE_ASW]

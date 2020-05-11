@@ -45,23 +45,38 @@ files
 		"client/demez_flashlight_base.h"
 	}
 		
-	folder "Game"
+	folder "Game Base"
 	{
+		"client/hl2/hl2_clientmode.cpp"
+		"client/hl2mp/clientmode_hl2mpnormal.cpp"
+		"client/hl2mp/clientmode_hl2mpnormal.h"
+		
+		"client/hl2/hl_in_main.cpp"
+		"client/hl2/hl_prediction.cpp"
+		"client/hl2/c_hl2_playerlocaldata.cpp"
+		"client/hl2/c_hl2_playerlocaldata.h"
+		
 		"client/hl2/c_basehlplayer.cpp"
 		"client/hl2/c_basehlplayer.h"
 		"client/hl2mp/c_hl2mp_player.cpp"
 		"client/hl2mp/c_hl2mp_player.h"
+		
 		"client/hl2/c_basehlcombatweapon.cpp"
 		"client/hl2/c_basehlcombatweapon.h"
+		
 	}
 	
 	folder "Weapons"
 	{
-		"client/hl2/c_weapon__stubs_hl2.cpp"
-		// ok so the client on hl2mp needs this, for whatever reason stuff here isn't done in the shared file
-		"client/hl2/c_weapon_crossbow.cpp"
-		"client/hl2/c_weapon_physcannon.cpp"
-		// "client/hl2/c_weapon_stunstick.cpp"
+		folder "HL2"
+		{
+			"client/hl2/c_weapon__stubs_hl2.cpp"
+			// ok so the client on hl2mp needs this, for whatever reason stuff here isn't done in the shared file
+			"client/hl2/c_weapon_crossbow.cpp"
+			"client/hl2/c_weapon_physcannon.cpp"
+			// "client/hl2/c_weapon_stunstick.cpp"
+			"client/episodic/c_weapon_hopwire.cpp"
+		}
 	}
 	
 	folder "NPCs"
@@ -73,6 +88,8 @@ files
 		"client/hl2/c_npc_antlionguard.cpp"
 		"client/hl2/c_npc_combinegunship.cpp"
 		"client/hl2/c_npc_manhack.cpp"
+		"client/episodic/c_npc_advisor.cpp"
+		"client/episodic/c_npc_puppet.cpp"
 	}
 	
 	folder "Vehicles"
@@ -82,83 +99,33 @@ files
 		"client/hl2/c_vehicle_crane.cpp"
 		"client/hl2/c_vehicle_crane.h"
 		"client/hl2/c_vehicle_prisoner_pod.cpp"
-	}
-	
-	folder "HUD"
-	{
-		"client/hl2/hud_ammo.cpp"
-		"client/hl2/hud_battery.cpp"
-		"client/hl2/hud_blood.cpp"
-		"client/hl2/hud_credits.cpp"
-		"client/hl2/hud_damageindicator.cpp"
-		"client/hl2/hud_flashlight.cpp"
-		"client/hl2/hud_locator.cpp"
-		"client/hl2/hud_health.cpp"
-		"client/hl2/hud_poisondamageindicator.cpp"
-		"client/hl2/hud_quickinfo.cpp"
-		"client/hl2/hud_radar.cpp"
-		"client/hl2/hud_radar.h"
-		"client/hl2/hud_suitpower.cpp"
-		"client/hl2/hud_suitpower.h"
-		"client/hl2/hud_weaponselection.cpp"
-		"client/hl2/hud_zoom.cpp"
-		"client/hl2/vgui_rootpanel_hl2.cpp"
-	}
-	
-	folder "HL2 DLL"
-	{
 		"client/episodic/c_vehicle_jeep_episodic.cpp"
-		"client/episodic/c_vort_charge_token.cpp"
-		"client/episodic/c_weapon_hopwire.cpp"
-		"client/episodic/c_npc_advisor.cpp"
-		"client/episodic/episodic_screenspaceeffects.cpp"
-		"client/episodic/episodic_screenspaceeffects.h"
-		"client/episodic/flesh_internal_material_proxy.cpp"
-		"client/episodic/c_prop_scalable.cpp"
-		"client/episodic/c_npc_puppet.cpp"
-		
-		"client/hl2/c_antlion_dust.cpp"
-		"client/hl2/c_ar2_explosion.cpp"
-		"client/hl2/c_basehelicopter.cpp"
-		"client/hl2/c_basehelicopter.h"
-		"client/hl2/c_citadel_effects.cpp"
-		"client/hl2/c_corpse.cpp"
-		"client/hl2/c_corpse.h"
-		"client/hl2/c_env_alyxtemp.cpp"
-		"client/hl2/c_env_headcrabcanister.cpp"
-		"client/hl2/c_env_starfield.cpp"
-		"client/hl2/c_func_tankmortar.cpp"
-		"client/hl2/c_hl2_playerlocaldata.cpp"
-		"client/hl2/c_hl2_playerlocaldata.h"
-		"client/hl2/c_info_teleporter_countdown.cpp"
-		"client/hl2/c_plasma_beam_node.cpp"
-		"client/hl2/c_prop_combine_ball.cpp"
-		"client/hl2/c_prop_combine_ball.h"
-		"client/hl2/c_rotorwash.cpp"
-		"client/hl2/c_script_intro.cpp"
-		"client/hl2/c_te_concussiveexplosion.cpp"
-		"client/hl2/c_te_flare.cpp"
-		"client/hl2/c_thumper_dust.cpp"
-		"client/hl2/fx_antlion.cpp"
-		"client/hl2/fx_bugbait.cpp"
-		"client/hl2/fx_hl2_impacts.cpp"
-		"client/hl2/fx_hl2_tracers.cpp"
-		"client/hl2/hl2_clientmode.cpp"
-		"client/hl2/hl_in_main.cpp"
-		"client/hl2/hl_prediction.cpp"
-		"client/hl2/ShieldProxy.cpp"
-		
-		"client/hl2/c_waterbullet.cpp"
-		"client/hl2/c_func_monitor.cpp"
 	}
-
-	folder "HL2MP"
+	
+	folder "UI"
 	{
-		"client/hl2mp/c_te_hl2mp_shotgun_shot.cpp"
-		"client/hl2mp/clientmode_hl2mpnormal.cpp"
-		"client/hl2mp/clientmode_hl2mpnormal.h"
-
-		folder "UI"
+		folder "HUD"
+		{
+			"client/hl2/hud_ammo.cpp"
+			"client/hl2/hud_battery.cpp"
+			"client/hl2/hud_blood.cpp"
+			"client/hl2/hud_credits.cpp"
+			"client/hl2/hud_damageindicator.cpp"
+			"client/hl2/hud_flashlight.cpp"
+			"client/hl2/hud_locator.cpp"
+			"client/hl2/hud_health.cpp"
+			"client/hl2/hud_poisondamageindicator.cpp"
+			"client/hl2/hud_quickinfo.cpp"
+			"client/hl2/hud_radar.cpp"
+			"client/hl2/hud_radar.h"
+			"client/hl2/hud_suitpower.cpp"
+			"client/hl2/hud_suitpower.h"
+			"client/hl2/hud_weaponselection.cpp"
+			"client/hl2/hud_zoom.cpp"
+			"client/hl2/vgui_rootpanel_hl2.cpp"
+		}
+		
+		folder "Multiplayer"
 		{
 			"client/hl2mp/ui/backgroundpanel.cpp"
 			"client/hl2mp/ui/backgroundpanel.h"
@@ -173,4 +140,49 @@ files
 			"client/hl2mp/hud_deathnotice.cpp"
 		}
 	}
+	
+	folder "Effects"
+	{
+		"client/hl2/fx_antlion.cpp"
+		"client/hl2/fx_bugbait.cpp"
+		"client/hl2/fx_hl2_impacts.cpp"
+		"client/hl2/fx_hl2_tracers.cpp"
+		"client/episodic/episodic_screenspaceeffects.cpp"
+		"client/episodic/episodic_screenspaceeffects.h"
+		"client/hl2mp/c_te_hl2mp_shotgun_shot.cpp"
+		"client/hl2/c_te_concussiveexplosion.cpp"
+		"client/hl2/c_te_flare.cpp"
+		"client/hl2/c_antlion_dust.cpp"
+		"client/hl2/c_ar2_explosion.cpp"
+		"client/episodic/flesh_internal_material_proxy.cpp"
+		"client/hl2/c_citadel_effects.cpp"
+		"client/hl2/c_env_alyxtemp.cpp"
+		"client/hl2/c_env_headcrabcanister.cpp"
+		"client/hl2/c_env_starfield.cpp"
+		"client/hl2/c_thumper_dust.cpp"
+	}
+	
+	folder "Half-Life 2 Assorted"
+	{
+		"client/episodic/c_vort_charge_token.cpp"
+		
+		"client/episodic/c_prop_scalable.cpp"
+		"client/hl2/c_prop_combine_ball.cpp"
+		"client/hl2/c_prop_combine_ball.h"
+		
+		"client/hl2/c_basehelicopter.cpp"
+		"client/hl2/c_basehelicopter.h"
+		"client/hl2/c_corpse.cpp"
+		"client/hl2/c_corpse.h"
+		"client/hl2/c_info_teleporter_countdown.cpp"
+		"client/hl2/c_plasma_beam_node.cpp"
+		"client/hl2/c_rotorwash.cpp"
+		"client/hl2/c_script_intro.cpp"
+		"client/hl2/c_waterbullet.cpp"
+		"client/hl2/ShieldProxy.cpp"
+		
+		"client/hl2/c_func_monitor.cpp"
+		"client/hl2/c_func_tankmortar.cpp"
+	}
 }
+

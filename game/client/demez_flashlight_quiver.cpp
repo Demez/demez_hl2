@@ -117,13 +117,6 @@ void CFlashlightEffect::UpdateLightNew(const Vector &vecPos, const Vector &vecFo
 	// We will lock some of the flashlight params if player is on a ladder, to prevent oscillations due to the trace-rays
 	bool bPlayerOnLadder = ( C_BasePlayer::GetLocalPlayer()->GetMoveType() == MOVETYPE_LADDER );
 
-#if ENGINE_QUIVER
-	const float flEpsilon = 0.1f;			// Offset flashlight position along vecUp
-	const float flDistCutoff = r_flashlighttracedistcutoff.GetFloat();
-	//const float flDistDrag = 0.2;
-	const float flDistDrag = 0;
-#endif
-
 	CTraceFilterSkipPlayerAndViewModel traceFilter;
 	float flOffsetY = r_flashlightoffsety.GetFloat();
 
@@ -192,7 +185,12 @@ void CFlashlightEffect::UpdateLightNew(const Vector &vecPos, const Vector &vecFo
 		debugoverlay->AddLineOverlay( vOrigin, pmDirectionTrace.endpos, 255, 0, 0, false, 0 );
 	}
 
-#if !ENGINE_2013
+#if ENGINE_QUIVER
+	const float flEpsilon = 0.1f;			// Offset flashlight position along vecUp
+	const float flDistCutoff = r_flashlighttracedistcutoff.GetFloat();
+	// const float flDistDrag = 0.2;
+	const float flDistDrag = 0;
+
 	float flDist = (pmDirectionTrace.endpos - vOrigin).Length();
 	if ( flDist < flDistCutoff )
 	{
@@ -218,6 +216,7 @@ void CFlashlightEffect::UpdateLightNew(const Vector &vecPos, const Vector &vecFo
 	{
 		m_flCurrentPullBackDist = Lerp( flDistDrag, m_flCurrentPullBackDist, 0.0f );
 	}
+
 	vOrigin = vOrigin - vDir * m_flCurrentPullBackDist;
 #endif
 

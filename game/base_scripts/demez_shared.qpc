@@ -1,6 +1,7 @@
 // ---------------------------------------------------------------
 // Demez Mod - Shared
 // kind of a mess here, oh well
+// honestly, it might be a good idea to include client and server base files for each engine here, but idk
 // ---------------------------------------------------------------
 macro DEMEZ_SRC_DIR ".."
 
@@ -55,10 +56,10 @@ configuration
 			"HL2MP"
 			"HL2_EPISODIC"
 			
-			"ENGINE_QUIVER"   [$ENGINE_QUIVER]
-			"ENGINE_2013"     [$ENGINE_2013]
-			"ENGINE_ASW"      [$ENGINE_ASW]
-			"ENGINE_CSGO"     [$ENGINE_CSGO]
+			"ENGINE_QUIVER=$ENGINE_QUIVER"
+			"ENGINE_2013=$ENGINE_2013"
+			"ENGINE_ASW=$ENGINE_ASW"
+			"ENGINE_CSGO=$ENGINE_CSGO"
 		}
 	}
 	
@@ -87,7 +88,7 @@ files
 		"shared/ai_activity.h"
 	}
 	
-	folder "Game"
+	folder "Game Base"
 	{
 		"shared/hl2mp/hl2mp_gamerules.cpp"
 		"shared/hl2mp/hl2mp_gamerules.h"
@@ -105,7 +106,7 @@ files
 		"shared/hl2mp/hl2mp_weapon_parse.h"
 	}
 
-	folder "HL2 DLL"
+	folder "Half-Life 2 Assorted"
 	{
 		"shared/episodic/npc_advisor_shared.h"
 		
@@ -119,15 +120,13 @@ files
 		"shared/hl2/env_alyxemp_shared.h"
 		"shared/hl2/hl2_player_shared.h"
 		"shared/hl2/hl_movedata.h"
-		
-		// on server only so uhhhh
-		"shared/hl2/survival_gamerules.cpp"
 	}
-
-	folder "HL2MP"
+	
+	folder "Weapons"
 	{
-		folder "Weapons Base"
+		folder "Base"
 		{
+			// TODO: move out of hl2mp and rename to weapon_demez_base.cpp and so on
 			"shared/weapons/hl2mp/weapon_hl2mpbase.cpp"
 			"shared/weapons/hl2mp/weapon_hl2mpbase.h"
 			"shared/weapons/hl2mp/weapon_hl2mpbase_machinegun.cpp"
@@ -136,14 +135,16 @@ files
 			"shared/weapons/hl2mp/weapon_hl2mpbasehlmpcombatweapon.cpp"
 			"shared/weapons/hl2mp/weapon_hl2mpbasehlmpcombatweapon.h"
 		}
-
-		folder "Weapons"
+		
+		folder "HL2"
 		{
+			"shared/weapons/hl2mp/weapon_crowbar.cpp"
+			"shared/weapons/hl2mp/weapon_stunstick.cpp"
+			"shared/weapons/hl2mp/weapon_stunstick.h"
 			"shared/weapons/hl2mp/weapon_357.cpp"
 			"shared/weapons/hl2mp/weapon_ar2.cpp"
 			"shared/weapons/hl2mp/weapon_ar2.h"
 			"shared/weapons/hl2mp/weapon_crossbow.cpp"
-			"shared/weapons/hl2mp/weapon_crowbar.cpp"
 			"shared/weapons/hl2mp/weapon_frag.cpp"
 			// "shared/weapons/hl2mp/weapon_physcannon.cpp"
 			// "shared/weapons/hl2mp/weapon_physcannon.h"
@@ -154,8 +155,7 @@ files
 			"shared/weapons/hl2mp/weapon_slam.cpp"
 			"shared/weapons/hl2mp/weapon_slam.h"
 			"shared/weapons/hl2mp/weapon_smg1.cpp"
-			"shared/weapons/hl2mp/weapon_stunstick.cpp"
-			"shared/weapons/hl2mp/weapon_stunstick.h"
 		}
 	}
 }
+
