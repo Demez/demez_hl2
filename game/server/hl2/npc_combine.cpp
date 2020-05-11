@@ -2348,12 +2348,12 @@ void CNPC_Combine::HandleAnimEvent( animevent_t *pEvent )
 
 	if (pEvent->type & AE_TYPE_NEWEVENTSYSTEM)
 	{
-		if ( pEvent->event == COMBINE_AE_BEGIN_ALTFIRE )
+		if ( GetAnimEvent(pEvent) == COMBINE_AE_BEGIN_ALTFIRE )
 		{
 			EmitSound( "Weapon_CombineGuard.Special1" );
 			handledEvent = true;
 		}
-		else if ( pEvent->event == COMBINE_AE_ALTFIRE )
+		else if ( GetAnimEvent(pEvent) == COMBINE_AE_ALTFIRE )
 		{
 			if( IsElite() )
 			{
@@ -2385,7 +2385,7 @@ void CNPC_Combine::HandleAnimEvent( animevent_t *pEvent )
 	}
 	else
 	{
-		switch( pEvent->event )
+		switch( GetAnimEvent(pEvent) )
 		{
 		case COMBINE_AE_AIM:	
 			{
@@ -2511,7 +2511,7 @@ void CNPC_Combine::HandleAnimEvent( animevent_t *pEvent )
 
 	if( handledEvent )
 	{
-		m_iLastAnimEventHandled = pEvent->event;
+		m_iLastAnimEventHandled = GetAnimEvent(pEvent);
 	}
 }
 

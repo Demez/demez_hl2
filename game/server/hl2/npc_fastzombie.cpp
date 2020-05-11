@@ -26,6 +26,7 @@
 #include "props.h"
 #include "physics_npc_solver.h"
 #include "physics_prop_ragdoll.h"
+#include "engine_defines.h"
 
 #ifdef HL2_EPISODIC
 #include "episodic/ai_behavior_passenger_zombie.h"
@@ -546,7 +547,7 @@ void CFastZombie::PrescheduleThink( void )
 			// Zombie is close! Recalculate pitch.
 			int iPitch;
 
-			m_flDistFactor = min( 1.0, 1 - flDistNoBBox / FASTZOMBIE_EXCITE_DIST ); 
+			m_flDistFactor = MIN( 1.0, 1 - flDistNoBBox / FASTZOMBIE_EXCITE_DIST ); 
 			iPitch = FASTZOMBIE_MIN_PITCH + ( ( FASTZOMBIE_MAX_PITCH - FASTZOMBIE_MIN_PITCH ) * m_flDistFactor); 
 			ENVELOPE_CONTROLLER.SoundChangePitch( m_pMoanSound, iPitch, FASTZOMBIE_SOUND_UPDATE_FREQ );
 		}
@@ -1048,7 +1049,7 @@ int CFastZombie::RangeAttack1Conditions( float flDot, float flDist )
 //-----------------------------------------------------------------------------
 void CFastZombie::HandleAnimEvent( animevent_t *pEvent )
 {
-	if ( pEvent->event == AE_FASTZOMBIE_CLIMB_LEFT || pEvent->event == AE_FASTZOMBIE_CLIMB_RIGHT )
+	if ( GetAnimEvent(pEvent) == AE_FASTZOMBIE_CLIMB_LEFT || GetAnimEvent(pEvent) == AE_FASTZOMBIE_CLIMB_RIGHT )
 	{
 		if( ++m_iClimbCount % 3 == 0 )
 		{
@@ -1059,25 +1060,25 @@ void CFastZombie::HandleAnimEvent( animevent_t *pEvent )
 		return;
 	}
 
-	if ( pEvent->event == AE_FASTZOMBIE_LEAP )
+	if ( GetAnimEvent(pEvent) == AE_FASTZOMBIE_LEAP )
 	{
 		LeapAttack();
 		return;
 	}
 	
-	if ( pEvent->event == AE_FASTZOMBIE_GALLOP_LEFT )
+	if ( GetAnimEvent(pEvent) == AE_FASTZOMBIE_GALLOP_LEFT )
 	{
 		EmitSound( "NPC_FastZombie.GallopLeft" );
 		return;
 	}
 
-	if ( pEvent->event == AE_FASTZOMBIE_GALLOP_RIGHT )
+	if ( GetAnimEvent(pEvent) == AE_FASTZOMBIE_GALLOP_RIGHT )
 	{
 		EmitSound( "NPC_FastZombie.GallopRight" );
 		return;
 	}
 	
-	if ( pEvent->event == AE_ZOMBIE_ATTACK_RIGHT )
+	if ( GetAnimEvent(pEvent) == AE_ZOMBIE_ATTACK_RIGHT )
 	{
 		Vector right;
 		AngleVectors( GetLocalAngles(), NULL, &right, NULL );
@@ -1087,7 +1088,7 @@ void CFastZombie::HandleAnimEvent( animevent_t *pEvent )
 		return;
 	}
 
-	if ( pEvent->event == AE_ZOMBIE_ATTACK_LEFT )
+	if ( GetAnimEvent(pEvent) == AE_ZOMBIE_ATTACK_LEFT )
 	{
 		Vector right;
 		AngleVectors( GetLocalAngles(), NULL, &right, NULL );
@@ -1100,14 +1101,14 @@ void CFastZombie::HandleAnimEvent( animevent_t *pEvent )
 #ifdef HL2_EPISODIC
 
 	// Do the leap attack
-	if ( pEvent->event == AE_FASTZOMBIE_VEHICLE_LEAP )
+	if ( GetAnimEvent(pEvent) == AE_FASTZOMBIE_VEHICLE_LEAP )
 	{
 		VehicleLeapAttack();
 		return;
 	}
 
 	// Die while doing an SS in a vehicle
-	if ( pEvent->event == AE_FASTZOMBIE_VEHICLE_SS_DIE )
+	if ( GetAnimEvent(pEvent) == AE_FASTZOMBIE_VEHICLE_SS_DIE )
 	{
 		if ( IsInAVehicle() )
 		{

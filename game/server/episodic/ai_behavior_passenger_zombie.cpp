@@ -736,7 +736,7 @@ void CAI_PassengerBehaviorZombie::GatherVehicleStateConditions( void )
 //-----------------------------------------------------------------------------
 void CAI_PassengerBehaviorZombie::HandleAnimEvent( animevent_t *pEvent )
 {
-	if ( pEvent->event == AE_PASSENGER_PHYSICS_PUSH )
+	if ( GetAnimEvent(pEvent) == AE_PASSENGER_PHYSICS_PUSH )
 	{
 		// Add a push into the vehicle
 		float flForce = (float) atof( pEvent->options );

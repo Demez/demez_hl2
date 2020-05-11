@@ -210,7 +210,7 @@ int CNPC_Alyx::ObjectCaps()
 //=========================================================
 void CNPC_Alyx::HandleAnimEvent( animevent_t *pEvent )
 {
-	if (pEvent->event == AE_ALYX_EMPTOOL_ATTACHMENT)
+	if (GetAnimEvent(pEvent) == AE_ALYX_EMPTOOL_ATTACHMENT)
 	{
 		if (!m_hEmpTool)
 		{
@@ -236,7 +236,7 @@ void CNPC_Alyx::HandleAnimEvent( animevent_t *pEvent )
 
 		return;
 	}
-	else if (pEvent->event == AE_ALYX_EMPTOOL_SEQUENCE)
+	else if (GetAnimEvent(pEvent) == AE_ALYX_EMPTOOL_SEQUENCE)
 	{
 		if (!m_hEmpTool)
 			return;
@@ -254,7 +254,7 @@ void CNPC_Alyx::HandleAnimEvent( animevent_t *pEvent )
 
 		return;
 	}
-	else if (pEvent->event == AE_ALYX_EMPTOOL_USE)
+	else if (GetAnimEvent(pEvent) == AE_ALYX_EMPTOOL_USE)
 	{
 		if( m_OperatorBehavior.IsGoalReady() )
 		{
@@ -265,12 +265,12 @@ void CNPC_Alyx::HandleAnimEvent( animevent_t *pEvent )
 		}
 		return;
 	}
-	else if ( pEvent->event == COMBINE_AE_BEGIN_ALTFIRE )
+	else if ( GetAnimEvent(pEvent) == COMBINE_AE_BEGIN_ALTFIRE )
 	{
 		EmitSound( "Weapon_CombineGuard.Special1" );
 		return;
 	}
-	else if ( pEvent->event == COMBINE_AE_ALTFIRE )
+	else if ( GetAnimEvent(pEvent) == COMBINE_AE_ALTFIRE )
 	{
 		animevent_t fakeEvent;
 
@@ -282,7 +282,7 @@ void CNPC_Alyx::HandleAnimEvent( animevent_t *pEvent )
 		return;
 	}
 
-	switch( pEvent->event )
+	switch( GetAnimEvent(pEvent) )
 	{
 	case 1:
 	default:

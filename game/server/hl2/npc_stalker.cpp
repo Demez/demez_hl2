@@ -1244,7 +1244,7 @@ int CNPC_Stalker::RangeAttack1Conditions( float flDot, float flDist )
 //-----------------------------------------------------------------------------
 void CNPC_Stalker::HandleAnimEvent( animevent_t *pEvent )
 {
-	switch( pEvent->event )
+	switch( GetAnimEvent(pEvent) )
 	{
 		case NPC_EVENT_LEFTFOOT:
 			{

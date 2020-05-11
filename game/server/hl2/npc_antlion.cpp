@@ -925,7 +925,7 @@ bool CNPC_Antlion::InnateWeaponLOSCondition( const Vector &ownerPos, const Vecto
 
 Vector VecCheckThrowTolerance( CBaseEntity *pEdict, const Vector &vecSpot1, Vector vecSpot2, float flSpeed, float flTolerance )
 {
-	flSpeed = max( 1.0f, flSpeed );
+	flSpeed = MAX( 1.0f, flSpeed );
 
 	float flGravity = sv_gravity.GetFloat();
 
@@ -1055,7 +1055,7 @@ void CNPC_Antlion::HandleAnimEvent( animevent_t *pEvent )
 {
 #ifdef HL2_EPISODIC
 		// Handle the spit event
-		if ( pEvent->event == AE_ANTLION_WORKER_SPIT )
+		if ( GetAnimEvent(pEvent) == AE_ANTLION_WORKER_SPIT )
 		{
 			if ( GetEnemy() )
 			{
@@ -1144,7 +1144,7 @@ void CNPC_Antlion::HandleAnimEvent( animevent_t *pEvent )
 			return;
 		}
 
-		if ( pEvent->event == AE_ANTLION_WORKER_DONT_EXPLODE )
+		if ( GetAnimEvent(pEvent) == AE_ANTLION_WORKER_DONT_EXPLODE )
 		{
 			m_bDontExplode = true;
 			return;
@@ -1152,44 +1152,44 @@ void CNPC_Antlion::HandleAnimEvent( animevent_t *pEvent )
 
 #endif // HL2_EPISODIC
 
-	if ( pEvent->event == AE_ANTLION_WALK_FOOTSTEP )
+	if ( GetAnimEvent(pEvent) == AE_ANTLION_WALK_FOOTSTEP )
 	{
 		MakeAIFootstepSound( 240.0f );
 		EmitSound( "NPC_Antlion.Footstep", m_hFootstep, pEvent->eventtime );
 		return;
 	}
 
-	if ( pEvent->event == AE_ANTLION_MELEE_HIT1 )
+	if ( GetAnimEvent(pEvent) == AE_ANTLION_MELEE_HIT1 )
 	{
 		MeleeAttack( ANTLION_MELEE1_RANGE, sk_antlion_swipe_damage.GetFloat(), QAngle( 20.0f, 0.0f, -12.0f ), Vector( -250.0f, 1.0f, 1.0f ) );
 		return;
 	}
 
-	if ( pEvent->event == AE_ANTLION_MELEE_HIT2 )
+	if ( GetAnimEvent(pEvent) == AE_ANTLION_MELEE_HIT2 )
 	{
 		MeleeAttack( ANTLION_MELEE1_RANGE, sk_antlion_swipe_damage.GetFloat(), QAngle( 20.0f, 0.0f, 0.0f ), Vector( -350.0f, 1.0f, 1.0f ) );
 		return;
 	}
 
-	if ( pEvent->event == AE_ANTLION_MELEE_POUNCE )
+	if ( GetAnimEvent(pEvent) == AE_ANTLION_MELEE_POUNCE )
 	{
 		MeleeAttack( ANTLION_MELEE2_RANGE, sk_antlion_swipe_damage.GetFloat(), QAngle( 4.0f, 0.0f, 0.0f ), Vector( -250.0f, 1.0f, 1.0f ) );
 		return;
 	}
 		
-	if ( pEvent->event == AE_ANTLION_OPEN_WINGS )
+	if ( GetAnimEvent(pEvent) == AE_ANTLION_OPEN_WINGS )
 	{
 		SetWings( true );
 		return;
 	}
 
-	if ( pEvent->event == AE_ANTLION_CLOSE_WINGS )
+	if ( GetAnimEvent(pEvent) == AE_ANTLION_CLOSE_WINGS )
 	{
 		SetWings( false );
 		return;
 	}
 
-	if ( pEvent->event == AE_ANTLION_VANISH )
+	if ( GetAnimEvent(pEvent) == AE_ANTLION_VANISH )
 	{
 		AddSolidFlags( FSOLID_NOT_SOLID );
 		m_takedamage	= DAMAGE_NO;
@@ -1199,7 +1199,7 @@ void CNPC_Antlion::HandleAnimEvent( animevent_t *pEvent )
 		return;
 	}
 
-	if ( pEvent->event == AE_ANTLION_BURROW_IN )
+	if ( GetAnimEvent(pEvent) == AE_ANTLION_BURROW_IN )
 	{
 		//Burrowing sound
 		EmitSound( "NPC_Antlion.BurrowIn" );
@@ -1218,7 +1218,7 @@ void CNPC_Antlion::HandleAnimEvent( animevent_t *pEvent )
 		return;
 	}
 
-	if ( pEvent->event == AE_ANTLION_BURROW_OUT )
+	if ( GetAnimEvent(pEvent) == AE_ANTLION_BURROW_OUT )
 	{
 		EmitSound( "NPC_Antlion.BurrowOut" );
 
@@ -1234,32 +1234,32 @@ void CNPC_Antlion::HandleAnimEvent( animevent_t *pEvent )
 		return;
 	}
 
-	if ( pEvent->event == AE_ANTLION_FOOTSTEP_SOFT )
+	if ( GetAnimEvent(pEvent) == AE_ANTLION_FOOTSTEP_SOFT )
 	{
 		EmitSound( "NPC_Antlion.FootstepSoft", pEvent->eventtime );
 		return;
 	}
 
-	if ( pEvent->event == AE_ANTLION_FOOTSTEP_HEAVY )
+	if ( GetAnimEvent(pEvent) == AE_ANTLION_FOOTSTEP_HEAVY )
 	{
 		EmitSound( "NPC_Antlion.FootstepHeavy", pEvent->eventtime );
 		return;
 	}
 	
 	
-	if ( pEvent->event == AE_ANTLION_MELEE1_SOUND )
+	if ( GetAnimEvent(pEvent) == AE_ANTLION_MELEE1_SOUND )
 	{
 		EmitSound( "NPC_Antlion.MeleeAttackSingle" );
 		return;
 	}
 	
-	if ( pEvent->event == AE_ANTLION_MELEE2_SOUND )
+	if ( GetAnimEvent(pEvent) == AE_ANTLION_MELEE2_SOUND )
 	{
 		EmitSound( "NPC_Antlion.MeleeAttackDouble" );
 		return;
 	}
 
-	if ( pEvent->event == AE_ANTLION_START_JUMP )
+	if ( GetAnimEvent(pEvent) == AE_ANTLION_START_JUMP )
 	{
 		StartJump();
 		return;
@@ -1267,7 +1267,7 @@ void CNPC_Antlion::HandleAnimEvent( animevent_t *pEvent )
 
 	// antlion worker events
 #if HL2_EPISODIC
-	if ( pEvent->event == AE_ANTLION_WORKER_EXPLODE_SCREAM )
+	if ( GetAnimEvent(pEvent) == AE_ANTLION_WORKER_EXPLODE_SCREAM )
 	{
 		if ( GetWaterLevel() < 2 )
 		{
@@ -1280,13 +1280,13 @@ void CNPC_Antlion::HandleAnimEvent( animevent_t *pEvent )
 		return;
 	}
 
-	if ( pEvent->event == AE_ANTLION_WORKER_EXPLODE_WARN )
+	if ( GetAnimEvent(pEvent) == AE_ANTLION_WORKER_EXPLODE_WARN )
 	{
 		CSoundEnt::InsertSound( SOUND_PHYSICS_DANGER, GetAbsOrigin(), sk_antlion_worker_burst_radius.GetFloat(), 0.5f, this );
 		return;
 	}
 
-	if ( pEvent->event == AE_ANTLION_WORKER_EXPLODE )
+	if ( GetAnimEvent(pEvent) == AE_ANTLION_WORKER_EXPLODE )
 	{
 		CTakeDamageInfo info( this, this, sk_antlion_worker_burst_damage.GetFloat(), DMG_BLAST_SURFACE | ( ANTLION_WORKER_BURST_IS_POISONOUS() ? DMG_POISON : DMG_ACID ) );
 		Event_Gibbed( info );

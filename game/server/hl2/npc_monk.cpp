@@ -7,7 +7,7 @@
 //=============================================================================//
 
 #include "cbase.h"
-#include "ai_baseactor.h"
+#include "ai_demez_actor.h"
 #include "ai_hull.h"
 #include "ammodef.h"
 #include "gamerules.h"
@@ -347,7 +347,7 @@ Vector CNPC_Monk::GetActualShootTrajectory( const Vector &shootOrigin )
 //-----------------------------------------------------------------------------
 void CNPC_Monk::HandleAnimEvent( animevent_t *pEvent )
 {
-	switch( pEvent->event )
+	switch( GetAnimEvent(pEvent) )
 	{
 		case NPC_EVENT_LEFTFOOT:
 			{

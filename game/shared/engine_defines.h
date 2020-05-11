@@ -16,9 +16,17 @@
 
 		#define SteamUser() steamapicontext->SteamUser()
 
-	#elif SERVER_DLL
-		// probably not going to work
-		#define UTIL_GetLocalPlayer UTIL_Demez_GetLocalPlayer
+	#elif GAME_DLL
+		#ifdef UTIL_H
+			#include "demez_util.h"
+			#define UTIL_GetLocalPlayer UTIL_Demez_GetLocalPlayer
+		#endif
+
+		#define GetAnimEvent( pEvent ) pEvent->Event()
+
+		// haha funny
+		// #define Activity ActivityDemez
+
 	#endif
 
 #elif ENGINE_QUIVER || ENGINE_2013
@@ -35,19 +43,16 @@
 
 		#define GetHudList() m_HudList
 
-		struct RenderableInstance_t {};
+	#elif GAME_DLL
+		#define LAST_SHARED_ENTITY_CLASS NUM_AI_CLASSES
 
-	#elif SERVER_DLL
+		#define GetRenderAlpha() GetRenderColor().a
+		#define SetRenderAlpha   SetRenderColorA
+
+		#define GetAnimEvent( pEvent ) pEvent->event
 	#endif
 
 #endif // ENGINE_QUIVER || ENGINE_2013
-
-#if ENGINE_QUIVER
-
-	#define MIN min
-	#define MAX max
-
-#endif
 
 #endif // ENGINE_DEFINES_H
 

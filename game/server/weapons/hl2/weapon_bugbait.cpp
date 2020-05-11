@@ -300,7 +300,7 @@ void CWeaponBugBait::ThrowGrenade( CBasePlayer *pPlayer )
 void CWeaponBugBait::Operator_HandleAnimEvent( animevent_t *pEvent, CBaseCombatCharacter *pOperator )
 {
 	CBasePlayer *pOwner = ToBasePlayer( GetOwner() );
-	switch( pEvent->event )
+	switch( GetAnimEvent(pEvent) )
 	{
 		case EVENT_WEAPON_SEQUENCE_FINISHED:
 			m_bDrawBackFinished = true;

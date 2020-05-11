@@ -70,7 +70,7 @@ Class_T	CNPC_GMan::Classify ( void )
 //-----------------------------------------------------------------------------
 void CNPC_GMan::HandleAnimEvent( animevent_t *pEvent )
 {
-	switch( pEvent->event )
+	switch( GetAnimEvent(pEvent) )
 	{
 	case 1:
 	default:

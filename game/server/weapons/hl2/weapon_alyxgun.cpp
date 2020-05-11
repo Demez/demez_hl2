@@ -270,7 +270,7 @@ void CWeaponAlyxGun::Operator_ForceNPCFire( CBaseCombatCharacter *pOperator, boo
 //-----------------------------------------------------------------------------
 void CWeaponAlyxGun::Operator_HandleAnimEvent( animevent_t *pEvent, CBaseCombatCharacter *pOperator )
 {
-	switch( pEvent->event )
+	switch( GetAnimEvent(pEvent) )
 	{
 		case EVENT_WEAPON_PISTOL_FIRE:
 		{

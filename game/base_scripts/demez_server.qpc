@@ -3,19 +3,18 @@
 // ---------------------------------------------------------------
 macro TYPE "server"
 
-include "base_scripts/demez_shared.qpc"
-
 configuration
 {
 	general
 	{
 		include_directories
 		{
-			"server/episodic"
-			"server/hl2"
-			"server/hl2mp"
-			
+			"server/ai"
+			"server/base_code"
 			"server/weapons/hl2"
+			
+			"server/base_classes"
+			// "server/base_code"
 		}
 	}
 
@@ -27,6 +26,9 @@ configuration
 		}
 	}
 }
+
+include "base_scripts/demez_shared.qpc"
+
 
 files
 {
@@ -79,14 +81,18 @@ files
 		}
 	}
 	
-	/*folder "Demez Base"
+	folder "Demez Base"
 	{
-		"server/demez/demez_util.cpp"
-		"server/demez/demez_util.h"
+		// "server/base_code/demez_util.cpp"
+		// "server/base_code/demez_util.h"
 		
-		"server/demez/ai/ai_demeznpc.cpp"
-		"server/demez/ai/ai_demeznpc.h"
-	}*/
+		"server/base_classes/ai_demez_actor.cpp"
+		"server/base_classes/ai_demez_actor.h"
+		"server/base_classes/ai_demez_npc.cpp"
+		"server/base_classes/ai_demez_npc.h"
+		"server/base_classes/demez_combat_character.cpp"
+		"server/base_classes/demez_combat_character.h"
+	}
 	
 	folder "Game Base"
 	{

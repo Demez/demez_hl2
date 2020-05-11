@@ -73,8 +73,6 @@ configuration
 
 files
 {
-	"shared/engine_defines.h"
-		
 	"$ENGINE_SHARED/predicted_viewmodel.cpp"
 	"$ENGINE_SHARED/predicted_viewmodel.h"
 	
@@ -82,6 +80,12 @@ files
 	// "$ENGINE_SHARED/ragdoll_shared.h"
 	// "$ENGINE_SHARED/solidsetdefaults.h"
 	// "$ENGINE_SHARED/touchlink.h"
+	
+	folder "Awfulness"
+	{
+		"shared/engine_defines.h"
+		"shared/ai_activity.h"
+	}
 	
 	folder "Game"
 	{
@@ -103,10 +107,7 @@ files
 
 	folder "HL2 DLL"
 	{
-		folder "Episodic"
-		{
-			"shared/episodic/*"
-		}
+		"shared/episodic/npc_advisor_shared.h"
 		
 		"$ENGINE_SHARED/script_intro_shared.cpp"
 		

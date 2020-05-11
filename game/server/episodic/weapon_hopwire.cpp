@@ -143,7 +143,7 @@ void CWeaponHopwire::Operator_HandleAnimEvent( animevent_t *pEvent, CBaseCombatC
 	CBasePlayer *pOwner = ToBasePlayer( GetOwner() );
 	bool fThrewGrenade = false;
 
-	switch( pEvent->event )
+	switch( GetAnimEvent(pEvent) )
 	{
 		case EVENT_WEAPON_SEQUENCE_FINISHED:
 			m_fDrawbackFinished = true;

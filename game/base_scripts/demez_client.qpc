@@ -3,8 +3,6 @@
 // ---------------------------------------------------------------
 macro TYPE "client"
 
-include "base_scripts/demez_shared.qpc"
-
 configuration
 {
 	general
@@ -12,11 +10,6 @@ configuration
 		include_directories
 		{
 			"client/hl2mp/ui"
-			"./hl2mp"
-			"$DEMEZ_SRC_DIR/game/shared/hl2mp"
-			"./hl2"
-			"./hl2/elements"
-			"$DEMEZ_SRC_DIR/game/shared/hl2"
 		}
 	}
 
@@ -28,6 +21,8 @@ configuration
 		}
 	}
 }
+
+include "base_scripts/demez_shared.qpc"
 
 files
 {

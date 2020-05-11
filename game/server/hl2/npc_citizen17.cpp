@@ -1018,7 +1018,7 @@ void CNPC_Citizen::PrescheduleThink()
 
 		const float TIME_FADE = 1.0;
 		float timeInSquad = gpGlobals->curtime - m_flTimeJoinedPlayerSquad;
-		timeInSquad = min( TIME_FADE, max( timeInSquad, 0 ) );
+		timeInSquad = MIN( TIME_FADE, MAX( timeInSquad, 0 ) );
 
 		float fade = ( 1.0 - timeInSquad / TIME_FADE );
 
@@ -1849,7 +1849,7 @@ Activity CNPC_Citizen::NPC_TranslateActivity( Activity activity )
 //------------------------------------------------------------------------------
 void CNPC_Citizen::HandleAnimEvent( animevent_t *pEvent )
 {
-	if ( pEvent->event == AE_CITIZEN_GET_PACKAGE )
+	if ( GetAnimEvent(pEvent) == AE_CITIZEN_GET_PACKAGE )
 	{
 		// Give the citizen a package
 		CBaseCombatWeapon *pWeapon = Weapon_Create( "weapon_citizenpackage" );
@@ -1864,7 +1864,7 @@ void CNPC_Citizen::HandleAnimEvent( animevent_t *pEvent )
 		}
 		return;
 	}
-	else if ( pEvent->event == AE_CITIZEN_HEAL )
+	else if ( GetAnimEvent(pEvent) == AE_CITIZEN_HEAL )
 	{
 		// Heal my target (if within range)
 #if HL2_EPISODIC
@@ -1888,7 +1888,7 @@ void CNPC_Citizen::HandleAnimEvent( animevent_t *pEvent )
 		return;
 	}
 
-	switch( pEvent->event )
+	switch( GetAnimEvent(pEvent) )
 	{
 	case NPC_EVENT_LEFTFOOT:
 		{

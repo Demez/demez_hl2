@@ -962,15 +962,15 @@ void CNPC_Dog::PickupOrCatchObject( const char *pAttachmentName )
 //-----------------------------------------------------------------------------
 void CNPC_Dog::HandleAnimEvent( animevent_t *pEvent )
 {
-	if ( pEvent->event == AE_DOG_THROW )
+	if ( GetAnimEvent(pEvent) == AE_DOG_THROW )
 	{
 		ThrowObject( pEvent->options );
 		return;
 	}
 
-	if ( pEvent->event == AE_DOG_PICKUP || pEvent->event == AE_DOG_CATCH || pEvent->event == AE_DOG_PICKUP_NOEFFECT )
+	if ( GetAnimEvent(pEvent) == AE_DOG_PICKUP || GetAnimEvent(pEvent) == AE_DOG_CATCH || GetAnimEvent(pEvent) == AE_DOG_PICKUP_NOEFFECT )
 	{
-		if ( pEvent->event == AE_DOG_PICKUP_NOEFFECT )
+		if ( GetAnimEvent(pEvent) == AE_DOG_PICKUP_NOEFFECT )
 			 m_bBeamEffects = false;
 		else
 			 m_bBeamEffects = true;

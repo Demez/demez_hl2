@@ -374,9 +374,9 @@ bool CHalfLife2::Damage_IsTimeBased( int iDmgType )
 		// --------------------------------------------------------------
 		// First initialize table so we can report missing relationships
 		// --------------------------------------------------------------
-		for (i=0;i<NUM_AI_CLASSES;i++)
+		for (i=0;i<LAST_SHARED_ENTITY_CLASS;i++)
 		{
-			for (j=0;j<NUM_AI_CLASSES;j++)
+			for (j=0;j<LAST_SHARED_ENTITY_CLASS;j++)
 			{
 				// By default all relationships are neutral of priority zero
 				CBaseCombatCharacter::SetDefaultRelationship( (Class_T)i, (Class_T)j, D_NU, 0 );

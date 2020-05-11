@@ -217,7 +217,7 @@ void CNPC_Crow::StopLoopingSounds( void )
 //-----------------------------------------------------------------------------
 void CNPC_Crow::HandleAnimEvent( animevent_t *pEvent )
 {
-	if ( pEvent->event == AE_CROW_TAKEOFF )
+	if ( GetAnimEvent(pEvent) == AE_CROW_TAKEOFF )
 	{
 		if ( GetNavigator()->GetPath()->GetCurWaypoint() )
 		{
@@ -226,7 +226,7 @@ void CNPC_Crow::HandleAnimEvent( animevent_t *pEvent )
 		return;
 	}
 
-	if( pEvent->event == AE_CROW_HOP )
+	if( GetAnimEvent(pEvent) == AE_CROW_HOP )
 	{
 		SetGroundEntity( NULL );
 
@@ -282,7 +282,7 @@ void CNPC_Crow::HandleAnimEvent( animevent_t *pEvent )
 		return;
 	}
 
-	if( pEvent->event == AE_CROW_FLY )
+	if( GetAnimEvent(pEvent) == AE_CROW_FLY )
 	{
 		//
 		// Start flying.
@@ -1092,7 +1092,7 @@ bool CNPC_Crow::BecomeRagdollOnClient( const Vector &force )
 	{
 		float flMass = VPhysicsGetObject()->GetMass();
 		float speed = VectorNormalize( newForce );
-		speed = min( speed, (CROW_RAGDOLL_SPEED_LIMIT * flMass) );
+		speed = MIN( speed, (CROW_RAGDOLL_SPEED_LIMIT * flMass) );
 		newForce *= speed;
 	}
 

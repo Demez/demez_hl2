@@ -11,6 +11,7 @@
 #include "ammodef.h"
 #include "eventlist.h"
 #include "npcevent.h"
+#include "engine_defines.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -30,7 +31,7 @@ int ITEM_GiveAmmo( CBasePlayer *pPlayer, float flCount, const char *pszAmmoName,
 	flCount *= g_pGameRules->GetAmmoQuantityScale(iAmmoType);
 
 	// Don't give out less than 1 of anything.
-	flCount = max( 1.0f, flCount );
+	flCount = MAX( 1.0f, flCount );
 
 	return pPlayer->GiveAmmo( flCount, iAmmoType, bSuppressSound );
 }
@@ -895,7 +896,7 @@ int CItem_AmmoCrate::OnTakeDamage( const CTakeDamageInfo &info )
 //-----------------------------------------------------------------------------
 void CItem_AmmoCrate::HandleAnimEvent( animevent_t *pEvent )
 {
-	if ( pEvent->event == AE_AMMOCRATE_PICKUP_AMMO )
+	if ( GetAnimEvent(pEvent) == AE_AMMOCRATE_PICKUP_AMMO )
 	{
 		if ( m_hActivator )
 		{

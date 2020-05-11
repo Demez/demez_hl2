@@ -334,19 +334,19 @@ void CNPC_Assassin::FirePistol( int hand )
 void CNPC_Assassin::HandleAnimEvent( animevent_t *pEvent )
 {
 	
-	if ( pEvent->event == AE_ASSASIN_FIRE_PISTOL_RIGHT )
+	if ( GetAnimEvent(pEvent) == AE_ASSASIN_FIRE_PISTOL_RIGHT )
 	{
 		FirePistol( 0 );
 		return;
 	}
 
-	if ( pEvent->event == AE_ASSASIN_FIRE_PISTOL_LEFT )
+	if ( GetAnimEvent(pEvent) == AE_ASSASIN_FIRE_PISTOL_LEFT )
 	{
 		FirePistol( 1 );
 		return;
 	}
 	
-	if ( pEvent->event == AE_ASSASIN_KICK_HIT )
+	if ( GetAnimEvent(pEvent) == AE_ASSASIN_KICK_HIT )
 	{
 		Vector	attackDir = BodyDirection2D();
 		Vector	attackPos = WorldSpaceCenter() + ( attackDir * 64.0f );

@@ -13,9 +13,9 @@
 //-----------------------------------------------------------------------------
 #include "cbase.h"
 #include "npcevent.h"
-#include "ai_basenpc.h"
 #include "ai_hull.h"
 #include "ai_baseactor.h"
+#include "ai_demez_npc.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -58,7 +58,7 @@ Class_T	CNPC_Magnusson::Classify ( void )
 //-----------------------------------------------------------------------------
 void CNPC_Magnusson::HandleAnimEvent( animevent_t *pEvent )
 {
-	switch( pEvent->event )
+	switch( GetAnimEvent(pEvent) )
 	{
 	case 1:
 	default:

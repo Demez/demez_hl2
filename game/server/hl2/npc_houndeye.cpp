@@ -272,7 +272,7 @@ float CNPC_Houndeye::MaxYawSpeed ( void )
 //=========================================================
 void CNPC_Houndeye::HandleAnimEvent( animevent_t *pEvent )
 {
-	switch ( pEvent->event )
+	switch ( GetAnimEvent(pEvent) )
 	{
 		case HOUND_AE_WARN:
 			// do stuff for this event.

@@ -681,7 +681,7 @@ void CHunterFlechette::FlechetteTouch( CBaseEntity *pOther )
 		CBreakable *pBreak = dynamic_cast <CBreakable *>(pOther);
 		if ( pBreak && ( pBreak->GetMaterialType() == matGlass ) )
 		{
-			flDamage = max( pOther->GetHealth(), flDamage );
+			flDamage = MAX( pOther->GetHealth(), flDamage );
 		}
 
 		CTakeDamageInfo	dmgInfo( this, GetOwnerEntity(), flDamage, DMG_DISSOLVE | DMG_NEVERGIB );
@@ -1792,7 +1792,7 @@ void CNPC_Hunter::Spawn()
 	float freeKnowledge = hunter_free_knowledge.GetFloat();
 	if ( freeKnowledge < GetEnemies()->GetEnemyDiscardTime() )
 	{
-		GetEnemies()->SetEnemyDiscardTime( max( freeKnowledge + 0.1, AI_DEF_ENEMY_DISCARD_TIME ) );
+		GetEnemies()->SetEnemyDiscardTime( MAX( freeKnowledge + 0.1, AI_DEF_ENEMY_DISCARD_TIME ) );
 	}
 	GetEnemies()->SetFreeKnowledgeDuration( freeKnowledge );
 
@@ -4253,25 +4253,25 @@ void CNPC_Hunter::HandleAnimEvent( animevent_t *pEvent )
 	Vector footPosition;
 	QAngle angles;
 	
-	if ( pEvent->event == AE_HUNTER_FOOTSTEP_LEFT )
+	if ( GetAnimEvent(pEvent) == AE_HUNTER_FOOTSTEP_LEFT )
 	{
 		LeftFootHit( pEvent->eventtime );
 		return;
 	}
 
-	if ( pEvent->event == AE_HUNTER_FOOTSTEP_RIGHT )
+	if ( GetAnimEvent(pEvent) == AE_HUNTER_FOOTSTEP_RIGHT )
 	{
 		RightFootHit( pEvent->eventtime );
 		return;
 	}
 
-	if ( pEvent->event == AE_HUNTER_FOOTSTEP_BACK )
+	if ( GetAnimEvent(pEvent) == AE_HUNTER_FOOTSTEP_BACK )
 	{
 		BackFootHit( pEvent->eventtime );
 		return;
 	}
 	
-	if ( pEvent->event == AE_HUNTER_START_EXPRESSION )
+	if ( GetAnimEvent(pEvent) == AE_HUNTER_START_EXPRESSION )
 	{
 		if ( pEvent->options && Q_strlen( pEvent->options ) )
 		{
@@ -4281,7 +4281,7 @@ void CNPC_Hunter::HandleAnimEvent( animevent_t *pEvent )
 		return;
 	}
 
-	if ( pEvent->event == AE_HUNTER_END_EXPRESSION )
+	if ( GetAnimEvent(pEvent) == AE_HUNTER_END_EXPRESSION )
 	{
 		if ( pEvent->options && Q_strlen( pEvent->options ) )
 		{
@@ -4291,13 +4291,13 @@ void CNPC_Hunter::HandleAnimEvent( animevent_t *pEvent )
 		return;
 	}
 
-	if ( pEvent->event == AE_HUNTER_MELEE_ANNOUNCE )
+	if ( GetAnimEvent(pEvent) == AE_HUNTER_MELEE_ANNOUNCE )
 	{
 		EmitSound( "NPC_Hunter.MeleeAnnounce" );
 		return;
 	}
 		
-	if ( pEvent->event == AE_HUNTER_MELEE_ATTACK_LEFT )
+	if ( GetAnimEvent(pEvent) == AE_HUNTER_MELEE_ATTACK_LEFT )
 	{
 		Vector right, forward;
 		AngleVectors( GetLocalAngles(), &forward, &right, NULL );
@@ -4309,7 +4309,7 @@ void CNPC_Hunter::HandleAnimEvent( animevent_t *pEvent )
 		return;
 	}
 
-	if ( pEvent->event == AE_HUNTER_MELEE_ATTACK_RIGHT )
+	if ( GetAnimEvent(pEvent) == AE_HUNTER_MELEE_ATTACK_RIGHT )
 	{
 		Vector right, forward;
 		AngleVectors( GetLocalAngles(), &forward, &right, NULL );
@@ -4321,7 +4321,7 @@ void CNPC_Hunter::HandleAnimEvent( animevent_t *pEvent )
 		return;
 	}
 
-	if ( pEvent->event == AE_HUNTER_SPRAY_BLOOD )
+	if ( GetAnimEvent(pEvent) == AE_HUNTER_SPRAY_BLOOD )
 	{
 		Vector vecOrigin;
 		Vector vecDir;
@@ -5178,7 +5178,7 @@ CBaseEntity *CNPC_Hunter::MeleeAttack( float flDist, int iDamage, QAngle &qaView
 					{
 						if ( GetAttachment( "blood_left", vecBloodPos ) )
 						{
-							SpawnBlood( vecBloodPos, g_vecAttackDir, pHurt->BloodColor(), min( iDamage, 30 ) );
+							SpawnBlood( vecBloodPos, g_vecAttackDir, pHurt->BloodColor(), MIN( iDamage, 30 ) );
 						}
 						
 						break;
@@ -7125,7 +7125,7 @@ public:
 		int nRequested = nNPCs;
 		if ( nNPCs < 3 )
 		{
-			nNPCs = min( 3, nNPCs + freeHunters.Count() );
+			nNPCs = MIN( 3, nNPCs + freeHunters.Count() );
 		}
 
 		int nSummoned = 0;

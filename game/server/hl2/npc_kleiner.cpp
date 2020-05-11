@@ -13,7 +13,7 @@
 #include	"npcevent.h"
 #include	"ai_basenpc.h"
 #include	"ai_hull.h"
-#include "ai_baseactor.h"
+#include "ai_demez_actor.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -56,7 +56,7 @@ Class_T	CNPC_Kleiner::Classify ( void )
 //-----------------------------------------------------------------------------
 void CNPC_Kleiner::HandleAnimEvent( animevent_t *pEvent )
 {
-	switch( pEvent->event )
+	switch( GetAnimEvent(pEvent) )
 	{
 	case 1:
 	default:

@@ -140,7 +140,7 @@ void CWeaponCrowbar::HandleAnimEventMeleeHit( animevent_t *pEvent, CBaseCombatCh
 //-----------------------------------------------------------------------------
 void CWeaponCrowbar::Operator_HandleAnimEvent( animevent_t *pEvent, CBaseCombatCharacter *pOperator )
 {
-	switch( pEvent->event )
+	switch( GetAnimEvent(pEvent) )
 	{
 	case EVENT_WEAPON_MELEE_HIT:
 		HandleAnimEventMeleeHit( pEvent, pOperator );

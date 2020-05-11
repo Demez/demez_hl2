@@ -1562,7 +1562,7 @@ void CWeaponRPG::Activate( void )
 //-----------------------------------------------------------------------------
 void CWeaponRPG::Operator_HandleAnimEvent( animevent_t *pEvent, CBaseCombatCharacter *pOperator )
 {
-	switch( pEvent->event )
+	switch( GetAnimEvent(pEvent) )
 	{
 		case EVENT_WEAPON_SMG1:
 		{

@@ -542,7 +542,7 @@ void CNPC_Zombine::TraceAttack( const CTakeDamageInfo &info, const Vector &vecDi
 
 void CNPC_Zombine::HandleAnimEvent( animevent_t *pEvent )
 {
-	if ( pEvent->event == AE_ZOMBINE_PULLPIN )
+	if ( GetAnimEvent(pEvent) == AE_ZOMBINE_PULLPIN )
 	{
 		Vector vecStart;
 		QAngle angles;
@@ -601,7 +601,7 @@ void CNPC_Zombine::HandleAnimEvent( animevent_t *pEvent )
 		return;
 	}
 
-	if ( pEvent->event == AE_NPC_ATTACK_BROADCAST )
+	if ( GetAnimEvent(pEvent) == AE_NPC_ATTACK_BROADCAST )
 	{
 		if ( HasGrenade() )
 			return;

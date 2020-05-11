@@ -232,7 +232,7 @@ int CWeaponStunStick::WeaponMeleeAttack1Condition( float flDot, float flDist )
 
 void CWeaponStunStick::Operator_HandleAnimEvent( animevent_t *pEvent, CBaseCombatCharacter *pOperator )
 {
-	switch( pEvent->event )
+	switch( GetAnimEvent(pEvent) )
 	{
 		case EVENT_WEAPON_MELEE_HIT:
 		{

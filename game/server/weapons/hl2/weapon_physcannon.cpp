@@ -1953,7 +1953,7 @@ void CWeaponPhysCannon::PuntVPhysics( CBaseEntity *pEntity, const Vector &vecFor
 			{
 				maxMass *= 2.5;	// 625 for vehicles
 			}
-			float mass = min(totalMass, maxMass); // max 250kg of additional force
+			float mass = MIN(totalMass, maxMass); // max 250kg of additional force
 
 			// Put some spin on the object
 			for ( i = 0; i < listCount; i++ )
@@ -1965,7 +1965,7 @@ void CWeaponPhysCannon::PuntVPhysics( CBaseEntity *pEntity, const Vector &vecFor
 				if ( pList[i] == pEntity->VPhysicsGetObject() )
 				{
 					ratio += hitObjectFactor;
-					ratio = min(ratio,1.0f);
+					ratio = MIN(ratio,1.0f);
 				}
 				else
 				{

@@ -10,7 +10,7 @@
 //=============================================================================//
 
 #include "cbase.h"
-#include "ai_basenpc.h"
+#include "ai_demez_npc.h"
 #include "ai_default.h"
 #include "ai_schedule.h"
 #include "ai_hull.h"
@@ -456,7 +456,7 @@ int CNPC_PoisonZombie::OnTakeDamage_Alive( const CTakeDamageInfo &inputInfo )
 	// Calculate what percentage of the creature's max health
 	// this amount of damage represents (clips at 1.0).
 	//
-	float flDamagePercent = min( 1, inputInfo.GetDamage() / m_iMaxHealth );
+	float flDamagePercent = MIN( 1, inputInfo.GetDamage() / m_iMaxHealth );
 
 	//
 	// Throw one crab for every 20% damage we take.
@@ -649,28 +649,28 @@ void CNPC_PoisonZombie::BreatheOffShort( void )
 void CNPC_PoisonZombie::HandleAnimEvent( animevent_t *pEvent )
 {
 	
-	if ( pEvent->event == AE_ZOMBIE_POISON_PICKUP_CRAB )
+	if ( GetAnimEvent(pEvent) == AE_ZOMBIE_POISON_PICKUP_CRAB )
 	{
 		EnableCrab( m_nThrowCrab, false );
 		SetBodygroup( ZOMBIE_BODYGROUP_THROW, 1 );
 		return;
 	}
 
-	if ( pEvent->event == AE_ZOMBIE_POISON_THROW_WARN_SOUND )
+	if ( GetAnimEvent(pEvent) == AE_ZOMBIE_POISON_THROW_WARN_SOUND )
 	{
 		BreatheOffShort();
 		EmitSound( "NPC_PoisonZombie.ThrowWarn" );
 		return;
 	}
 
-	if ( pEvent->event == AE_ZOMBIE_POISON_THROW_SOUND )
+	if ( GetAnimEvent(pEvent) == AE_ZOMBIE_POISON_THROW_SOUND )
 	{
 		BreatheOffShort();
 		EmitSound( "NPC_PoisonZombie.Throw" );
 		return;
 	}
 
-	if ( pEvent->event == AE_ZOMBIE_POISON_THROW_CRAB )
+	if ( GetAnimEvent(pEvent) == AE_ZOMBIE_POISON_THROW_CRAB )
 	{
 		SetBodygroup( ZOMBIE_BODYGROUP_THROW, 0 );
 
@@ -716,7 +716,7 @@ void CNPC_PoisonZombie::HandleAnimEvent( animevent_t *pEvent )
 		return;
 	}
 
-	if ( pEvent->event == AE_ZOMBIE_POISON_SPIT )
+	if ( GetAnimEvent(pEvent) == AE_ZOMBIE_POISON_SPIT )
 	{
 		Vector forward;
 		QAngle qaPunch( 45, random->RandomInt(-5, 5), random->RandomInt(-5, 5) );

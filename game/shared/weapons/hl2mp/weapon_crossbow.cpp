@@ -963,7 +963,7 @@ void CWeaponCrossbow::SetChargerState( ChargerState_t state )
 //-----------------------------------------------------------------------------
 void CWeaponCrossbow::Operator_HandleAnimEvent( animevent_t *pEvent, CBaseCombatCharacter *pOperator )
 {
-	switch( pEvent->event )
+	switch( GetAnimEvent(pEvent) )
 	{
 	case EVENT_WEAPON_THROW:
 		SetChargerState( CHARGER_STATE_START_LOAD );

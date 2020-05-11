@@ -256,7 +256,7 @@ float CNPC_Bullsquid::MaxYawSpeed( void )
 //=========================================================
 void CNPC_Bullsquid::HandleAnimEvent( animevent_t *pEvent )
 {
-	switch( pEvent->event )
+	switch( GetAnimEvent(pEvent) )
 	{
 		case BSQUID_AE_SPIT:
 		{
