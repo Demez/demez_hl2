@@ -28,7 +28,7 @@ files
 {
 	folder "Base"
 	{
-		- "$ENGINE_SRC_DIR/game/shared/weapon_parse_default.cpp" [!$ENGINE_2013]
+		- "$ENGINE_SRC_DIR/game/shared/weapon_parse_default.cpp" [$ENGINE_QUIVER]
 		- "$ENGINE_SRC_DIR/game/client/flashlighteffect.cpp"
 		
 		"$ENGINE_SRC/game/client/c_team_objectiveresource.cpp"
@@ -94,12 +94,12 @@ files
 	
 	folder "Vehicles"
 	{
-		"client/hl2/c_vehicle_airboat.cpp"
-		"client/hl2/c_vehicle_cannon.cpp"
-		"client/hl2/c_vehicle_crane.cpp"
-		"client/hl2/c_vehicle_crane.h"
-		"client/hl2/c_vehicle_prisoner_pod.cpp"
-		"client/episodic/c_vehicle_jeep_episodic.cpp"
+		"client/vehicles/c_vehicle_airboat.cpp"
+		"client/vehicles/c_vehicle_cannon.cpp"
+		"client/vehicles/c_vehicle_crane.cpp"
+		"client/vehicles/c_vehicle_crane.h"
+		"client/vehicles/c_vehicle_prisoner_pod.cpp"
+		"client/vehicles/c_vehicle_jeep_episodic.cpp"
 	}
 	
 	folder "UI"

@@ -334,6 +334,7 @@ files
 	folder "Vehicles"
 	{
 		"server/vehicles/vehicle_airboat.cpp"
+		"server/vehicles/vehicle_apc.cpp"
 		"server/vehicles/vehicle_apc.h"
 		"server/vehicles/vehicle_cannon.cpp"
 		"server/vehicles/vehicle_crane.cpp"
@@ -424,7 +425,6 @@ files
 			"server/hl2/grenade_pathfollower.cpp"
 			"server/hl2/grenade_pathfollower.h"
 			"server/hl2/npc_missiledefense.cpp"
-			"server/hl2/vehicle_apc.cpp"
 			"server/weapons/hl2/weapon_cguard.cpp"
 			"server/weapons/hl2/weapon_flaregun.cpp"
 			"server/weapons/hl2/weapon_flaregun.h"

@@ -112,7 +112,7 @@ public:
 	void			DampenUpMotion( Vector &vecVehicleEyePos, QAngle &vecVehicleEyeAngles, float flFrameTime );
 
 	virtual void	TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr
-#ifdef ENGINE_2013
+#if ENGINE_2013
 								, CDmgAccumulator* pAccumulator
 #endif
 	);
@@ -823,7 +823,7 @@ Vector CPropAirboat::GetSmoothedVelocity( void )
 // Purpose: 
 //-----------------------------------------------------------------------------
 void CPropAirboat::TraceAttack( const CTakeDamageInfo &inputInfo, const Vector &vecDir, trace_t *ptr
-#ifdef ENGINE_2013
+#if ENGINE_2013
 							   , CDmgAccumulator* pAccumulator
 #endif
 )
@@ -837,7 +837,7 @@ void CPropAirboat::TraceAttack( const CTakeDamageInfo &inputInfo, const Vector &
 		}
 	}
 
-#ifdef ENGINE_2013
+#if ENGINE_2013
 	BaseClass::TraceAttack( info, vecDir, ptr, pAccumulator );
 #else
 	BaseClass::TraceAttack( info, vecDir, ptr );

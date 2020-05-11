@@ -277,7 +277,7 @@ void CPropJeep::DoImpactEffect( trace_t &tr, int nDamageType )
 // Purpose: 
 //-----------------------------------------------------------------------------
 void CPropJeep::TraceAttack( const CTakeDamageInfo &inputInfo, const Vector &vecDir, trace_t *ptr
-#ifdef ENGINE_2013
+#if ENGINE_2013
 							, CDmgAccumulator* pAccumulator
 #endif
 )
@@ -291,7 +291,7 @@ void CPropJeep::TraceAttack( const CTakeDamageInfo &inputInfo, const Vector &vec
 		}
 	}
 
-#ifdef ENGINE_2013
+#if ENGINE_2013
 	BaseClass::TraceAttack( info, vecDir, ptr, pAccumulator );
 #else
 	BaseClass::TraceAttack( info, vecDir, ptr );

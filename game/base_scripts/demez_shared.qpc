@@ -44,6 +44,7 @@ configuration
 			"$TYPE/hl2"
 			"$TYPE/hl2mp"
 			"$TYPE/episodic"
+			"$TYPE/vehicles"
 			
 			"$ENGINE_SRC/game/$TYPE"
 		}
