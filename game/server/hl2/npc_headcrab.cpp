@@ -2006,7 +2006,7 @@ int CBaseHeadcrab::SelectFailSchedule( int failedSchedule, int failedTask, AI_Ta
 //			&vecDir - 
 //			*ptr - 
 //-----------------------------------------------------------------------------
-#ifdef ENGINE_2013
+#if ENGINE_2013
 void CBaseHeadcrab::TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr, CDmgAccumulator* pAccumulator )
 #else
 void CBaseHeadcrab::TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr )
@@ -2034,7 +2034,7 @@ void CBaseHeadcrab::TraceAttack( const CTakeDamageInfo &info, const Vector &vecD
 		ApplyAbsVelocityImpulse( puntDir );
 	}
 
-#ifdef ENGINE_2013
+#if ENGINE_2013
 	BaseClass::TraceAttack( newInfo, vecDir, ptr, pAccumulator );
 #else
 	BaseClass::TraceAttack( newInfo, vecDir, ptr );

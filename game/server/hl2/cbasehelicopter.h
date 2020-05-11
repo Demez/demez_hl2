@@ -117,7 +117,7 @@ public:
 	virtual void ApplyGeneralDrag( void );
 
 	void	TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr
-#ifdef ENGINE_2013
+#if ENGINE_2013
 						, CDmgAccumulator* pAccumulator
 #endif
 	);

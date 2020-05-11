@@ -684,7 +684,7 @@ float CNPC_BaseZombie::GetHitgroupDamageMultiplier( int iHitGroup, const CTakeDa
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-#ifdef ENGINE_2013
+#if ENGINE_2013
 void CNPC_BaseZombie::TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr, CDmgAccumulator* pAccumulator )
 #else
 void CNPC_BaseZombie::TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr )
@@ -706,7 +706,7 @@ void CNPC_BaseZombie::TraceAttack( const CTakeDamageInfo &info, const Vector &ve
 		infoCopy.ScaleDamage( 0.625 );
 	}
 
-#ifdef ENGINE_2013
+#if ENGINE_2013
 	BaseClass::TraceAttack( infoCopy, vecDir, ptr, pAccumulator );
 #else
 	BaseClass::TraceAttack( infoCopy, vecDir, ptr );

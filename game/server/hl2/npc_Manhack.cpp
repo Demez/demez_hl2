@@ -324,7 +324,7 @@ void CNPC_Manhack::PrescheduleThink( void )
 // Input  :
 // Output :
 //-----------------------------------------------------------------------------
-#ifdef ENGINE_2013
+#if ENGINE_2013
 void CNPC_Manhack::TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr, CDmgAccumulator* pAccumulator )
 #else
 void CNPC_Manhack::TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr )
@@ -344,7 +344,7 @@ void CNPC_Manhack::TraceAttack( const CTakeDamageInfo &info, const Vector &vecDi
 		g_pEffects->Sparks( ptr->endpos, 1, 1, &ptr->plane.normal );
 	}
 
-#ifdef ENGINE_2013
+#if ENGINE_2013
 	BaseClass::TraceAttack( info, vecDir, ptr, pAccumulator );
 #else
 	BaseClass::TraceAttack( info, vecDir, ptr );

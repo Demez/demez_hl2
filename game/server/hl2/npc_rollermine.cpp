@@ -243,7 +243,7 @@ public:
 
 	int		OnTakeDamage( const CTakeDamageInfo &info );
 	void	TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr
-#ifdef ENGINE_2013
+#if ENGINE_2013
 						, CDmgAccumulator* pAccumulator
 #endif
 	);
@@ -2819,7 +2819,7 @@ float CNPC_RollerMine::VehicleHeading( CBaseEntity *pVehicle )
 //			*ptr - 
 //-----------------------------------------------------------------------------
 void CNPC_RollerMine::TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr
-#ifdef ENGINE_2013
+#if ENGINE_2013
 								  , CDmgAccumulator* pAccumulator
 #endif
 )
@@ -2838,7 +2838,7 @@ void CNPC_RollerMine::TraceAttack( const CTakeDamageInfo &info, const Vector &ve
 			newInfo.SetDamageForce( info.GetDamageForce() * 20 );
 		}
 
-#ifdef ENGINE_2013
+#if ENGINE_2013
 	BaseClass::TraceAttack( newInfo, vecDir, ptr, pAccumulator );
 #else
 	BaseClass::TraceAttack( newInfo, vecDir, ptr );
@@ -2846,7 +2846,7 @@ void CNPC_RollerMine::TraceAttack( const CTakeDamageInfo &info, const Vector &ve
 		return;
 	}
 
-#ifdef ENGINE_2013
+#if ENGINE_2013
 	BaseClass::TraceAttack( info, vecDir, ptr, pAccumulator );
 #else
 	BaseClass::TraceAttack( info, vecDir, ptr );

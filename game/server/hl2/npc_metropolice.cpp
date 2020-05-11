@@ -3813,7 +3813,7 @@ bool CNPC_MetroPolice::IsHeavyDamage( const CTakeDamageInfo &info )
 // TraceAttack
 //-----------------------------------------------------------------------------
 void CNPC_MetroPolice::TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr
-#ifdef ENGINE_2013
+#if ENGINE_2013
 								   , CDmgAccumulator* pAccumulator
 #endif
 )
@@ -3848,7 +3848,7 @@ void CNPC_MetroPolice::TraceAttack( const CTakeDamageInfo &info, const Vector &v
 		EmitSound( "gore/bhit_helmet-1.wav" );
 	}
 
-#ifdef ENGINE_2013
+#if ENGINE_2013
 	BaseClass::TraceAttack( info, vecDir, ptr, pAccumulator );
 #else
 	BaseClass::TraceAttack( info, vecDir, ptr );

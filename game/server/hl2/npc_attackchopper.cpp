@@ -382,7 +382,7 @@ public:
 	Class_T Classify ( void ) { return CLASS_COMBINE_GUNSHIP; }
 	virtual int	OnTakeDamage_Alive( const CTakeDamageInfo &info );
 
-#ifdef ENGINE_2013
+#if ENGINE_2013
 	virtual void TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr, CDmgAccumulator* pAccumulator );
 #else
 	virtual void TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr );
@@ -3476,7 +3476,7 @@ void CNPC_AttackHelicopter::DropCorpse( int nDamage )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-#ifdef ENGINE_2013
+#if ENGINE_2013
 void CNPC_AttackHelicopter::TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr, CDmgAccumulator* pAccumulator )
 #else
 void CNPC_AttackHelicopter::TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr )
@@ -3489,7 +3489,7 @@ void CNPC_AttackHelicopter::TraceAttack( const CTakeDamageInfo &info, const Vect
 		 ( info.GetInflictor()->Classify() == CLASS_MISSILE ) || 
 		 ( info.GetAttacker()->Classify() == CLASS_MISSILE ) )
 	{
-#ifdef ENGINE_2013
+#if ENGINE_2013
 		BaseClass::TraceAttack( info, vecDir, ptr, pAccumulator );
 #else
 		BaseClass::TraceAttack( info, vecDir, ptr );

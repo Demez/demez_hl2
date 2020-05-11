@@ -1278,7 +1278,7 @@ public:
 	// Damage handling
 	//---------------------------------
 	void			TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr
-#ifdef ENGINE_2013
+#if ENGINE_2013
 								, CDmgAccumulator* pAccumulator
 #endif
 	);
@@ -5334,7 +5334,7 @@ void CNPC_Hunter::DeathSound( const CTakeDamageInfo &info )
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 void CNPC_Hunter::TraceAttack( const CTakeDamageInfo &inputInfo, const Vector &vecDir, trace_t *ptr
-#ifdef ENGINE_2013
+#if ENGINE_2013
 							  , CDmgAccumulator* pAccumulator
 #endif
 )
@@ -5396,7 +5396,7 @@ void CNPC_Hunter::TraceAttack( const CTakeDamageInfo &inputInfo, const Vector &v
 		DispatchParticleEffect( "blood_impact_synth_01_arc_parent", PATTACH_POINT_FOLLOW, this, gm_nHeadCenterAttachment );
 	}
 
-#ifdef ENGINE_2013
+#if ENGINE_2013
 	BaseClass::TraceAttack( info, vecDir, ptr, pAccumulator );
 #else
 	BaseClass::TraceAttack( info, vecDir, ptr );

@@ -1265,7 +1265,7 @@ void CBaseHelicopter::DrawDebugGeometryOverlays(void)
 // Output : 
 //-----------------------------------------------------------------------------
 void CBaseHelicopter::TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr
-#ifdef ENGINE_2013
+#if ENGINE_2013
 								  , CDmgAccumulator* pAccumulator
 #endif
 )
@@ -1275,7 +1275,7 @@ void CBaseHelicopter::TraceAttack( const CTakeDamageInfo &info, const Vector &ve
 	// the target. (RPG missiles do this sometimes).
 	if( info.GetDamageType() & (DMG_BLAST|DMG_AIRBOAT) )
 	{
-#ifdef ENGINE_2013
+#if ENGINE_2013
 		BaseClass::TraceAttack( info, vecDir, ptr, pAccumulator );
 #else
 		BaseClass::TraceAttack( info, vecDir, ptr );

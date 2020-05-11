@@ -16,7 +16,7 @@
 
 #include "c_basehlplayer.h"
 
-#ifdef ENGINE_QUIVER
+#if ENGINE_QUIVER
 extern ConVar r_shadowmapresolution;
 #else
 extern ConVar r_flashlightdepthres;

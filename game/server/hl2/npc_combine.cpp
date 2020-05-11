@@ -1447,7 +1447,7 @@ void CNPC_Combine::AnnounceEnemyType( CBaseEntity *pEnemy )
 // TraceAttack
 //-----------------------------------------------------------------------------
 void CNPC_Combine::TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr
-#ifdef ENGINE_2013
+#if ENGINE_2013
 							   , CDmgAccumulator* pAccumulator
 #endif
 )
@@ -1464,7 +1464,7 @@ void CNPC_Combine::TraceAttack( const CTakeDamageInfo &info, const Vector &vecDi
 		EmitSound( "gore/bhit_helmet-1.wav" );
 	}
 
-#ifdef ENGINE_2013
+#if ENGINE_2013
 	BaseClass::TraceAttack( info, vecDir, ptr, pAccumulator );
 #else
 	BaseClass::TraceAttack( info, vecDir, ptr );

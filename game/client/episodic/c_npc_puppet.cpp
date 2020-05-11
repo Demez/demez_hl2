@@ -158,7 +158,7 @@ void C_NPC_Puppet::AccumulateLayers( CStudioHdr *hdr, Vector pos[], Quaternion q
 					if (fWeight > 1)
 						fWeight = 1;
 
-#ifdef ENGINE_2013
+#if ENGINE_2013
 					boneSetup.AccumulatePose( pos, q, nSequence, fCycle, fWeight, currentTime, NULL );
 #elif ENGINE_QUIVER
 					AccumulatePose( hdr, NULL, pos, q, nSequence, fCycle, poseparam, boneMask, fWeight, currentTime );

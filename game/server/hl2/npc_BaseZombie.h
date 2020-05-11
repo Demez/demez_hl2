@@ -144,7 +144,7 @@ public:
 	
 	virtual float GetHitgroupDamageMultiplier( int iHitGroup, const CTakeDamageInfo &info );
 
-#ifdef ENGINE_2013
+#if ENGINE_2013
 	void TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr, CDmgAccumulator* pAccumulator );
 #else
 	void TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr );

@@ -628,7 +628,7 @@ void CHL2MP_Player::FireBullets ( const FireBulletsInfo_t &info )
 	if ( pWeapon )
 	{
 		modinfo.m_iPlayerDamage = modinfo.
-#ifdef ENGINE_2013
+#if ENGINE_2013
 			m_flDamage
 #else	
 			m_iDamage

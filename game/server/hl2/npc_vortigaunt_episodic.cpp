@@ -1245,7 +1245,7 @@ void CNPC_Vortigaunt::DeathSound( const CTakeDamageInfo &info )
 // Purpose:
 //-----------------------------------------------------------------------------
 void CNPC_Vortigaunt::TraceAttack( const CTakeDamageInfo &inputInfo, const Vector &vecDir, trace_t *ptr
-#ifdef ENGINE_2013
+#if ENGINE_2013
 								  , CDmgAccumulator* pAccumulator
 #endif
 )
@@ -1282,7 +1282,7 @@ void CNPC_Vortigaunt::TraceAttack( const CTakeDamageInfo &inputInfo, const Vecto
 		break;
 	}
 
-#ifdef ENGINE_2013
+#if ENGINE_2013
 	BaseClass::TraceAttack( info, vecDir, ptr, pAccumulator );
 #else
 	BaseClass::TraceAttack( info, vecDir, ptr );

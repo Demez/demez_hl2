@@ -2442,7 +2442,7 @@ void CFuncTankGun::Fire( int bulletCount, const Vector &barrelEnd, const Vector 
 	info.m_flDistance = MAX_TRACE_LENGTH;
 	info.m_iTracerFreq = 1;
 	info.
-#ifdef ENGINE_2013
+#if ENGINE_2013
 		m_flDamage
 #else	
 		m_iDamage

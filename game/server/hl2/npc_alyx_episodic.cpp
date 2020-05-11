@@ -2224,12 +2224,12 @@ void CNPC_Alyx::OnStateChange( NPC_STATE OldState, NPC_STATE NewState )
 // Purpose:
 //-----------------------------------------------------------------------------
 void CNPC_Alyx::TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr
-#ifdef ENGINE_2013
+#if ENGINE_2013
 							, CDmgAccumulator* pAccumulator
 #endif
 )
 {
-#ifdef ENGINE_2013
+#if ENGINE_2013
 	BaseClass::TraceAttack( info, vecDir, ptr, pAccumulator );
 #else
 	BaseClass::TraceAttack( info, vecDir, ptr );

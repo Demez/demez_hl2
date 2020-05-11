@@ -2998,7 +2998,7 @@ void CNPC_Strider::HuntSound()
 //---------------------------------------------------------
 //---------------------------------------------------------
 void CNPC_Strider::TraceAttack( const CTakeDamageInfo &inputInfo, const Vector &vecDir, trace_t *ptr
-#ifdef ENGINE_2013
+#if ENGINE_2013
 							   , CDmgAccumulator* pAccumulator
 #endif
 )
@@ -3049,7 +3049,7 @@ void CNPC_Strider::TraceAttack( const CTakeDamageInfo &inputInfo, const Vector &
 		}
 	}
 
-#ifdef ENGINE_2013
+#if ENGINE_2013
 	BaseClass::TraceAttack( info, vecDir, ptr, pAccumulator );
 #else
 	BaseClass::TraceAttack( info, vecDir, ptr );

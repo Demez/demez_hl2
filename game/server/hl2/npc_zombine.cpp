@@ -111,7 +111,7 @@ public:
 
 	virtual void Event_Killed( const CTakeDamageInfo &info );
 	virtual void TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr
-#ifdef ENGINE_2013
+#if ENGINE_2013
 							 , CDmgAccumulator* pAccumulator
 #endif
 	);
@@ -513,7 +513,7 @@ bool CNPC_Zombine::HandleInteraction( int interactionType, void *data, CBaseComb
 }
 
 void CNPC_Zombine::TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr
-#ifdef ENGINE_2013
+#if ENGINE_2013
 							   , CDmgAccumulator* pAccumulator )
 {
 	BaseClass::TraceAttack( info, vecDir, ptr, pAccumulator );
