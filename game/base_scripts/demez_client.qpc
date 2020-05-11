@@ -40,7 +40,9 @@ files
 	
 	folder "Demez"
 	{
-		"client/c_demez_flashlighteffect.cpp"
+		"client/demez_flashlight.cpp" [$ENGINE_ASW || $ENGINE_CSGO]
+		"client/demez_flashlight_quiver.cpp" [$ENGINE_QUIVER || $ENGINE_2013]
+		"client/demez_flashlight_base.h"
 	}
 		
 	folder "Game"
