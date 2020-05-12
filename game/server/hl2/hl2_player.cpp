@@ -3327,10 +3327,21 @@ WeaponProficiency_t CHL2_Player::CalcWeaponProficiency( CBaseCombatWeapon *pWeap
 	return proficiency;
 }
 
+static void Collision_ClearTrace( const Vector &vecRayStart, const Vector &vecRayDelta, CBaseTrace *pTrace )
+{
+	pTrace->startpos = vecRayStart;
+	pTrace->endpos = vecRayStart;
+	pTrace->endpos += vecRayDelta;
+	pTrace->startsolid = false;
+	pTrace->allsolid = false;
+	pTrace->fraction = 1.0f;
+	pTrace->contents = 0;
+}
+
 //-----------------------------------------------------------------------------
 // Purpose: override how single player rays hit the player
 //-----------------------------------------------------------------------------
-
+#if ENGINE_OLD
 bool LineCircleIntersection(
 	const Vector2D &center,
 	const float radius,
@@ -3373,18 +3384,6 @@ bool LineCircleIntersection(
 
 	return true;
 }
-
-static void Collision_ClearTrace( const Vector &vecRayStart, const Vector &vecRayDelta, CBaseTrace *pTrace )
-{
-	pTrace->startpos = vecRayStart;
-	pTrace->endpos = vecRayStart;
-	pTrace->endpos += vecRayDelta;
-	pTrace->startsolid = false;
-	pTrace->allsolid = false;
-	pTrace->fraction = 1.0f;
-	pTrace->contents = 0;
-}
-
 
 bool IntersectRayWithAACylinder( const Ray_t &ray, 
 	const Vector &center, float radius, float height, CBaseTrace *pTrace )
@@ -3463,7 +3462,7 @@ bool IntersectRayWithAACylinder( const Ray_t &ray,
 
 	return true;
 }
-
+#endif
 
 bool CHL2_Player::TestHitboxes( const Ray_t &ray, unsigned int fContentsMask, trace_t& tr )
 {
