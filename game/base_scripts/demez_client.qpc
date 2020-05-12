@@ -28,7 +28,8 @@ files
 {
 	folder "Base"
 	{
-		- "$ENGINE_SRC_DIR/game/shared/weapon_parse_default.cpp" [$ENGINE_QUIVER]
+		// is something fucked with conditions here?
+		- "$ENGINE_SRC_DIR/game/shared/weapon_parse_default.cpp" [$ENGINE_QUIVER || $ENGINE_ASW || $ENGINE_CSGO] //[!$ENGINE_2013]
 		- "$ENGINE_SRC_DIR/game/client/flashlighteffect.cpp"
 		
 		"$ENGINE_SRC/game/client/c_team_objectiveresource.cpp"
@@ -106,7 +107,7 @@ files
 		"client/vehicles/c_vehicle_jeep_episodic.cpp"
 	}
 	
-	folder "UI"
+	folder "VGUI"
 	{
 		folder "HUD"
 		{

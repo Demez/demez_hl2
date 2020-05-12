@@ -2,3 +2,17 @@ macro PROJECT_NAME "Client - Demez ASW"
 macro ENGINE_ASW "1"
 
 include "base_scripts/demez_client.qpc"
+include "base_scripts/demez_gameui.qpc"
+
+configuration
+{
+	compiler
+	{
+		preprocessor_definitions
+		{
+			"GAMEUI_EMBEDDED"
+			"GAMEUI_EXPORTS"
+		}
+	}
+}
+

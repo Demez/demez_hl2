@@ -8,9 +8,6 @@
 // but tell me, do you want to place about 100 #if ENGINE_ASW statements just so it's not "evil"?
 // it would be way messier as well, this is actually a very clean way to do it
 #if ENGINE_ASW || ENGINE_CSGO
-	#define ENGINE_NEW 1
-	#define ENGINE_OLD 0
-
 
 	#define SetRenderColorAlpha(pEntity, red, green, blue, alpha) \
 					pEntity->SetRenderColor( red, green, blue ); \
@@ -28,7 +25,7 @@
 	#define TypeDesc_FieldOffset(dataDesc, offset) dataDesc->fieldOffset
 
 	#if CLIENT_DLL
-		#define SteamUser() steamapicontext->SteamUser()
+		// #define SteamUser() steamapicontext->SteamUser()
 	#elif GAME_DLL
 		#ifdef UTIL_H
 			#include "demez_util.h"
@@ -40,9 +37,6 @@
 	#endif
 
 #elif ENGINE_QUIVER || ENGINE_2013
-	#define ENGINE_NEW 0
-	#define ENGINE_OLD 1
-
 	#define RENDER_INSTANCE_INPUT
 	#define RENDER_INSTANCE
 
