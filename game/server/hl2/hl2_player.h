@@ -32,7 +32,10 @@ enum HL2PlayerPhysFlag_e
 };
 
 class IPhysicsPlayerController;
+
+#if ENGINE_OLD
 class CLogicPlayerProxy;
+#endif
 
 struct commandgoal_t
 {
