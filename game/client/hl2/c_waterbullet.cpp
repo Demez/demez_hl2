@@ -33,6 +33,7 @@ public:
 		}
 	}
 
+#if ENGINE_OLD
 #define	BUBBLES_PER_INCH	0.2
 
 	void AddEntity( void )
@@ -106,6 +107,7 @@ public:
 
 		BaseClass::AddEntity();
 	}
+#endif
 
 	bool ShouldDraw( void ) { return true; }
 
