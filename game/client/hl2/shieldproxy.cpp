@@ -10,6 +10,7 @@
 #include "materialsystem/IMaterialVar.h"
 #include "materialsystem/IMaterialSystem.h"
 #include <KeyValues.h>
+#include "engine_defines.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -69,7 +70,7 @@ void CShieldProxy::OnBind( C_BaseEntity *pEnt )
 {
 	if (m_AlphaVar)
 	{
-		m_AlphaVar->SetFloatValue( pEnt->m_clrRender->a );
+		m_AlphaVar->SetFloatValue( pEnt->GetRenderAlpha() );
 	}
 
 	if( !m_pTextureScrollVar )

@@ -10,7 +10,11 @@
 #include "c_tracer.h"
 #include "particle_collision.h"
 #include "view.h"
+
+#include "engine_defines.h"
+#if ENGINE_OLD
 #include "ClientEffectPrecacheSystem.h"
+#endif
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -18,9 +22,9 @@
 #define	PLASMASPARK_LIFETIME 0.5
 #define SPRAYS_PER_THINK		12
 
-CLIENTEFFECT_REGISTER_BEGIN( PrecacheEffectPlasmaBeam )
-CLIENTEFFECT_MATERIAL( "sprites/plasmaember" )
-CLIENTEFFECT_REGISTER_END()
+PRECACHE_REGISTER_BEGIN( GLOBAL, PrecacheEffectPlasmaBeam )
+PRECACHE( MATERIAL, "sprites/plasmaember" )
+PRECACHE_REGISTER_END()
 
 class  C_PlasmaBeamNode;
 

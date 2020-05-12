@@ -10,16 +10,21 @@
 #include "particles_attractor.h"
 #include "iefx.h"
 #include "dlight.h"
-#include "ClientEffectPrecacheSystem.h"
 #include "c_te_effect_dispatch.h"
 #include "fx_quad.h"
-
-#include "c_ai_basenpc.h"
 
 // For material proxy
 #include "ProxyEntity.h"
 #include "materialsystem/IMaterial.h"
 #include "materialsystem/IMaterialVar.h"
+
+// idk
+#undef DECLARE_CLIENT_EFFECT
+#define DECLARE_CLIENT_EFFECT( effectName, callbackFunction ) \
+		static CClientEffectRegistration ClientEffectReg_##callbackFunction( #effectName, callbackFunction );
+
+#include "c_ai_demez_npc.h"
+#include "engine_defines.h"
 
 #define NUM_INTERIOR_PARTICLES	8
 
@@ -478,7 +483,7 @@ void DispelCallback( const CEffectData &data )
 	}
 }
 
-DECLARE_CLIENT_EFFECT( "VortDispel", DispelCallback );
+DECLARE_CLIENT_EFFECT( VortDispel, DispelCallback );
 
 //-----------------------------------------------------------------------------
 // Purpose: Used for emissive lightning layer on vort

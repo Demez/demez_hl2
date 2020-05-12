@@ -10,6 +10,7 @@
 #include "c_te_effect_dispatch.h"
 #include "iefx.h"
 #include "decals.h"
+#include "engine_defines.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -331,4 +332,4 @@ void AntlionGibCallback( const CEffectData &data )
 	FX_AntlionGib( data.m_vOrigin, data.m_vNormal, data.m_flScale );
 }
 
-DECLARE_CLIENT_EFFECT( "AntlionGib", AntlionGibCallback );
+DECLARE_CLIENT_EFFECT( AntlionGib, AntlionGibCallback );

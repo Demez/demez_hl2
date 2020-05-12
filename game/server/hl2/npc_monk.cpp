@@ -74,6 +74,8 @@ public:
 	void OnKilledNPC( CBaseCombatCharacter *pKilled );
 
 	bool IsJumpLegal( const Vector &startPos, const Vector &apex, const Vector &endPos ) const;
+	bool IsJumpLegal( const Vector &startPos, const Vector &apex, const Vector &endPos, float maxUp, float maxDown, float maxDist ) const;
+
 	int SelectFailSchedule( int failedSchedule, int failedTask, AI_TaskFailureCode_t taskFailCode );
 
 	DECLARE_DATADESC();
@@ -679,7 +681,21 @@ bool CNPC_Monk::IsJumpLegal( const Vector &startPos, const Vector &apex, const V
 {
 	if ( startPos.z - endPos.z < 0 )
 		return false;
-	return BaseClass::IsJumpLegal( startPos, apex, endPos );
+
+	const float MAX_JUMP_RISE		= 80.0f;
+	const float MAX_JUMP_DISTANCE	= 250.0f;
+	const float MAX_JUMP_DROP		= 192.0f;
+
+	return BaseClass::IsJumpLegal( startPos, apex, endPos, MAX_JUMP_RISE, MAX_JUMP_DROP, MAX_JUMP_DISTANCE );
+}
+
+bool CNPC_Monk::IsJumpLegal( const Vector &startPos, const Vector &apex, const Vector &endPos, 
+							float maxUp, float maxDown, float maxDist ) const
+{
+	if ( startPos.z - endPos.z < 0 )
+		return false;
+
+	return BaseClass::IsJumpLegal( startPos, apex, endPos, maxUp, maxDown, maxDist );
 }
 
 //-----------------------------------------------------------------------------

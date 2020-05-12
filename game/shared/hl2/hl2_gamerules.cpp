@@ -9,6 +9,7 @@
 #include "hl2_gamerules.h"
 #include "ammodef.h"
 #include "hl2_shareddefs.h"
+#include "demez_ammodef.h"
 
 #ifdef CLIENT_DLL
 
@@ -1470,7 +1471,7 @@ bool CHalfLife2::Damage_IsTimeBased( int iDmgType )
 		int numGrenades = pRecipient->GetAmmoCount( grenadeIndex );
 
 		// If we're not maxed out on grenades and we've randomly okay'd it
-		if ( ( numGrenades < GetAmmoDef()->MaxCarry( grenadeIndex ) ) && ( random->RandomInt( 0, 2 ) == 0 ) )
+		if ( ( numGrenades < GetAmmoDef()->MaxCarry( grenadeIndex, pRecipient ) ) && ( random->RandomInt( 0, 2 ) == 0 ) )
 			return true;
 
 		return false;
@@ -1799,7 +1800,7 @@ bool CHalfLife2::ShouldBurningPropsEmitLight()
 
 CAmmoDef *GetAmmoDef()
 {
-	static CAmmoDef def;
+	static CDemezAmmoDef def;
 	static bool bInitted = false;
 	
 	if ( !bInitted )

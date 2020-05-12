@@ -93,8 +93,8 @@ public:
 #ifdef CLIENT_DLL
 
 	virtual bool			IsTransparent( void ) { return true; }
-	virtual RenderGroup_t	GetRenderGroup( void ) { return RENDER_GROUP_TRANSLUCENT_ENTITY; }
-	virtual int				DrawModel( int flags );
+	virtual RenderGroup_t	GetRenderGroup( void ) { return RENDER_GROUP_TRANSLUCENT; }
+	virtual int				DrawModel( int flags RENDER_INSTANCE_INPUT );
 	virtual void			OnDataChanged( DataUpdateType_t updateType );
 	virtual bool			ShouldDraw( void ) { return (IsEffectActive(EF_NODRAW)==false); }
 
@@ -2278,7 +2278,7 @@ void CWeaponRPG::DrawEffects( void )
 //-----------------------------------------------------------------------------
 // Purpose: Called on third-person weapon drawing
 //-----------------------------------------------------------------------------
-int	CWeaponRPG::DrawModel( int flags )
+int	CWeaponRPG::DrawModel( int flags RENDER_INSTANCE_INPUT )
 {
 	// Only render these on the transparent pass
 	if ( flags & STUDIO_TRANSPARENCY )
@@ -2288,7 +2288,7 @@ int	CWeaponRPG::DrawModel( int flags )
 	}
 
 	// Draw the model as normal
-	return BaseClass::DrawModel( flags );
+	return BaseClass::DrawModel( flags RENDER_INSTANCE );
 }
 
 //-----------------------------------------------------------------------------
@@ -2476,7 +2476,7 @@ void CLaserDot::MakeInvisible( void )
 //-----------------------------------------------------------------------------
 // Purpose: Draw our sprite
 //-----------------------------------------------------------------------------
-int CLaserDot::DrawModel( int flags )
+int CLaserDot::DrawModel( int flags RENDER_INSTANCE_INPUT )
 {
 	color32 color={255,255,255,255};
 	Vector	vecAttachment, vecDir;

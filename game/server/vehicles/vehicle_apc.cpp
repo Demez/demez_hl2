@@ -50,7 +50,12 @@
 #define DEATH_VOLLEY_MIN_FIRE_TIME		0.333
 #define DEATH_VOLLEY_MAX_FIRE_TIME		0.166
 
-extern short g_sModelIndexFireball; // Echh...
+// Echh...
+#if ENGINE_NEW
+extern int      g_sModelIndexFireball;
+#else
+extern short    g_sModelIndexFireball;
+#endif
 
 
 ConVar sk_apc_health( "sk_apc_health", "750" );
@@ -434,7 +439,11 @@ void CPropAPC::Event_Killed( const CTakeDamageInfo &info )
 		te->Explosion( filter, random->RandomFloat( 0.0, 1.0 ),	&vecAbsPoint, 
 			g_sModelIndexFireball, random->RandomInt( 4, 10 ), 
 			random->RandomInt( 8, 15 ), 
+#if ENGINE_NEW
+			( i < 2 ) ? TE_EXPLFLAG_NONE : TE_EXPLFLAG_NOPARTICLES | TE_EXPLFLAG_NOFIREBALLSMOKE,
+#else
 			( i < 2 ) ? TE_EXPLFLAG_NODLIGHTS : TE_EXPLFLAG_NOPARTICLES | TE_EXPLFLAG_NOFIREBALLSMOKE | TE_EXPLFLAG_NODLIGHTS,
+#endif
 			100, 0 );
 	}
 

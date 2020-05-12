@@ -5,7 +5,6 @@
 // $NoKeywords: $
 //=============================================================================//
 #include "cbase.h"
-#include "c_ai_basenpc.h"
 #include "c_te_particlesystem.h"
 #include "fx.h"
 #include "fx_sparks.h"
@@ -29,9 +28,9 @@
 #include "iefx.h"
 #include "c_te_effect_dispatch.h"
 #include "tier0/vprof.h"
-#include "ClientEffectPrecacheSystem.h"
 #include <bitbuf.h>
 #include "fx_water.h"
+#include "c_ai_demez_npc.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -951,7 +950,7 @@ void StriderMuzzleFlashCallback( const CEffectData &data )
 	MuzzleFlash_Strider( data.m_hEntity, data.m_nAttachmentIndex );
 }
 
-DECLARE_CLIENT_EFFECT( "StriderMuzzleFlash", StriderMuzzleFlashCallback );
+DECLARE_CLIENT_EFFECT( StriderMuzzleFlash, StriderMuzzleFlashCallback );
 
 #define	BLOOD_MIN_SPEED	64.0f*2.0f
 #define BLOOD_MAX_SPEED 256.0f*8.0f
@@ -1044,5 +1043,5 @@ void StriderBloodCallback( const CEffectData &data )
 	StriderBlood( data.m_vOrigin, data.m_vNormal, data.m_flScale );
 }
 
-DECLARE_CLIENT_EFFECT( "StriderBlood", StriderBloodCallback );
+DECLARE_CLIENT_EFFECT( StriderBlood, StriderBloodCallback );
 

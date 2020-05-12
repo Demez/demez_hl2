@@ -11,6 +11,8 @@
 #pragma once
 #endif
 
+#include "engine_defines.h"
+
 class C_PropCombineBall : public C_BaseAnimating
 {
 	DECLARE_CLASS( C_PropCombineBall, C_BaseAnimating );
@@ -22,7 +24,7 @@ public:
 	virtual RenderGroup_t GetRenderGroup( void );
 
 	virtual void	OnDataChanged( DataUpdateType_t updateType );
-	virtual int		DrawModel( int flags );
+	virtual int		DrawModel( int flags RENDER_INSTANCE_INPUT );
 
 protected:
 

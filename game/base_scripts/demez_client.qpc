@@ -43,6 +43,11 @@ files
 		"client/demez_flashlight.cpp" [$ENGINE_ASW || $ENGINE_CSGO]
 		"client/demez_flashlight_quiver.cpp" [$ENGINE_QUIVER || $ENGINE_2013]
 		"client/demez_flashlight_base.h"
+		
+		"client/base_classes/c_ai_demez_npc.cpp"
+		"client/base_classes/c_ai_demez_npc.h"
+		"client/base_classes/c_demez_combat_character.cpp"
+		"client/base_classes/c_demez_combat_character.h"
 	}
 		
 	folder "Game Base"
@@ -63,7 +68,6 @@ files
 		
 		"client/hl2/c_basehlcombatweapon.cpp"
 		"client/hl2/c_basehlcombatweapon.h"
-		
 	}
 	
 	folder "Weapons"

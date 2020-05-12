@@ -11,6 +11,7 @@
 #include "materialsystem/imaterialvar.h"
 #include "particles_simple.h"
 #include "particles_attractor.h"
+#include "engine_defines.h"
 
 // FIXME: Move out
 extern void DrawSpriteTangentSpace( const Vector &vecOrigin, float flWidth, float flHeight, color32 color );
@@ -34,7 +35,7 @@ public:
 	}
 
 	virtual void	Update( void );
-	virtual int		DrawModel( int flags );
+	virtual int		DrawModel( int flags RENDER_INSTANCE_INPUT );
 	virtual void	GetRenderBounds( Vector& mins, Vector& maxs );
 
 	bool			SetupEmitters( void );
@@ -256,7 +257,7 @@ void C_HopwireExplosion::Update( void )
 //-----------------------------------------------------------------------------
 // Purpose: Updates and renders all effects
 //-----------------------------------------------------------------------------
-int C_HopwireExplosion::DrawModel( int flags )
+int C_HopwireExplosion::DrawModel( int flags RENDER_INSTANCE_INPUT )
 {
 	AddParticles();
 
@@ -337,11 +338,7 @@ class C_GrenadeHopwire : public C_BaseGrenade
 public:
 	C_GrenadeHopwire( void );
 
-	virtual int		DrawModel( int flags
-#if ENGINE_ASW || ENGINE_CSGO
-							  , const RenderableInstance_t &instance
-#endif
-	);
+	virtual int		DrawModel( int flags RENDER_INSTANCE_INPUT );
 
 	virtual void	OnDataChanged( DataUpdateType_t updateType );
 	virtual void	ReceiveMessage( int classID, bf_read &msg );
@@ -415,19 +412,11 @@ void C_GrenadeHopwire::OnDataChanged( DataUpdateType_t updateType )
 // Purpose: 
 // Input  : flags - 
 //-----------------------------------------------------------------------------
-int	C_GrenadeHopwire::DrawModel( int flags
-#if ENGINE_ASW || ENGINE_CSGO
-	, const RenderableInstance_t &instance
-#endif
-)
+int	C_GrenadeHopwire::DrawModel( int flags RENDER_INSTANCE_INPUT )
 {
 	if ( m_ExplosionEffect.IsActive() )
 		return 1;
 
-	return BaseClass::DrawModel( flags
-#if ENGINE_ASW || ENGINE_CSGO
-								, instance
-#endif
-	);
+	return BaseClass::DrawModel( flags RENDER_INSTANCE );
 }
 

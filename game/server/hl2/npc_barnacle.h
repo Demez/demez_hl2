@@ -10,9 +10,9 @@
 #pragma once
 #endif
 
-#include "ai_basenpc.h"
 #include "studio.h"
 #include "physics_prop_ragdoll.h"
+#include "ai_demez_npc.h"
 
 class CNPC_Barnacle;
 
@@ -176,7 +176,7 @@ private:
 	CHandle<CBarnacleTongueTip>	m_hTongueRoot;
 	CHandle<CBarnacleTongueTip>	m_hTongueTip;
 	CHandle<CRagdollProp>		m_hRagdoll;
-	matrix3x4_t					m_pRagdollBones[MAXSTUDIOBONES];
+	matrix3x4a_t                m_pRagdollBones[MAXSTUDIOBONES];
 	IPhysicsConstraint			*m_pConstraint;
 	float						m_flRestUnitsAboveGround;
 	int							m_nSpitAttachment;

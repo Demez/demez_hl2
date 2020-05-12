@@ -8,12 +8,12 @@
 
 #include "cbase.h"
 #include "basecombatcharacter.h"
-#include "ai_basenpc.h"
 #include "decals.h"
 #include "IEffects.h"
 #include "ai_squad.h"
 #include "ai_utils.h"
 #include "ai_senses.h"
+#include "ai_demez_npc.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

@@ -499,7 +499,7 @@ void C_WeaponStunStick::SetupAttachmentPoints( void )
 //-----------------------------------------------------------------------------
 // Purpose: Draws the stunstick model (with extra effects)
 //-----------------------------------------------------------------------------
-int C_WeaponStunStick::DrawModel( int flags )
+int C_WeaponStunStick::DrawModel( int flags RENDER_INSTANCE_INPUT )
 {
 	if ( ShouldDraw() == false )
 		return 0;
@@ -511,7 +511,7 @@ int C_WeaponStunStick::DrawModel( int flags )
 		return 1;
 	}
 
-	return BaseClass::DrawModel( flags );
+	return BaseClass::DrawModel( flags RENDER_INSTANCE );
 }
 
 //-----------------------------------------------------------------------------
@@ -601,15 +601,7 @@ void C_WeaponStunStick::OnDataChanged( DataUpdateType_t updateType )
 }
 
 //-----------------------------------------------------------------------------
-// Purpose: Tells us we're always a translucent entity
-//-----------------------------------------------------------------------------
-RenderGroup_t C_WeaponStunStick::GetRenderGroup( void )
-{
-	return RENDER_GROUP_TWOPASS;
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: Tells us we're always a translucent entity
+// Purpose: 
 //-----------------------------------------------------------------------------
 bool C_WeaponStunStick::InSwing( void )
 {
@@ -836,6 +828,6 @@ void StunstickImpactCallback( const CEffectData &data )
 	FX_Sparks( data.m_vOrigin, 1, 2, data.m_vNormal, 6, 64, 256 );
 }
 
-DECLARE_CLIENT_EFFECT( "StunstickImpact", StunstickImpactCallback );
+DECLARE_CLIENT_EFFECT( StunstickImpact, StunstickImpactCallback );
 
 #endif

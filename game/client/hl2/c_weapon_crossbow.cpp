@@ -6,37 +6,42 @@
 
 #include "cbase.h"
 #include "model_types.h"
-#include "ClientEffectPrecacheSystem.h"
 #include "fx.h"
 #include "c_te_effect_dispatch.h"
 #include "beamdraw.h"
 
-CLIENTEFFECT_REGISTER_BEGIN( PrecacheEffectCrossbow )
-CLIENTEFFECT_MATERIAL( "effects/muzzleflash1" )
-CLIENTEFFECT_REGISTER_END()
+#include "c_demez_combat_character.h"
+#if ENGINE_OLD
+#include "ClientEffectPrecacheSystem.h"
+#endif
+
+PRECACHE_REGISTER_BEGIN( GLOBAL, PrecacheEffectCrossbow )
+PRECACHE( MATERIAL, "effects/muzzleflash1" )
+PRECACHE_REGISTER_END()
 
 //
 // Crossbow bolt
 //
 
-class C_CrossbowBolt : public C_BaseCombatCharacter
+class C_CrossbowBolt : public C_DemezCombatCharacter
 {
-	DECLARE_CLASS( C_CrossbowBolt, C_BaseCombatCharacter );
+	DECLARE_CLASS( C_CrossbowBolt, C_DemezCombatCharacter );
 	DECLARE_CLIENTCLASS();
 public:
 	
 	C_CrossbowBolt( void );
-
+#if ENGINE_OLD
 	virtual RenderGroup_t GetRenderGroup( void )
 	{
 		// We want to draw translucent bits as well as our main model
 		return RENDER_GROUP_TWOPASS;
 	}
+#endif
 
 	virtual void	ClientThink( void );
 
 	virtual void	OnDataChanged( DataUpdateType_t updateType );
-	virtual int		DrawModel( int flags );
+	virtual int		DrawModel( int flags, const RenderableInstance_t &instance );
 
 private:
 
@@ -77,7 +82,7 @@ void C_CrossbowBolt::OnDataChanged( DataUpdateType_t updateType )
 // Input  : flags - 
 // Output : int
 //-----------------------------------------------------------------------------
-int C_CrossbowBolt::DrawModel( int flags )
+int C_CrossbowBolt::DrawModel( int flags, const RenderableInstance_t &instance )
 {
 	// See if we're drawing the motion blur
 	if ( flags & STUDIO_TRANSPARENCY )
@@ -125,7 +130,7 @@ int C_CrossbowBolt::DrawModel( int flags )
 	}
 
 	// Draw the normal portion
-	return BaseClass::DrawModel( flags );
+	return BaseClass::DrawModel( flags, instance );
 }
 
 //-----------------------------------------------------------------------------
@@ -156,4 +161,4 @@ void CrosshairLoadCallback( const CEffectData &data )
 	}
 }
 
-DECLARE_CLIENT_EFFECT( "CrossbowLoad", CrosshairLoadCallback );
+DECLARE_CLIENT_EFFECT( CrossbowLoad, CrosshairLoadCallback );

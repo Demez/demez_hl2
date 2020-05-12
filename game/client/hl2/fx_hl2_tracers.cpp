@@ -13,7 +13,11 @@
 #include "particles_localspace.h"
 #include "dlight.h"
 #include "iefx.h"
+
+#include "engine_defines.h"
+#if ENGINE_OLD
 #include "ClientEffectPrecacheSystem.h"
+#endif
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -23,12 +27,11 @@ extern void FX_TracerSound( const Vector &start, const Vector &end, int iTracerT
 
 extern ConVar muzzleflash_light;
 
-
-CLIENTEFFECT_REGISTER_BEGIN( PrecacheTracers )
-CLIENTEFFECT_MATERIAL( "effects/gunshiptracer" )
-CLIENTEFFECT_MATERIAL( "effects/combinemuzzle1" )
-CLIENTEFFECT_MATERIAL( "effects/combinemuzzle2_nocull" )
-CLIENTEFFECT_REGISTER_END()
+PRECACHE_REGISTER_BEGIN( GLOBAL, PrecacheTracers )
+PRECACHE( MATERIAL, "effects/gunshiptracer" )
+PRECACHE( MATERIAL, "effects/combinemuzzle1" )
+PRECACHE( MATERIAL, "effects/combinemuzzle2_nocull" )
+PRECACHE_REGISTER_END()
 
 //-----------------------------------------------------------------------------
 // Purpose: Gunship's Tracer
@@ -40,7 +43,7 @@ void GunshipTracerCallback( const CEffectData &data )
 	FX_GunshipTracer( (Vector&)data.m_vStart, (Vector&)data.m_vOrigin, flVelocity, bWhiz );
 }
 
-DECLARE_CLIENT_EFFECT( "GunshipTracer", GunshipTracerCallback );
+DECLARE_CLIENT_EFFECT( GunshipTracer, GunshipTracerCallback );
 
 
 //-----------------------------------------------------------------------------
@@ -53,7 +56,7 @@ void StriderTracerCallback( const CEffectData &data )
 	FX_StriderTracer( (Vector&)data.m_vStart, (Vector&)data.m_vOrigin, flVelocity, bWhiz );
 }
 
-DECLARE_CLIENT_EFFECT( "StriderTracer", StriderTracerCallback );
+DECLARE_CLIENT_EFFECT( StriderTracer, StriderTracerCallback );
 
 
 //-----------------------------------------------------------------------------
@@ -66,7 +69,7 @@ void HunterTracerCallback( const CEffectData &data )
 	FX_HunterTracer( (Vector&)data.m_vStart, (Vector&)data.m_vOrigin, flVelocity, bWhiz );
 }
 
-DECLARE_CLIENT_EFFECT( "HunterTracer", HunterTracerCallback );
+DECLARE_CLIENT_EFFECT( HunterTracer, HunterTracerCallback );
 
 
 //-----------------------------------------------------------------------------
@@ -79,7 +82,7 @@ void GaussTracerCallback( const CEffectData &data )
 	FX_GaussTracer( (Vector&)data.m_vStart, (Vector&)data.m_vOrigin, flVelocity, bWhiz );
 }
 
-DECLARE_CLIENT_EFFECT( "GaussTracer", GaussTracerCallback );
+DECLARE_CLIENT_EFFECT( GaussTracer, GaussTracerCallback );
 
 
 //-----------------------------------------------------------------------------
@@ -113,7 +116,7 @@ void AirboatGunHeavyTracerCallback( const CEffectData &data )
 	FX_AddDiscreetLine( vecStart, vecShotDir, flVelocity, flLength, flTotalDist, 5.0f, flLife, "effects/gunshiptracer" );
 }
 
-DECLARE_CLIENT_EFFECT( "AirboatGunHeavyTracer", AirboatGunHeavyTracerCallback );
+DECLARE_CLIENT_EFFECT( AirboatGunHeavyTracer, AirboatGunHeavyTracerCallback );
 
 //-----------------------------------------------------------------------------
 // Purpose: Airboat gun tracers 
@@ -146,7 +149,7 @@ void AirboatGunTracerCallback( const CEffectData &data )
 	FX_AddDiscreetLine( vecStart, vecShotDir, flVelocity, flLength, flTotalDist, 2.0f, flLife, "effects/gunshiptracer" );
 }
 
-DECLARE_CLIENT_EFFECT( "AirboatGunTracer", AirboatGunTracerCallback );
+DECLARE_CLIENT_EFFECT( AirboatGunTracer, AirboatGunTracerCallback );
 
 
 //-----------------------------------------------------------------------------
@@ -185,7 +188,7 @@ void HelicopterTracerCallback( const CEffectData &data )
 	}
 }
 
-DECLARE_CLIENT_EFFECT( "HelicopterTracer", HelicopterTracerCallback );
+DECLARE_CLIENT_EFFECT( HelicopterTracer, HelicopterTracerCallback );
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -296,7 +299,7 @@ void AR2TracerCallback( const CEffectData &data )
 	FX_AR2Tracer( (Vector&)vecStart, (Vector&)data.m_vOrigin, flVelocity, bWhiz );
 }
 
-DECLARE_CLIENT_EFFECT( "AR2Tracer", AR2TracerCallback );
+DECLARE_CLIENT_EFFECT( AR2Tracer, AR2TracerCallback );
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -396,7 +399,7 @@ void AR2ExplosionCallback( const CEffectData &data )
 	FX_AddLine( lineData );
 }
 
-DECLARE_CLIENT_EFFECT( "AR2Explosion", AR2ExplosionCallback );
+DECLARE_CLIENT_EFFECT( AR2Explosion, AR2ExplosionCallback );
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -420,7 +423,7 @@ void AR2ImpactCallback( const CEffectData &data )
 				(FXQUAD_BIAS_SCALE|FXQUAD_BIAS_ALPHA) );
 }
 
-DECLARE_CLIENT_EFFECT( "AR2Impact", AR2ImpactCallback );
+DECLARE_CLIENT_EFFECT( AR2Impact, AR2ImpactCallback );
 
 //-----------------------------------------------------------------------------
 // Creates a muzzleflash elight
@@ -545,7 +548,7 @@ void AirboatMuzzleFlashCallback( const CEffectData &data )
 	MuzzleFlash_Airboat( data.m_hEntity, data.m_nAttachmentIndex );
 }
 
-DECLARE_CLIENT_EFFECT( "AirboatMuzzleFlash", AirboatMuzzleFlashCallback );
+DECLARE_CLIENT_EFFECT( AirboatMuzzleFlash, AirboatMuzzleFlashCallback );
 
 
 //-----------------------------------------------------------------------------
@@ -610,7 +613,7 @@ void ChopperMuzzleFlashCallback( const CEffectData &data )
 	MuzzleFlash_Chopper( data.m_hEntity, data.m_nAttachmentIndex );
 }
 
-DECLARE_CLIENT_EFFECT( "ChopperMuzzleFlash", ChopperMuzzleFlashCallback );
+DECLARE_CLIENT_EFFECT( ChopperMuzzleFlash, ChopperMuzzleFlashCallback );
 
 
 //-----------------------------------------------------------------------------
@@ -671,7 +674,7 @@ void GunshipMuzzleFlashCallback( const CEffectData &data )
 	MuzzleFlash_Gunship( data.m_hEntity, data.m_nAttachmentIndex );
 }
 
-DECLARE_CLIENT_EFFECT( "GunshipMuzzleFlash", GunshipMuzzleFlashCallback );
+DECLARE_CLIENT_EFFECT( GunshipMuzzleFlash, GunshipMuzzleFlashCallback );
 
 
 //-----------------------------------------------------------------------------
@@ -712,4 +715,4 @@ void HunterMuzzleFlashCallback( const CEffectData &data )
 	MuzzleFlash_Hunter( data.m_hEntity, data.m_nAttachmentIndex );
 }
 
-DECLARE_CLIENT_EFFECT( "HunterMuzzleFlash", HunterMuzzleFlashCallback );
+DECLARE_CLIENT_EFFECT( HunterMuzzleFlash, HunterMuzzleFlashCallback );

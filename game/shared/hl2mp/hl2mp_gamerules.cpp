@@ -34,6 +34,8 @@
 	#include "hl2mp_gameinterface.h"
 	#include "hl2mp_cvars.h"
 
+	#include "demez_items.h"
+
 #ifdef DEBUG	
 	#include "hl2mp_bot_temp.h"
 #endif
@@ -485,9 +487,9 @@ Vector CHL2MPRules::VecWeaponRespawnSpot( CBaseCombatWeapon *pWeapon )
 
 #ifndef CLIENT_DLL
 
-CItem* IsManagedObjectAnItem( CBaseEntity *pObject )
+CDemezItem* IsManagedObjectAnItem( CBaseEntity *pObject )
 {
-	return dynamic_cast< CItem*>( pObject );
+	return dynamic_cast< CDemezItem*>( pObject );
 }
 
 CBaseHLCombatWeapon* IsManagedObjectAWeapon( CBaseEntity *pObject )
@@ -497,7 +499,7 @@ CBaseHLCombatWeapon* IsManagedObjectAWeapon( CBaseEntity *pObject )
 
 bool GetObjectsOriginalParameters( CBaseEntity *pObject, Vector &vOriginalOrigin, QAngle &vOriginalAngles )
 {
-	if ( CItem *pItem = IsManagedObjectAnItem( pObject ) )
+	if ( CDemezItem *pItem = IsManagedObjectAnItem( pObject ) )
 	{
 		if ( pItem->m_flNextResetCheckTime > gpGlobals->curtime )
 			 return false;
@@ -508,7 +510,8 @@ bool GetObjectsOriginalParameters( CBaseEntity *pObject, Vector &vOriginalOrigin
 		pItem->m_flNextResetCheckTime = gpGlobals->curtime + sv_hl2mp_item_respawn_time.GetFloat();
 		return true;
 	}
-	else if ( CBaseHLCombatWeapon *pWeapon = IsManagedObjectAWeapon( pObject )) 
+
+	if ( CBaseHLCombatWeapon *pWeapon = IsManagedObjectAWeapon( pObject )) 
 	{
 		if ( pWeapon->m_flNextResetCheckTime > gpGlobals->curtime )
 			 return false;
@@ -789,7 +792,7 @@ void CHL2MPRules::ClientSettingsChanged( CBasePlayer *pPlayer )
 		return;
 
 	const char *pCurrentModel = modelinfo->GetModelName( pPlayer->GetModel() );
-	const char *szModelName = engine->GetClientConVarValue( engine->IndexOfEdict( pPlayer->edict() ), "cl_playermodel" );
+	const char *szModelName = engine->GetClientConVarValue( ENTINDEX( pPlayer->edict() ), "cl_playermodel" );
 
 	//If we're different.
 	if ( stricmp( szModelName, pCurrentModel ) )
@@ -891,10 +894,17 @@ int CHL2MPRules::PlayerRelationship( CBaseEntity *pPlayer, CBaseEntity *pTarget 
 
 const char *CHL2MPRules::GetGameDescription( void )
 { 
-	if ( IsTeamplay() )
-		return "Team Deathmatch"; 
+	if ( IsCoOp() )
+		return "Demez HL2 - Coop"; 
 
-	return "Deathmatch"; 
+	else if ( IsTeamplay() )
+		return "Demez HL2 - Team Deathmatch"; 
+
+	else if ( IsDeathmatch() )
+		return "Demez HL2 - Deathmatch"; 
+
+	else
+		return "Demez HL2 - Unknown"; 
 } 
 
 
@@ -1146,7 +1156,7 @@ CAmmoDef *GetAmmoDef()
 		if ( pPlayer->GetActiveWeapon() && pPlayer->IsNetClient() )
 		{
 			// Player has an active item, so let's check cl_autowepswitch.
-			const char *cl_autowepswitch = engine->GetClientConVarValue( engine->IndexOfEdict( pPlayer->edict() ), "cl_autowepswitch" );
+			const char *cl_autowepswitch = engine->GetClientConVarValue( ENTINDEX( pPlayer->edict() ), "cl_autowepswitch" );
 			if ( cl_autowepswitch && atoi( cl_autowepswitch ) <= 0 )
 			{
 				return false;
@@ -1295,7 +1305,7 @@ void CHL2MPRules::CleanUpMap()
 				CMapEntityRef &ref = g_MapEntityRefs[m_iIterator];
 				m_iIterator = g_MapEntityRefs.Next( m_iIterator );	// Seek to the next entity.
 
-				if ( ref.m_iEdict == -1 || engine->PEntityOfEntIndex( ref.m_iEdict ) )
+				if ( ref.m_iEdict == -1 || INDEXENT( ref.m_iEdict ) )
 				{
 					// Doh! The entity was delete and its slot was reused.
 					// Just use any old edict slot. This case sucks because we lose the baseline.

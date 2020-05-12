@@ -7,6 +7,7 @@
 #include "cbase.h"
 #include "fx_quad.h"
 #include "fx.h"
+#include "engine_defines.h"
 
 class C_MortarShell : public C_BaseEntity
 {
@@ -16,9 +17,9 @@ public:
 	DECLARE_CLIENTCLASS();
 
 	void OnDataChanged( DataUpdateType_t updateType );
-	int DrawModel( int flags );
+	int DrawModel( int flags RENDER_INSTANCE_INPUT );
 	
-	RenderGroup_t	GetRenderGroup( void )	{ return RENDER_GROUP_TRANSLUCENT_ENTITY; }
+	RenderGroup_t	GetRenderGroup( void )	{ return RENDER_GROUP_TRANSLUCENT; }
 
 private:
 
@@ -54,7 +55,7 @@ void C_MortarShell::OnDataChanged( DataUpdateType_t updateType )
 	if ( updateType == DATA_UPDATE_CREATED )
 	{
 		m_flStarttime = gpGlobals->curtime;
-		AddToLeafSystem( RENDER_GROUP_TRANSLUCENT_ENTITY );
+		AddToLeafSystem( RENDER_GROUP_TRANSLUCENT );
 
 		m_pEmitter = CSimpleEmitter::Create( "C_EntityDissolve" );
 		m_pEmitter->SetSortOrigin( GetAbsOrigin() );
@@ -195,7 +196,7 @@ inline float C_MortarShell::GetEndPerc( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-int C_MortarShell::DrawModel( int flags )
+int C_MortarShell::DrawModel( int flags RENDER_INSTANCE_INPUT )
 {
 	if ( gpGlobals->frametime <= 0.0f )
 		return 0;

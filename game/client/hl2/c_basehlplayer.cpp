@@ -148,11 +148,7 @@ void C_BaseHLPlayer::Zoom( float FOVOffset, float time )
 // Input  : flags - 
 // Output : int
 //-----------------------------------------------------------------------------
-int C_BaseHLPlayer::DrawModel( int flags
-#if ENGINE_NEW
-							  , const RenderableInstance_t &instance
-#endif
-)
+int C_BaseHLPlayer::DrawModel( int flags RENDER_INSTANCE_INPUT )
 {
 	// Not pitch for player
 	QAngle saveAngles = GetLocalAngles();
@@ -162,11 +158,7 @@ int C_BaseHLPlayer::DrawModel( int flags
 
 	SetLocalAngles( useAngles );
 
-	int iret = BaseClass::DrawModel( flags
-#if ENGINE_NEW
-									, instance
-#endif
-	);
+	int iret = BaseClass::DrawModel( flags RENDER_INSTANCE );
 
 	SetLocalAngles( saveAngles );
 

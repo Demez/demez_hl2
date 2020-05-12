@@ -214,26 +214,14 @@ void ComputeRenderInfo( mstudiobbox_t *pHitBox, const matrix3x4_t &hitboxToWorld
 // Output : int
 //-----------------------------------------------------------------------------
 
-int C_WeaponPhysCannon::DrawModel( int flags
-#if ENGINE_NEW
-								  , const RenderableInstance_t &instance
-#endif
-)
+int C_WeaponPhysCannon::DrawModel( int flags RENDER_INSTANCE_INPUT )
 {
 	// If we're not ugrading, don't do anything special
 	if ( m_bIsCurrentlyUpgrading == false && m_bWasUpgraded == false )
-#if ENGINE_NEW
-		return BaseClass::DrawModel( flags, instance );
-#else
-		return BaseClass::DrawModel( flags );
-#endif
+		return BaseClass::DrawModel( flags RENDER_INSTANCE );
 
 	if ( gpGlobals->frametime == 0 )
-#if ENGINE_NEW
-		return BaseClass::DrawModel( flags, instance );
-#else
-		return BaseClass::DrawModel( flags );
-#endif
+		return BaseClass::DrawModel( flags RENDER_INSTANCE );
 
 	if ( !m_bReadyToDraw )
 		return 0;
@@ -417,11 +405,7 @@ int C_WeaponPhysCannon::DrawModel( int flags
 		}
 	}
 
-#if ENGINE_NEW
-	return BaseClass::DrawModel( flags, instance );
-#else
-	return BaseClass::DrawModel( flags );
-#endif
+	return BaseClass::DrawModel( flags RENDER_INSTANCE );
 }
 
 //---------------------------------------------------------

@@ -15,7 +15,6 @@
 #include "particles_simple.h"
 #include "citadel_effects_shared.h"
 #include "particles_attractor.h"
-#include "ClientEffectPrecacheSystem.h"
 #include "c_te_effect_dispatch.h"
 
 #include "c_ai_basenpc.h"

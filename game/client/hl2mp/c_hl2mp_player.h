@@ -34,12 +34,7 @@ public:
 
 	static C_HL2MP_Player* GetLocalHL2MPPlayer();
 
-#if ENGINE_NEW
-	virtual int	DrawModel( int flags, const RenderableInstance_t &instance );
-#else
-	virtual int	DrawModel( int flags );
-#endif
-
+	virtual int	DrawModel( int flags RENDER_INSTANCE_INPUT );
 	virtual void AddEntity( void );
 
 	QAngle GetAnimEyeAngles( void ) { return m_angEyeAngles; }
@@ -61,8 +56,8 @@ public:
 	virtual Vector GetAutoaimVector( float flDelta );
 	virtual void NotifyShouldTransmit( ShouldTransmitState_t state );
 
-#if ENGINE_ASW || ENGINE_CSGO
-	virtual bool CreateLightEffects( void ) {}
+#if ENGINE_NEW
+	virtual bool CreateLightEffects( void ) { return BaseClass::CreateLightEffects(); }
 #else
 	virtual void CreateLightEffects( void ) {}
 #endif

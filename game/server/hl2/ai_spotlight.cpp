@@ -6,9 +6,9 @@
 
 #include "cbase.h"
 #include "ai_spotlight.h"
-#include "ai_basenpc.h"
 #include "spotlightend.h"
 #include "beam_shared.h"
+#include "ai_demez_npc.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -360,17 +360,17 @@ void CAI_Spotlight::UpdateSpotlightEndpoint( void )
 	// Fade out spotlight end if past max length.  
 	if (m_flSpotlightCurLength > 2*m_flSpotlightMaxLength)
 	{
-		m_hSpotlightTarget->SetRenderColorA( 0 );
+		m_hSpotlightTarget->SetRenderAlpha( 0 );
 		m_hSpotlight->SetFadeLength(m_flSpotlightMaxLength);
 	}
 	else if (m_flSpotlightCurLength > m_flSpotlightMaxLength)		
 	{
-		m_hSpotlightTarget->SetRenderColorA( (1-((m_flSpotlightCurLength-m_flSpotlightMaxLength)/m_flSpotlightMaxLength)) );
+		m_hSpotlightTarget->SetRenderAlpha( (1-((m_flSpotlightCurLength-m_flSpotlightMaxLength)/m_flSpotlightMaxLength)) );
 		m_hSpotlight->SetFadeLength(m_flSpotlightMaxLength);
 	}
 	else
 	{
-		m_hSpotlightTarget->SetRenderColorA( 1.0 );
+		m_hSpotlightTarget->SetRenderAlpha( 1.0 );
 		m_hSpotlight->SetFadeLength(m_flSpotlightCurLength);
 	}
 

@@ -42,11 +42,15 @@ public:
 #endif
 
 #ifdef CLIENT_DLL
-	virtual int				DrawModel( int flags );
+	virtual int				DrawModel( int flags RENDER_INSTANCE_INPUT );
 	virtual void			ClientThink( void );
 	virtual void			OnDataChanged( DataUpdateType_t updateType );
-	virtual RenderGroup_t	GetRenderGroup( void );
 	virtual void			ViewModelDrawn( C_BaseViewModel *pBaseViewModel );
+
+#if ENGINE_OLD
+	// Purpose: Tells us we're always a translucent entity
+	virtual RenderGroup_t	GetRenderGroup( void ) { return RENDER_GROUP_TWOPASS; }
+#endif
 	
 #endif
 

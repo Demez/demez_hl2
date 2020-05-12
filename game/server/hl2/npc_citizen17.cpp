@@ -3458,7 +3458,7 @@ bool CNPC_Citizen::ShouldHealTarget( CBaseEntity *pTarget, bool bActiveUse )
 			else
 			{
 				// Does the player need the ammo we can give him?
-				int iMax = GetAmmoDef()->MaxCarry(iAmmoType);
+				int iMax = GetAmmoDef()->MaxCarry(iAmmoType, (CBaseCombatCharacter *)pTarget);
 				int iCount = ((CBasePlayer*)pTarget)->GetAmmoCount(iAmmoType);
 				if ( !iCount || ((iMax - iCount) >= m_iAmmoAmount) )
 				{

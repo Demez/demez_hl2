@@ -35,7 +35,11 @@ public:
 	C_PropJeepEpisodic();
 
 	void OnEnteredVehicle( C_BasePlayer *pPlayer );
+#if ENGINE_NEW
+	bool Simulate( void );
+#else
 	void Simulate( void );
+#endif
 
 public:
 	int		m_iNumRadarContacts;
@@ -110,7 +114,11 @@ C_PropJeepEpisodic::C_PropJeepEpisodic()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void C_PropJeepEpisodic::Simulate( void )
+#if ENGINE_NEW
+bool C_PropJeepEpisodic::Simulate()
+#else
+void C_PropJeepEpisodic::Simulate()
+#endif
 {
 	// Keep trying to hook to the radar.
 	if( GetHudRadar() != NULL )
@@ -121,7 +129,7 @@ void C_PropJeepEpisodic::Simulate( void )
 		GetHudRadar()->SetVehicle( this );
 	}
 
-	BaseClass::Simulate();
+	return BaseClass::Simulate();
 }
 
 //-----------------------------------------------------------------------------

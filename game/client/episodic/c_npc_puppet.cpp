@@ -5,8 +5,8 @@
 //=============================================================================
 
 #include "cbase.h"
-#include "c_ai_basenpc.h"
 #include "bone_setup.h"
+#include "c_ai_demez_npc.h"
 
 // Must be the last file included
 #include "memdbgon.h"
@@ -108,12 +108,16 @@ void C_NPC_Puppet::ClientThink( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-#if ENGINE_2013 || ENGINE_ASW
+#if ENGINE_2013 || ENGINE_NEW
 void C_NPC_Puppet::AccumulateLayers( IBoneSetup &boneSetup, Vector pos[], Quaternion q[], float currentTime )
 #else
 void C_NPC_Puppet::AccumulateLayers( CStudioHdr *hdr, Vector pos[], Quaternion q[], float poseparam[], float currentTime, int boneMask )
 #endif
 {
+#if ENGINE_NEW
+	BaseClass::AccumulateLayers( boneSetup, pos, q, currentTime );
+#else
+
 	if ( m_hAnimationTarget == NULL )
 		return;
 
@@ -176,5 +180,6 @@ void C_NPC_Puppet::AccumulateLayers( CStudioHdr *hdr, Vector pos[], Quaternion q
 			}
 		}
 	}
+#endif // ENGINE_NEW
 }
 

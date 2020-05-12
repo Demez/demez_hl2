@@ -14,7 +14,7 @@ configuration
 			"server/weapons/hl2"
 			
 			"server/base_classes"
-			// "server/base_code"
+			"server/base_code"
 		}
 	}
 
@@ -58,16 +58,15 @@ files
 		// "$ENGINE_SRC/game/server/logic_achievement.cpp"
 		"$ENGINE_SRC/game/server/vehicle_choreo_generic.cpp"
 		
+		"$ENGINE_SRC/game/server/BaseBludgeonWeapon.cpp"
+		"$ENGINE_SRC/game/server/BaseBludgeonWeapon.h"
+		
 		"$ENGINE_SRC/game/shared/ragdoll_shared.h"
 		"$ENGINE_SRC/game/shared/solidsetdefaults.h"
-		"$ENGINE_SRC/game/shared/hl2/survival_gamerules.cpp"
 		"$ENGINE_SRC/game/shared/vehicle_choreo_generic_shared.h"
 		"$ENGINE_SRC/game/shared/touchlink.h"
 	
 		"$ENGINE_SRC/game/shared/teamplayroundbased_gamerules.cpp"
-		
-		"$ENGINE_SRC/game/server/BaseBludgeonWeapon.cpp"
-		"$ENGINE_SRC/game/server/BaseBludgeonWeapon.h"
 			
 		folder "AI"
 		{
@@ -82,10 +81,10 @@ files
 		}
 	}
 	
-	folder "Demez Base"
+	folder "Demez"
 	{
-		// "server/base_code/demez_util.cpp"
-		// "server/base_code/demez_util.h"
+		"server/base_code/demez_util.cpp"
+		"server/base_code/demez_util.h"
 		
 		"server/base_classes/ai_demez_actor.cpp"
 		"server/base_classes/ai_demez_actor.h"
@@ -93,6 +92,8 @@ files
 		"server/base_classes/ai_demez_npc.h"
 		"server/base_classes/demez_combat_character.cpp"
 		"server/base_classes/demez_combat_character.h"
+		"server/base_classes/demez_items.cpp"
+		"server/base_classes/demez_items.h"
 	}
 	
 	folder "Game Base"
@@ -343,7 +344,6 @@ files
 		"server/vehicles/vehicle_viewcontroller.cpp"
 		"server/vehicles/vehicle_jeep.cpp"
 		"server/vehicles/vehicle_jeep_episodic.cpp"
-		// "server/vehicles/vehicle_jeep_episodic.h"
 	}
 	
 	folder "Items"

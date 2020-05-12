@@ -102,8 +102,8 @@ void CHL2MPTextWindow::OnKeyCodePressed(KeyCode code)
 {
 	if ( m_iScoreBoardKey != BUTTON_CODE_INVALID && m_iScoreBoardKey == code )
 	{
-		gViewPortInterface->ShowPanel( PANEL_SCOREBOARD, true );
-		gViewPortInterface->PostMessageToPanel( PANEL_SCOREBOARD, new KeyValues( "PollHideCode", "code", code ) );
+		GetViewPortInterface()->ShowPanel( PANEL_SCOREBOARD, true );
+		GetViewPortInterface()->PostMessageToPanel( PANEL_SCOREBOARD, new KeyValues( "PollHideCode", "code", code ) );
 	}
 	else
 	{

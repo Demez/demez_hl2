@@ -9,6 +9,7 @@
 #include "script_intro.h"
 #include "point_camera.h"
 #include "ai_utils.h"
+#include "engine_defines.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

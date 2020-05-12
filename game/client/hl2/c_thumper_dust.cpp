@@ -13,6 +13,7 @@
 #include "fx_quad.h"
 #include "c_te_effect_dispatch.h"
 #include "view.h"
+#include "engine_defines.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -167,4 +168,4 @@ void ThumperDustCallback( const CEffectData &data )
 	FX_ThumperDust( data );
 }
 
-DECLARE_CLIENT_EFFECT( "ThumperDust", ThumperDustCallback );
+DECLARE_CLIENT_EFFECT( ThumperDust, ThumperDustCallback );

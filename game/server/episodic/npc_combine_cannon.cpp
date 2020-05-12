@@ -840,7 +840,7 @@ bool CNPC_Combine_Cannon::FireBullet( const Vector &vecTarget, bool bDirectShot 
 	info.m_flDistance = MAX_TRACE_LENGTH;
 	info.m_pAttacker = this;
 	info.m_iAmmoType = m_iAmmoType;
-	info.m_iPlayerDamage = 20.0f;
+	FireBullets_PlayerDamage(info) = 20.0f;
 	info.m_vecSpread = Vector( 0.015f, 0.015f, 0.015f );  // medium cone
 
 	FireBullets( info );

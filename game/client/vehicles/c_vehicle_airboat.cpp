@@ -23,7 +23,6 @@
 #include "fx_water.h"
 #include "engine/ivdebugoverlay.h"
 #include "view.h"
-#include "ClientEffectPrecacheSystem.h"
 #include "c_basehlplayer.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -78,8 +77,12 @@ public:
 public:
 
 	// C_BaseEntity
+#if ENGINE_NEW
+	virtual bool Simulate();
+#else
 	virtual void Simulate();
-
+#endif
+	
 	// IClientVehicle
 	virtual void UpdateViewAngles( C_BasePlayer *pLocalPlayer, CUserCmd *pCmd );
 	virtual void OnEnteredVehicle( C_BasePlayer *pPlayer );
@@ -89,7 +92,7 @@ public:
 	virtual int GetPrimaryAmmoCount() const;
 	virtual int GetJoystickResponseCurve() const;
 
-	int		DrawModel( int flags );
+	int		DrawModel( int flags RENDER_INSTANCE_INPUT );
 
 	// Draws crosshair in the forward direction of the boat
 	void DrawHudElements( );
@@ -241,7 +244,12 @@ void C_PropAirboat::DrawHudElements( )
 
 	MDLCACHE_CRITICAL_SECTION();
 
+#if ENGINE_NEW
+	CHudTexture *pIcon = HudIcons().GetIcon( IsX360() ? "crosshair_default" : "plushair" );
+#else
 	CHudTexture *pIcon = GetHud().GetIcon( IsX360() ? "crosshair_default" : "plushair" );
+#endif
+
 	if ( pIcon != NULL )
 	{
 		float x, y;
@@ -485,12 +493,16 @@ void C_PropAirboat::OnEnteredVehicle( C_BasePlayer *pPlayer )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
+#if ENGINE_NEW
+bool C_PropAirboat::Simulate()
+#else
 void C_PropAirboat::Simulate()
+#endif
 {
 	UpdateHeadlight();
 	UpdateWake();
 
-	BaseClass::Simulate();
+	return BaseClass::Simulate();
 }
 
 
@@ -595,13 +607,13 @@ void C_PropAirboat::DrawSegment( const BeamSeg_t &beamSeg, const Vector &vNormal
 
 	// Specify the points.
 	m_Mesh.Position3fv( vPoint1.Base() );
-	m_Mesh.Color4f( VectorExpand( beamSeg.m_vColor ), beamSeg.m_flAlpha );
+	m_Mesh.Color4f( BeamSegColors(bemSeg) );
 	m_Mesh.TexCoord2f( 0, 0, beamSeg.m_flTexCoord );
 	m_Mesh.TexCoord2f( 1, 0, beamSeg.m_flTexCoord );
 	m_Mesh.AdvanceVertex();
 
 	m_Mesh.Position3fv( vPoint2.Base() );
-	m_Mesh.Color4f( VectorExpand( beamSeg.m_vColor ), beamSeg.m_flAlpha );
+	m_Mesh.Color4f( BeamSegColors(bemSeg) );
 	m_Mesh.TexCoord2f( 0, 1, beamSeg.m_flTexCoord );
 	m_Mesh.TexCoord2f( 1, 1, beamSeg.m_flTexCoord );
 	m_Mesh.AdvanceVertex();
@@ -865,14 +877,23 @@ int C_PropAirboat::DrawWake( void )
 
 		float flLifePerc = RemapValClamped( ( pPoint->m_flDieTime - gpGlobals->curtime ), 0, WAKE_LIFETIME, 0.0f, 1.0f );
 
-		BeamSeg_t curSeg;
-		curSeg.m_vColor.x = curSeg.m_vColor.y = curSeg.m_vColor.z = 1.0f;
-
 		float flAlphaFade = flLifePerc;
 		float alpha = RemapValClamped( fabs( m_vecPhysVelocity.y ), 128, 600, 0.0f, 1.0f );
 
+		BeamSeg_t curSeg;
+
+#if ENGINE_NEW
+		// TODO: check if these are the right colors for x y z
+		curSeg.m_color.r = curSeg.m_color.g = curSeg.m_color.b = 1.0f;
+
+		curSeg.m_color.a = 0.25f;
+		curSeg.m_color.a *= flAlphaFade * alpha;
+#else
+		curSeg.m_vColor.x = curSeg.m_vColor.y = curSeg.m_vColor.z = 1.0f;
+
 		curSeg.m_flAlpha = 0.25f;
 		curSeg.m_flAlpha *= flAlphaFade * alpha;
+#endif
 
 		curSeg.m_vPos = pPoint->m_vecScreenPos;
 		
@@ -912,9 +933,9 @@ int C_PropAirboat::DrawWake( void )
 // Input  : flags - 
 // Output : int
 //-----------------------------------------------------------------------------
-int C_PropAirboat::DrawModel( int flags )
+int C_PropAirboat::DrawModel( int flags RENDER_INSTANCE_INPUT )
 {
-	if ( BaseClass::DrawModel( flags ) == false )
+	if ( BaseClass::DrawModel( flags RENDER_INSTANCE ) == false )
 		return 0;
 	
 	if ( !m_bReadyToDraw )

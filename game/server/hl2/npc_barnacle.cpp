@@ -1099,7 +1099,7 @@ void CNPC_Barnacle::LiftRagdoll( float flBiteZOffset )
 			*/
 
 			// Get the current bone matrix
-			matrix3x4_t pBoneToWorld[MAXSTUDIOBONES];
+			matrix3x4a_t pBoneToWorld[MAXSTUDIOBONES];
 			pAnimating->SetupBones( pBoneToWorld, BONE_USED_BY_ANYTHING );
 
 			// Apply the forces to the ragdoll

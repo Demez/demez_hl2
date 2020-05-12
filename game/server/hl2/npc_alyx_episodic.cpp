@@ -11,7 +11,6 @@
 
 #include "cbase.h"
 #include "npcevent.h"
-#include "ai_basenpc.h"
 #include "ai_hull.h"
 #include "ai_basehumanoid.h"
 #include "ai_behavior_follow.h"
@@ -36,6 +35,7 @@
 #include "ai_interactions.h"
 #include "weapon_flaregun.h"
 #include "env_debughistory.h"
+#include "ai_demez_npc.h"
 
 extern Vector PointOnLineNearestPoint(const Vector& vStartPos, const Vector& vEndPos, const Vector& vPoint);
 
@@ -275,7 +275,12 @@ void CNPC_Alyx::HandleAnimEvent( animevent_t *pEvent )
 		animevent_t fakeEvent;
 
 		fakeEvent.pSource = this;
+
+#if ENGINE_NEW
+		fakeEvent.Event(EVENT_WEAPON_AR2_ALTFIRE);
+#else
 		fakeEvent.event = EVENT_WEAPON_AR2_ALTFIRE;
+#endif
 		GetActiveWeapon()->Operator_HandleAnimEvent( &fakeEvent, this );
 		//m_iNumGrenades--;
 

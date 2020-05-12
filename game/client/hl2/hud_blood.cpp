@@ -5,9 +5,9 @@
 //=============================================================================//
 
 #include "cbase.h"
-#include "ClientEffectPrecacheSystem.h"
 #include "c_te_effect_dispatch.h"
 #include "hud.h"
+#include "engine_defines.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -31,4 +31,4 @@ void BloodSplatCallback( const CEffectData & data )
 */
 }
 
-DECLARE_CLIENT_EFFECT( "HudBloodSplat", BloodSplatCallback );
+DECLARE_CLIENT_EFFECT( HudBloodSplat, BloodSplatCallback );

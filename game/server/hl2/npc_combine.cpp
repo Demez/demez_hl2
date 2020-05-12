@@ -240,7 +240,12 @@ void CNPC_Combine::InputStopPatrolling( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CNPC_Combine::InputAssault( inputdata_t &inputdata )
 {
+#if ENGINE_NEW
+	// i think it should use pActivator? idk
+	m_AssaultBehavior.SetParameters( inputdata.pActivator, CUE_DONT_WAIT );
+#else
 	m_AssaultBehavior.SetParameters( AllocPooledString(inputdata.value.String()), CUE_DONT_WAIT, RALLY_POINT_SELECT_DEFAULT );
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -2360,7 +2365,11 @@ void CNPC_Combine::HandleAnimEvent( animevent_t *pEvent )
 				animevent_t fakeEvent;
 
 				fakeEvent.pSource = this;
+#if ENGINE_NEW
+				fakeEvent.Event(EVENT_WEAPON_AR2_ALTFIRE);
+#else
 				fakeEvent.event = EVENT_WEAPON_AR2_ALTFIRE;
+#endif
 				GetActiveWeapon()->Operator_HandleAnimEvent( &fakeEvent, this );
 
 				// Stop other squad members from combine balling for a while.

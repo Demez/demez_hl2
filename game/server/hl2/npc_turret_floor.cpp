@@ -1179,7 +1179,7 @@ bool CNPC_FloorTurret::IsValidEnemy( CBaseEntity *pEnemy )
 		return false;
 
 	// If our eye is stuck in something, don't shoot
-	if ( UTIL_PointContents(EyePosition()) & MASK_SHOT )
+	if ( Engine_UTIL_PointContents(EyePosition(), MASK_SHOT) )
 		return false;
 
 	// Turrets have limited vertical aim capability

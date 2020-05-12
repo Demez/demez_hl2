@@ -39,12 +39,14 @@ configuration
 			"shared/hl2mp"
 			
 			"shared/weapons/hl2mp"
+			"shared/base_classes"
 			
 			"$TYPE"
 			"$TYPE/hl2"
 			"$TYPE/hl2mp"
 			"$TYPE/episodic"
 			"$TYPE/vehicles"
+			"$TYPE/base_classes"
 			
 			"$ENGINE_SRC/game/$TYPE"
 		}
@@ -87,6 +89,12 @@ files
 	{
 		"shared/engine_defines.h"
 		"shared/ai_activity.h"
+	}
+	
+	folder "Demez"
+	{
+		"shared/base_classes/demez_ammodef.cpp"
+		"shared/base_classes/demez_ammodef.h"
 	}
 	
 	folder "Game Base"

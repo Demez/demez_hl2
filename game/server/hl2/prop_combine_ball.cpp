@@ -791,7 +791,7 @@ void CPropCombineBall::OnPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunPickup
 	if ( m_pGlowTrail )
 	{
 		m_pGlowTrail->TurnOff();
-		m_pGlowTrail->SetRenderColor( 0, 0, 0, 0 );
+		SetRenderColorAlpha( m_pGlowTrail, 0, 0, 0, 0 );
 	}
 
 	if ( reason != PUNTED_BY_CANNON )
@@ -897,7 +897,7 @@ void CPropCombineBall::OnPhysGunDrop( CBasePlayer *pPhysGunUser, PhysGunDrop_t R
 	if ( m_pGlowTrail )
 	{
 		m_pGlowTrail->TurnOn();
-		m_pGlowTrail->SetRenderColor( 255, 255, 255, 255 );
+		SetRenderColorAlpha( m_pGlowTrail, 255, 255, 255, 255 );
 	}
 
 	// Set our desired speed to be launched at

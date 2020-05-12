@@ -34,6 +34,7 @@
 #include "sprite.h"
 #include "particle_parse.h"
 #include "particle_system.h"
+#include "engine_defines.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -2522,7 +2523,9 @@ void CNPC_AntlionGuard::StartTask( const Task_t *pTask )
 	case TASK_ANTLIONGUARD_GET_CHASE_PATH_ENEMY_TOLERANCE:
 		{
 			// Chase the enemy, but allow local navigation to succeed if it gets within the goal tolerance
+#if ENGINE_OLD
 			GetNavigator()->SetLocalSucceedOnWithinTolerance( true );
+#endif
 
 			if ( GetNavigator()->SetGoal( GOALTYPE_ENEMY ) )
 			{
@@ -2534,7 +2537,9 @@ void CNPC_AntlionGuard::StartTask( const Task_t *pTask )
 				TaskFail(FAIL_NO_ROUTE);
 			}
 
+#if ENGINE_OLD
 			GetNavigator()->SetLocalSucceedOnWithinTolerance( false );
+#endif
 		}
 		break;
 
@@ -3740,7 +3745,7 @@ bool CNPC_AntlionGuard::IsUnreachable(CBaseEntity *pEntity)
 
 	// Note that it's ok to remove elements while I'm iterating
 	// as long as I iterate backwards and remove them using FastRemove
-	for (int i=m_UnreachableEnts.Size()-1;i>=0;i--)
+	for (int i = m_UnreachableEnts.VectorCount() - 1; i >= 0; i--)
 	{
 		// Remove any dead elements
 		if (m_UnreachableEnts[i].hUnreachableEnt == NULL)

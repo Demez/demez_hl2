@@ -6,21 +6,25 @@
 #pragma once
 #endif
 
-#include "ai_basenpc.h"
 #include "demez_combat_character.h"
+
+// full smile
+#define private public
+#include "ai_basenpc.h"
+#undef private
+
 #include "engine_defines.h"
 
-class CAI_DemezNPC: public CDemezCombatCharacter,
-	public CAI_BaseNPC
+class CAI_DemezNPC: public CAI_BaseNPC
 {
-	DECLARE_CLASS( CAI_DemezNPC, CDemezCombatCharacter );
+	DECLARE_CLASS( CAI_DemezNPC, CAI_BaseNPC );
 
 public:
 	CAI_DemezNPC();
 	~CAI_DemezNPC();
 	
-	// DECLARE_DATADESC();
-	// DECLARE_SERVERCLASS();
+	DECLARE_DATADESC();
+	DECLARE_SERVERCLASS();
 };
 
 

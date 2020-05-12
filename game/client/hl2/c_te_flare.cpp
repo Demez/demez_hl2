@@ -5,7 +5,6 @@
 // $NoKeywords: $
 //=============================================================================//
 #include "cbase.h"
-#include "ClientEffectPrecacheSystem.h"
 #include "particles_simple.h"
 #include "iefx.h"
 #include "dlight.h"
@@ -14,15 +13,20 @@
 #include "clientsideeffects.h"
 #include "c_pixel_visibility.h"
 
+#include "engine_defines.h"
+#if ENGINE_OLD
+#include "ClientEffectPrecacheSystem.h"
+#endif
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
 //Precahce the effects
-CLIENTEFFECT_REGISTER_BEGIN( PrecacheEffectFlares )
-CLIENTEFFECT_MATERIAL( "effects/redflare" )
-CLIENTEFFECT_MATERIAL( "effects/yellowflare" )
-CLIENTEFFECT_MATERIAL( "effects/yellowflare_noz" )
-CLIENTEFFECT_REGISTER_END()
+PRECACHE_REGISTER_BEGIN( GLOBAL, PrecacheEffectFlares )
+PRECACHE( MATERIAL, "effects/redflare" )
+PRECACHE( MATERIAL, "effects/yellowflare" )
+PRECACHE( MATERIAL, "effects/yellowflare_noz" )
+PRECACHE_REGISTER_END()
 
 class C_Flare : public C_BaseCombatCharacter, CSimpleEmitter
 {
@@ -308,7 +312,7 @@ void C_Flare::Update( float timeDelta )
 		{
 			Vector	smokeOrg = GetAbsOrigin();
 
-			Vector	flareScreenDir = ( smokeOrg - MainViewOrigin() );
+			Vector	flareScreenDir = ( smokeOrg - MainViewOrigin(GET_ACTIVE_SPLITSCREEN_SLOT()) );
 			VectorNormalize( flareScreenDir );
 
 			smokeOrg = smokeOrg + ( flareScreenDir * 2.0f );

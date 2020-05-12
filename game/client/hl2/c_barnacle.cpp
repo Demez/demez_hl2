@@ -6,7 +6,6 @@
 //=============================================================================//
 
 #include "cbase.h"
-#include "c_ai_basenpc.h"
 #include "engine/ivmodelinfo.h"
 #include "rope_physics.h"
 #include "materialsystem/IMaterialSystem.h"
@@ -14,6 +13,7 @@
 #include "engine/IVDebugOverlay.h"
 #include "bone_setup.h"
 #include "model_types.h"
+#include "c_ai_demez_npc.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -56,7 +56,12 @@ public:
 	void	OnDataChanged( DataUpdateType_t updateType );
 	void	InitTonguePhysics( void );
 	void	ClientThink( void );
-	void	StandardBlendingRules( CStudioHdr *pStudioHdr, Vector pos[], Quaternion q[], float currentTime, int boneMask );
+
+#if ENGINE_NEW
+	void    StandardBlendingRules( CStudioHdr *pStudioHdr, Vector pos[], QuaternionAligned q[], float currentTime, int boneMask );
+#else
+	void    StandardBlendingRules( CStudioHdr *pStudioHdr, Vector pos[], Quaternion q[], float currentTime, int boneMask );
+#endif
 
 	void	SetVecTip( const float *pPosition );
 	void	SetAltitude( float flAltitude );
@@ -200,7 +205,11 @@ void C_NPC_Barnacle::ClientThink( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
+#if ENGINE_NEW
+void C_NPC_Barnacle::StandardBlendingRules( CStudioHdr *hdr, Vector pos[], QuaternionAligned q[], float currentTime, int boneMask )
+#else
 void C_NPC_Barnacle::StandardBlendingRules( CStudioHdr *hdr, Vector pos[], Quaternion q[], float currentTime, int boneMask )
+#endif
 {
 	BaseClass::StandardBlendingRules( hdr, pos, q, currentTime, boneMask );
 

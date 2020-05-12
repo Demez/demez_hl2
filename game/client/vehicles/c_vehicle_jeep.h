@@ -14,6 +14,7 @@
 #include "flashlighteffect.h"
 //#include "c_baseplayer.h"
 //#include "c_te_effect_dispatch.h"
+#include "engine_defines.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 //#include "tier0/memdbgon.h"

@@ -582,8 +582,13 @@ bool CHL2GameMovement::CheckJumpButton(void)
 		return false;
 
 	// Still updating the eye position.
+#if ENGINE_NEW
+	if (player->m_Local.m_nDuckJumpTimeMsecs > 0)
+		return false;
+#else
 	if (player->m_Local.m_flDuckJumpTime > 0.0f)
 		return false;
+#endif
 
 	// In the air now.
 	SetGroundEntity(NULL);
@@ -693,7 +698,11 @@ bool CHL2GameMovement::CheckJumpButton(void)
 	// Set jump time.
 	if (gpGlobals->maxClients == 1)
 	{
+#if ENGINE_NEW
+		player->m_Local.m_nJumpTimeMsecs = GAMEMOVEMENT_JUMP_TIME;
+#else
 		player->m_Local.m_flJumpTime = GAMEMOVEMENT_JUMP_TIME;
+#endif
 		player->m_Local.m_bInDuckJump = true;
 	}
 

@@ -10,25 +10,25 @@
 #include "beam_shared.h"
 #include "materialsystem/IMaterial.h"
 #include "model_types.h"
-#include "ClientEffectPrecacheSystem.h"
 #include "beamdraw.h"
+#include "c_ai_demez_npc.h"
 
-class C_RollerMine : public C_AI_BaseNPC
+class C_RollerMine : public C_AI_DemezNPC
 {
-	DECLARE_CLASS( C_RollerMine, C_AI_BaseNPC );
+	DECLARE_CLASS( C_RollerMine, C_AI_DemezNPC );
 public:
 	DECLARE_CLIENTCLASS();
 
 			C_RollerMine( void ) {}
 
-	int		DrawModel( int flags );
+	int		DrawModel( int flags RENDER_INSTANCE_INPUT );
 
 	RenderGroup_t GetRenderGroup( void ) 
 	{	
 		if ( m_bIsOpen )
-			return RENDER_GROUP_TRANSLUCENT_ENTITY;	
+			return RENDER_GROUP_TRANSLUCENT;	
 		else
-			return RENDER_GROUP_OPAQUE_ENTITY;
+			return RENDER_GROUP_OPAQUE;
 	}
 
 private:
@@ -54,7 +54,7 @@ END_RECV_TABLE()
 // Input  : flags - 
 // Output : int
 //-----------------------------------------------------------------------------
-int C_RollerMine::DrawModel( int flags )
+int C_RollerMine::DrawModel( int flags RENDER_INSTANCE_INPUT )
 {
 	if ( m_bIsOpen && m_flActiveTime <= gpGlobals->curtime )
 	{
@@ -170,5 +170,5 @@ int C_RollerMine::DrawModel( int flags )
 		}
 	}
 
-	return BaseClass::DrawModel( flags );
+	return BaseClass::DrawModel( flags RENDER_INSTANCE );
 }

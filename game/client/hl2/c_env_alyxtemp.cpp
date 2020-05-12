@@ -51,7 +51,7 @@ END_RECV_TABLE()
 //-----------------------------------------------------------------------------
 RenderGroup_t C_AlyxEmpEffect::GetRenderGroup( void )
 {
-	return RENDER_GROUP_TRANSLUCENT_ENTITY;
+	return RENDER_GROUP_TRANSLUCENT;
 }
 
 //-----------------------------------------------------------------------------

@@ -105,7 +105,12 @@ void CBaseHL2MPBludgeonWeapon::PrimaryAttack()
 #ifndef CLIENT_DLL
 	CHL2MP_Player *pPlayer = ToHL2MPPlayer( GetPlayerOwner() );
 	// Move other players back to history positions based on local player's lag
-	lagcompensation->StartLagCompensation( pPlayer, pPlayer->GetCurrentCommand() );
+	#if ENGINE_NEW
+		lagcompensation->StartLagCompensation( pPlayer, LAG_COMPENSATE_BOUNDS );
+	#else
+		lagcompensation->StartLagCompensation( pPlayer, pPlayer->GetCurrentCommand() );
+	#endif
+
 #endif
 	Swing( false );
 #ifndef CLIENT_DLL
@@ -227,21 +232,21 @@ bool CBaseHL2MPBludgeonWeapon::ImpactWater( const Vector &start, const Vector &e
 	//FIXME: This doesn't handle the case of trying to splash while being underwater, but that's not going to look good
 	//		 right now anyway...
 	
-	// We must start outside the water
-	if ( UTIL_PointContents( start ) & (CONTENTS_WATER|CONTENTS_SLIME))
+	// We must start outside the water 
+	if ( Engine_UTIL_PointContents(start, (CONTENTS_WATER|CONTENTS_SLIME)) )
 		return false;
 
 	// We must end inside of water
-	if ( !(UTIL_PointContents( end ) & (CONTENTS_WATER|CONTENTS_SLIME)))
+	if ( !(Engine_UTIL_PointContents( end, (CONTENTS_WATER|CONTENTS_SLIME) )))
 		return false;
 
 	trace_t	waterTrace;
 
 	UTIL_TraceLine( start, end, (CONTENTS_WATER|CONTENTS_SLIME), GetOwner(), COLLISION_GROUP_NONE, &waterTrace );
 
+#ifndef CLIENT_DLL
 	if ( waterTrace.fraction < 1.0f )
 	{
-#ifndef CLIENT_DLL
 		CEffectData	data;
 
 		data.m_fFlags  = 0;
@@ -255,9 +260,9 @@ bool CBaseHL2MPBludgeonWeapon::ImpactWater( const Vector &start, const Vector &e
 			data.m_fFlags |= FX_WATER_IN_SLIME;
 		}
 
-		DispatchEffect( "watersplash", data );			
+		DispatchEffect( "watersplash", data );
+	}	
 #endif
-	}
 
 	return true;
 }

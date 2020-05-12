@@ -10,6 +10,8 @@
 #pragma once
 #endif
 
+#include "engine_defines.h"
+
 #define	SF_ENERGYCORE_NO_PARTICLES	(1<<0)
 #define	SF_ENERGYCORE_START_ON		(1<<1)
 

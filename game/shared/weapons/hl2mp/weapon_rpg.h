@@ -239,10 +239,12 @@ public:
 #ifdef CLIENT_DLL
 
 	// We need to render opaque and translucent pieces
+#if ENGINE_OLD
 	virtual RenderGroup_t	GetRenderGroup( void ) {	return RENDER_GROUP_TWOPASS;	}
+#endif
 
 	virtual void	NotifyShouldTransmit( ShouldTransmitState_t state );
-	virtual int		DrawModel( int flags );
+	virtual int		DrawModel( int flags RENDER_INSTANCE_INPUT );
 	virtual void	ViewModelDrawn( C_BaseViewModel *pBaseViewModel );
 	virtual bool	IsTranslucent( void );
 

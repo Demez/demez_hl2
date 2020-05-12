@@ -19,7 +19,7 @@
 #include "materialsystem/imaterialvar.h"
 #include "ieffects.h"
 #include "hudelement.h"
-#include "ClientEffectPrecacheSystem.h"
+#include "engine_defines.h"
 
 using namespace vgui;
 
@@ -121,7 +121,7 @@ static DamageAnimation_t g_DamageAnimations[] =
 //-----------------------------------------------------------------------------
 CHudDamageIndicator::CHudDamageIndicator( const char *pElementName ) : CHudElement( pElementName ), BaseClass(NULL, "HudDamageIndicator")
 {
-	vgui::Panel *pParent = g_pClientMode->GetViewport();
+	vgui::Panel *pParent = GetClientMode()->GetViewport();
 	SetParent( pParent );
 
 	m_WhiteAdditiveMaterial.Init( "vgui/white_additive", TEXTURE_GROUP_VGUI ); 
@@ -343,7 +343,7 @@ void CHudDamageIndicator::MsgFunc_Damage( bf_read &msg )
 	// player has just died, just run the dead damage animation
 	if ( pPlayer->GetHealth() <= 0 )
 	{
-		g_pClientMode->GetViewportAnimationController()->StartAnimationSequence( "HudPlayerDeath" );
+		GetClientMode()->GetViewportAnimationController()->StartAnimationSequence( "HudPlayerDeath" );
 		return;
 	}
 
@@ -353,7 +353,7 @@ void CHudDamageIndicator::MsgFunc_Damage( bf_read &msg )
 	if ( vecFrom == vec3_origin && !(bitsDamage & DMG_DROWN))
 		return;
 
-	Vector vecDelta = (vecFrom - MainViewOrigin());
+	Vector vecDelta = (vecFrom - MainViewOrigin(GET_ACTIVE_SPLITSCREEN_SLOT()));
 	VectorNormalize( vecDelta );
 
 	int highDamage = DAMAGE_LOW;
@@ -396,7 +396,7 @@ void CHudDamageIndicator::MsgFunc_Damage( bf_read &msg )
 
 		if ( dmgAnim->name )
 		{
-			g_pClientMode->GetViewportAnimationController()->StartAnimationSequence( dmgAnim->name );
+			GetClientMode()->GetViewportAnimationController()->StartAnimationSequence( dmgAnim->name );
 		}
 	}
 }
@@ -409,8 +409,8 @@ void CHudDamageIndicator::GetDamagePosition( const Vector &vecDelta, float *flRo
 	float flRadius = 360.0f;
 
 	// Player Data
-	Vector playerPosition = MainViewOrigin();
-	QAngle playerAngles = MainViewAngles();
+	Vector playerPosition = MainViewOrigin(GET_ACTIVE_SPLITSCREEN_SLOT());
+	QAngle playerAngles = MainViewAngles(GET_ACTIVE_SPLITSCREEN_SLOT());
 
 	Vector forward, right, up(0,0,1);
 	AngleVectors (playerAngles, &forward, NULL, NULL );

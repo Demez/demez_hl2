@@ -364,7 +364,7 @@ void CCrossbowBolt::BoltTouch( CBaseEntity *pOther )
 			}
 			
 			// Shoot some sparks
-			if ( UTIL_PointContents( GetAbsOrigin() ) != CONTENTS_WATER)
+			if ( !Engine_UTIL_PointContents( GetAbsOrigin(), CONTENTS_WATER ) )
 			{
 				g_pEffects->Sparks( GetAbsOrigin() );
 			}
@@ -815,6 +815,7 @@ void CWeaponCrossbow::CreateChargerEffects( void )
 //-----------------------------------------------------------------------------
 void CWeaponCrossbow::SetSkin( int skinNum )
 {
+#ifndef CLIENT_DLL
 	CBasePlayer *pOwner = ToBasePlayer( GetOwner() );
 	
 	if ( pOwner == NULL )
@@ -826,6 +827,7 @@ void CWeaponCrossbow::SetSkin( int skinNum )
 		return;
 
 	pViewModel->m_nSkin = skinNum;
+#endif
 }
 
 //-----------------------------------------------------------------------------

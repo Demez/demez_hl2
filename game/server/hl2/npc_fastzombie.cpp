@@ -1759,8 +1759,12 @@ void CFastZombie::BuildScheduleTestBits( void )
 	// BaseClass::BuildScheduleTestBits();
 	//
 	// For now, make sure our active behavior gets a chance to add its own bits
-	if ( GetRunningBehavior() )
+	if ( GetPrimaryBehavior() )
+#if ENGINE_NEW
+		GetPrimaryBehavior()->BuildScheduleTestBits(); 
+#else
 		GetRunningBehavior()->BridgeBuildScheduleTestBits(); 
+#endif
 
 #ifdef HL2_EPISODIC
 	SetCustomInterruptCondition( COND_PROVOKED );

@@ -1077,7 +1077,11 @@ void CNPC_BaseZombie::DieChopped( const CTakeDamageInfo &info )
 
 	Vector forceVector( vec3_origin );
 
+#if ENGINE_NEW
+	forceVector += CalcDeathForceVector( info );
+#else
 	forceVector += CalcDamageForceVector( info );
+#endif
 
 	if( !m_fIsHeadless && !bSquashed )
 	{
@@ -1256,8 +1260,12 @@ void CNPC_BaseZombie::Ignite( float flFlameLifetime, bool bNPCOnly, float flSize
 //---------------------------------------------------------
 void CNPC_BaseZombie::CopyRenderColorTo( CBaseEntity *pOther )
 {
+#if ENGINE_NEW
+	color24 color = GetRenderColor();
+#else
 	color32 color = GetRenderColor();
-	pOther->SetRenderColor( color.r, color.g, color.b, color.a );
+#endif
+	SetRenderColorAlpha( pOther, color.r, color.g, color.b, GetRenderAlpha() );
 }
 
 //-----------------------------------------------------------------------------

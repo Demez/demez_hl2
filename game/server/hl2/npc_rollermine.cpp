@@ -38,6 +38,8 @@
 #include "mapentities.h"
 #include "RagdollBoogie.h"
 #include "physics_collisionevent.h"
+#include "ai_demez_npc.h"
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -2528,7 +2530,7 @@ void CNPC_RollerMine::Explode( void )
 	}
 
 	// Underwater explosion?
-	if ( UTIL_PointContents( GetAbsOrigin() ) & MASK_WATER )
+	if ( Engine_UTIL_PointContents( GetAbsOrigin(), MASK_WATER) )
 	{
 		CEffectData	data;
 		data.m_vOrigin = WorldSpaceCenter();
@@ -2600,11 +2602,11 @@ void CNPC_RollerMine::EmbedOnGroundImpact()
 void CNPC_RollerMine::PrescheduleThink()
 {
 	// Are we underwater?
-	if ( UTIL_PointContents( GetAbsOrigin() ) & MASK_WATER )
+	if ( Engine_UTIL_PointContents( GetAbsOrigin(), MASK_WATER ) )
 	{
 		// As soon as we're far enough underwater, detonate
 		Vector vecAboveMe = GetAbsOrigin() + Vector(0,0,64);
-		if ( UTIL_PointContents( vecAboveMe ) & MASK_WATER )
+		if ( Engine_UTIL_PointContents( vecAboveMe, MASK_WATER ) )
 		{
 			Explode();
 			return;

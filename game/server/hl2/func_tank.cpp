@@ -2441,14 +2441,10 @@ void CFuncTankGun::Fire( int bulletCount, const Vector &barrelEnd, const Vector 
 
 	info.m_flDistance = MAX_TRACE_LENGTH;
 	info.m_iTracerFreq = 1;
-	info.
-#if ENGINE_2013
-		m_flDamage
-#else	
-		m_iDamage
-#endif
-		= m_iBulletDamage;
-	info.m_iPlayerDamage = m_iBulletDamageVsPlayer;
+
+	FireBullets_Damage(info) = m_iBulletDamage;
+	FireBullets_PlayerDamage(info) = m_iBulletDamageVsPlayer;
+	
 	info.m_pAttacker = pAttacker;
 	info.m_pAdditionalIgnoreEnt = GetParent();
 

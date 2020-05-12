@@ -36,8 +36,12 @@ public:
 	ClientModeHL2MPNormal();
 	~ClientModeHL2MPNormal();
 
-	virtual void	Init();
-	virtual int		GetDeathMessageStartHeight( void );
+	virtual void        Init();
+	virtual int         GetDeathMessageStartHeight( void );
+
+#if ENGINE_NEW
+	virtual void        DoPostScreenSpaceEffects( const CViewSetup *pSetup ) { BaseClass::DoPostScreenSpaceEffects(pSetup); }
+#endif
 };
 
 extern IClientMode *GetClientModeNormal();

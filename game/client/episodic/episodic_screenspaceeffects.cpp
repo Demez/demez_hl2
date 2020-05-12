@@ -11,7 +11,6 @@
 #include "cdll_client_int.h"
 #include "materialsystem/itexture.h"
 #include "keyvalues.h"
-#include "ClientEffectPrecacheSystem.h"
 
 #include "episodic_screenspaceeffects.h"
 

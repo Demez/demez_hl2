@@ -1000,7 +1000,7 @@ void CNPC_Stalker::DrawAttackBeam(void)
 
 	CalcBeamPosition();
 
-	bool bInWater = (UTIL_PointContents ( tr.endpos ) & MASK_WATER)?true:false;
+	bool bInWater = (Engine_UTIL_PointContents(tr.endpos, MASK_WATER)) ? true : false;
 	// ---------------------------------------------
 	//	Update the beam position
 	// ---------------------------------------------

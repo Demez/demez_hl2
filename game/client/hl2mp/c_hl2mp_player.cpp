@@ -91,8 +91,15 @@ void C_HL2MP_Player::UpdateIDTarget()
 
 	trace_t tr;
 	Vector vecStart, vecEnd;
+
+#if ENGINE_NEW
+	VectorMA( MainViewOrigin(GetSplitScreenPlayerSlot()), 1500, MainViewForward(engine->GetActiveSplitScreenPlayerSlot()), vecEnd );
+	VectorMA( MainViewOrigin(GetSplitScreenPlayerSlot()), 10,   MainViewForward(engine->GetActiveSplitScreenPlayerSlot()), vecStart );
+#else
 	VectorMA( MainViewOrigin(), 1500, MainViewForward(), vecEnd );
 	VectorMA( MainViewOrigin(), 10,   MainViewForward(), vecStart );
+#endif
+
 	UTIL_TraceLine( vecStart, vecEnd, MASK_SOLID, this, COLLISION_GROUP_NONE, &tr );
 
 	if ( !tr.startsolid && tr.DidHitNonWorldEntity() )
@@ -269,20 +276,12 @@ void C_HL2MP_Player::ClientThink( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-#if ENGINE_NEW
-int C_HL2MP_Player::DrawModel( int flags, const RenderableInstance_t &instance )
-#else
-int C_HL2MP_Player::DrawModel( int flags )
-#endif
+int C_HL2MP_Player::DrawModel( int flags RENDER_INSTANCE_INPUT )
 {
 	if ( !m_bReadyToDraw )
 		return 0;
 
-#if ENGINE_NEW
-    return BaseClass::DrawModel( flags, instance );
-#else
-    return BaseClass::DrawModel( flags );
-#endif
+    return BaseClass::DrawModel( flags RENDER_INSTANCE );
 }
 
 //-----------------------------------------------------------------------------
@@ -362,6 +361,7 @@ const QAngle &C_HL2MP_Player::EyeAngles()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
+#if ENGINE_OLD
 void C_HL2MP_Player::AddEntity( void )
 {
 	BaseClass::AddEntity();
@@ -455,12 +455,14 @@ void C_HL2MP_Player::AddEntity( void )
 		}
 	}
 }
+#endif
 
 ShadowType_t C_HL2MP_Player::ShadowCastType( void ) 
 {
 	if ( !IsVisible() )
 		 return SHADOWS_NONE;
 
+	// what if i SHADOWS_RENDER_TO_DEPTH_TEXTURE...
 	return SHADOWS_RENDER_TO_TEXTURE_DYNAMIC;
 }
 
@@ -877,7 +879,12 @@ void C_HL2MPRagdoll::CreateHL2MPRagdoll( void )
 			Interp_Copy( pPlayer );
 
 			SetAbsAngles( pPlayer->GetRenderAngles() );
+
+#if ENGINE_NEW
+			GetRotationInterpolator().Reset(gpGlobals->curtime);
+#else
 			GetRotationInterpolator().Reset();
+#endif
 
 			m_flAnimTime = pPlayer->m_flAnimTime;
 			SetSequence( pPlayer->GetSequence() );
@@ -922,11 +929,15 @@ void C_HL2MPRagdoll::CreateHL2MPRagdoll( void )
 	SetModelIndex( m_nModelIndex );
 
 	// Make us a ragdoll..
+#if ENGINE_NEW
+	m_bClientSideRagdoll = true;
+#else
 	m_nRenderFX = kRenderFxRagdoll;
+#endif
 
-	matrix3x4_t boneDelta0[MAXSTUDIOBONES];
-	matrix3x4_t boneDelta1[MAXSTUDIOBONES];
-	matrix3x4_t currentBones[MAXSTUDIOBONES];
+	matrix3x4a_t boneDelta0[MAXSTUDIOBONES];
+	matrix3x4a_t boneDelta1[MAXSTUDIOBONES];
+	matrix3x4a_t currentBones[MAXSTUDIOBONES];
 	const float boneDt = 0.05f;
 
 	if ( pPlayer && !pPlayer->IsDormant() )

@@ -8,6 +8,7 @@
 #include "cbase.h"
 #include "EventLog.h"
 #include "KeyValues.h"
+#include "engine_defines.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -54,7 +55,11 @@ static CHL2EventLog s_HL2EventLog;
 //-----------------------------------------------------------------------------
 // Singleton access
 //-----------------------------------------------------------------------------
+#if ENGINE_NEW
+CEventLog* GameLogSystem()
+#else
 IGameSystem* GameLogSystem()
+#endif
 {
 	return &s_HL2EventLog;
 }

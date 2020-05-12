@@ -8,7 +8,6 @@
 #include "soundenvelope.h"
 #include "Sprite.h"
 #include "entitylist.h"
-#include "ai_basenpc.h"
 #include "soundent.h"
 #include "explode.h"
 #include "physics.h"
@@ -17,6 +16,7 @@
 #include "movevars_shared.h"
 #include "vphysics/constraints.h"
 #include "ai_hint.h"
+#include "ai_demez_npc.h"
 
 enum
 {

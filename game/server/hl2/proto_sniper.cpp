@@ -3261,7 +3261,7 @@ void CSniperBullet::BulletThink( void )
 				//Msg("-");
 				vecCursor += m_vecDir * STEP_SIZE;
 
-				if( UTIL_PointContents( vecCursor ) != CONTENTS_SOLID )
+				if( !Engine_UTIL_PointContents( vecCursor, CONTENTS_SOLID ) )
 				{
 					// Passed out of a solid! 
 					SetAbsOrigin( vecCursor );

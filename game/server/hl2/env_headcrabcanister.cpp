@@ -13,9 +13,9 @@
 #include "ar2_explosion.h"
 #include "SkyCamera.h"
 #include "smoke_trail.h"
-#include "ai_basenpc.h"
 #include "npc_headcrab.h"
 #include "ai_motor.h"
+#include "ai_demez_npc.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
