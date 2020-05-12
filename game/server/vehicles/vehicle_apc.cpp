@@ -51,12 +51,7 @@
 #define DEATH_VOLLEY_MAX_FIRE_TIME		0.166
 
 // Echh...
-#if ENGINE_NEW
-extern int      g_sModelIndexFireball;
-#else
-extern short    g_sModelIndexFireball;
-#endif
-
+extern_g_sModelIndexFireball;
 
 ConVar sk_apc_health( "sk_apc_health", "750" );
 

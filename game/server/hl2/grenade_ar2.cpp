@@ -16,6 +16,7 @@
 #include "engine/IEngineSound.h"
 #include "world.h"
 #include "weapon_ar2.h"
+#include "engine_defines.h"
 
 #ifdef PORTAL
 	#include "portal_util_shared.h"
@@ -26,7 +27,8 @@
 
 #define AR2_GRENADE_MAX_DANGER_RADIUS	300
 
-extern short	g_sModelIndexFireball;			// (in combatweapon.cpp) holds the index for the smoke cloud
+// (in combatweapon.cpp) holds the index for the smoke cloud
+extern_g_sModelIndexFireball;
 
 // Moved to HL2_SharedGameRules because these are referenced by shared AmmoDef functions
 extern ConVar    sk_plr_dmg_smg1_grenade;

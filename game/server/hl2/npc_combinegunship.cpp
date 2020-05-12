@@ -57,11 +57,7 @@
 #define GUNSHIP_NUM_DAMAGE_OUTPUTS		4
 
 // holds the index for the fireball
-#if ENGINE_NEW
-extern int      g_sModelIndexFireball;
-#else
-extern short    g_sModelIndexFireball;
-#endif
+extern_g_sModelIndexFireball;
 
 int g_iGunshipEffectIndex = -1;
 

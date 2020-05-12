@@ -7,7 +7,7 @@
 
 #include "cbase.h"
 #include "grenade_homer.h"
-#include "weapon_ar2.h" // this is including server/hl2/weapon_ar2.h, just so it compiles, idk why it breaks with hl2mp weapon_ar2.h
+#include "weapon_ar2.h"
 #include "soundent.h"
 #include "decals.h"
 #include "shake.h"
@@ -28,7 +28,8 @@
 #define	 HOMER_TRAIL1_LIFE		0.2
 #define	 HOMER_TRAIL2_LIFE		3.0//	1.0
 
-extern short	g_sModelIndexFireball;			// (in combatweapon.cpp) holds the index for the smoke cloud
+// (in combatweapon.cpp) holds the index for the smoke cloud
+extern_g_sModelIndexFireball;
 
 ConVar    sk_dmg_homer_grenade( "sk_dmg_homer_grenade","0" );
 ConVar	  sk_homer_grenade_radius( "sk_homer_grenade_radius","0" );

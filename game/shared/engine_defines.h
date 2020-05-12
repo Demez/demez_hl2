@@ -18,7 +18,9 @@
 
 	#define RENDER_INSTANCE_INPUT , const RenderableInstance_t &instance
 	#define RENDER_INSTANCE , instance
-
+	
+	#define extern_g_sModelIndexFireball extern int g_sModelIndexFireball
+	
 	#define BeamSegColors(bemSeg) beamSeg.m_color.r, beamSeg.m_color.g, beamSeg.m_color.b, beamSeg.m_color.a
 	#define FireBullets_PlayerDamage(info) info.m_flPlayerDamage
 	#define Engine_UTIL_PointContents(vector, contentsMask) UTIL_PointContents(vector, contentsMask)
@@ -50,6 +52,7 @@
 	#define GET_ACTIVE_SPLITSCREEN_SLOT()
 
 	#define matrix3x4a_t matrix3x4_t
+	#define extern_g_sModelIndexFireball extern short g_sModelIndexFireball
 
 	#define PRECACHE_REGISTER_BEGIN( _system, _className ) CLIENTEFFECT_REGISTER_BEGIN( _className )
 	#define PRECACHE( _type, _name ) CLIENTEFFECT_MATERIAL( _name )
