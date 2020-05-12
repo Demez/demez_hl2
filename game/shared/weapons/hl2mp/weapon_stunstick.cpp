@@ -27,7 +27,12 @@
 	#include "fx.h"
 
 	extern void DrawHalo( IMaterial* pMaterial, const Vector &source, float scale, float const *color, float flHDRColorScale );
+
+#if ENGINE_NEW
+	extern void FormatViewModelAttachment( C_BasePlayer *pPlayer, Vector &vOrigin, bool bInverse );
+#else
 	extern void FormatViewModelAttachment( Vector &vOrigin, bool bInverse );
+#endif
 
 #endif
 
@@ -446,7 +451,12 @@ bool UTIL_GetWeaponAttachment( C_BaseCombatWeapon *pWeapon, int attachmentID, Ve
 	if ( pOwner != NULL )
 	{
 		int ret = pOwner->GetViewModel()->GetAttachment( attachmentID, absOrigin, absAngles );
+
+#if ENGINE_NEW
+		FormatViewModelAttachment( pOwner, absOrigin, true );
+#else
 		FormatViewModelAttachment( absOrigin, true );
+#endif
 
 		return ret;
 	}
@@ -551,9 +561,14 @@ void C_WeaponStunStick::ClientThink( void )
 			int attachment = random->RandomInt( 0, 15 );
 
 			UTIL_GetWeaponAttachment( this, attachment, vecOrigin, vecAngles );
-			::FormatViewModelAttachment( vecOrigin, false );
-
 			CBasePlayer *pOwner = ToBasePlayer( GetOwner() );
+
+#if ENGINE_NEW
+			::FormatViewModelAttachment( pOwner, vecOrigin, false );
+#else
+			::FormatViewModelAttachment( vecOrigin, false );
+#endif
+
 			CBaseEntity *pBeamEnt = pOwner->GetViewModel();
 
 			beamInfo.m_vecStart = vec3_origin;

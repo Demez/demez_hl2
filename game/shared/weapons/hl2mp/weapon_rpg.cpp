@@ -2109,7 +2109,11 @@ bool CWeaponRPG::Reload( void )
 
 #define	RPG_LASER_BEAM_LENGTH	128
 
+#if ENGINE_NEW
+extern void FormatViewModelAttachment( C_BasePlayer *pPlayer, Vector &vOrigin, bool bInverse );
+#else
 extern void FormatViewModelAttachment( Vector &vOrigin, bool bInverse );
+#endif
 
 //-----------------------------------------------------------------------------
 // Purpose: Returns the attachment point on either the world or viewmodel
@@ -2126,7 +2130,11 @@ void CWeaponRPG::GetWeaponAttachment( int attachmentId, Vector &outVector, Vecto
 		if ( pOwner != NULL )
 		{
 			pOwner->GetViewModel()->GetAttachment( attachmentId, outVector, angles );
+#if ENGINE_NEW
+			::FormatViewModelAttachment( pOwner, outVector, true );
+#else
 			::FormatViewModelAttachment( outVector, true );
+#endif
 		}
 	}
 	else
