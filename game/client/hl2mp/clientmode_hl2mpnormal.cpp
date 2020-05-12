@@ -91,13 +91,20 @@ IViewPortPanel* CHudViewport::CreatePanelByName( const char *szPanelName )
 	return BaseClass::CreatePanelByName( szPanelName ); 
 }
 
+void ClientModeHL2MPNormal::InitViewport()
+{
+	m_pViewport = new CHudViewport();
+	m_pViewport->Start( gameuifuncs, gameeventmanager );
+}
+
 //-----------------------------------------------------------------------------
 // ClientModeHLNormal implementation
 //-----------------------------------------------------------------------------
 ClientModeHL2MPNormal::ClientModeHL2MPNormal()
 {
-	m_pViewport = new CHudViewport();
-	m_pViewport->Start( gameuifuncs, gameeventmanager );
+#if ENGINE_OLD
+	InitViewport();
+#endif
 }
 
 
@@ -124,5 +131,65 @@ void ClientModeHL2MPNormal::Init()
 	}
 }
 
+
+#if ENGINE_NEW
+// See interface.h/.cpp for specifics:  basically this ensures that we actually Sys_UnloadModule the dll and that we don't call Sys_LoadModule 
+//  over and over again.
+static CDllDemandLoader g_GameUI( "gameui" );
+
+class FullscreenHL2MPViewport : public CHudViewport
+{
+private:
+	DECLARE_CLASS_SIMPLE( FullscreenHL2MPViewport, CHudViewport );
+
+private:
+	virtual void InitViewportSingletons(void)
+	{
+		SetAsFullscreenViewportInterface();
+	}
+};
+
+class ClientModeHL2MPNormalFullscreen : public ClientModeHL2MPNormal
+{
+	DECLARE_CLASS_SIMPLE( ClientModeHL2MPNormalFullscreen, ClientModeHL2MPNormal );
+public:
+	virtual void InitViewport()
+	{
+		// Skip over BaseClass!!!
+		BaseClass::BaseClass::InitViewport();
+		m_pViewport = new FullscreenHL2MPViewport();
+		m_pViewport->Start( gameuifuncs, gameeventmanager );
+	}
+
+	virtual void Init()
+	{
+		// 
+		//CASW_VGUI_Debug_Panel *pDebugPanel = new CASW_VGUI_Debug_Panel( GetViewport(), "ASW Debug Panel" );
+		//g_hDebugPanel = pDebugPanel;
+
+		// Skip over BaseClass!!!
+		BaseClass::BaseClass::Init();
+
+		// Load up the combine control panel scheme
+		if (!g_hVGuiCombineScheme)
+		{
+			g_hVGuiCombineScheme = vgui::scheme()->LoadSchemeFromFileEx(enginevgui->GetPanel(PANEL_CLIENTDLL), IsXbox() ? "resource/ClientScheme.res" : "resource/CombinePanelScheme.res", "CombineScheme");
+			if (!g_hVGuiCombineScheme)
+			{
+				Warning("Couldn't load combine panel scheme!\n");
+			}
+		}
+	}
+	void Shutdown()
+	{
+	}
+};
+
+static ClientModeHL2MPNormalFullscreen g_FullscreenClientMode;
+IClientMode *GetFullscreenClientMode(void)
+{
+	return &g_FullscreenClientMode;
+}
+#endif
 
 
