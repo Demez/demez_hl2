@@ -10,6 +10,9 @@
 #include "clientmode_hl2mpnormal.h"
 #include "panelmetaclassmgr.h"
 
+#include "c_gameinstructor.h"
+#include "c_baselesson.h"
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -93,3 +96,20 @@ void CHLModeManager::LevelShutdown( void )
 static CHLModeManager g_HLModeManager;
 IVModeManager *modemanager = &g_HLModeManager;
 
+
+#if ENGINE_NEW
+// just gonna shove this here
+void CScriptedIconLesson::Mod_PreReadLessonsFromFile( void )
+{
+}
+
+bool CScriptedIconLesson::Mod_ProcessElementAction( int iAction, bool bNot, const char *pchVarName, EHANDLE &hVar, const CGameInstructorSymbol *pchParamName, float fParam, C_BaseEntity *pParam, const char *pchParam, bool &bModHandled )
+{
+	return false;
+}
+
+bool C_GameInstructor::Mod_HiddenByOtherElements( void )
+{
+	return false;
+}
+#endif
