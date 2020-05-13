@@ -98,7 +98,6 @@ void CHLModeManager::LevelShutdown( void )
 	GetClientMode()->LevelShutdown();
 }
 
-0
 #if ENGINE_NEW
 void CHLModeManager::DoPostScreenSpaceEffects( const CViewSetup *pSetup )
 {
