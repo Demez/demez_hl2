@@ -6,4 +6,7 @@ include "base_scripts/demez_server.qpc"
 files
 {
 	- "$ENGINE_SRC_DIR/game/server/logic_playerproxy.cpp"
+	- "$ENGINE_SRC_DIR/game/server/ai_activity.cpp"
+	
+	"server/ai_activity.cpp"
 }

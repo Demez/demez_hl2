@@ -169,7 +169,7 @@ void C_NPC_Puppet::AccumulateLayers( CStudioHdr *hdr, Vector pos[], Quaternion q
 #endif
 					
 
-#if _DEBUG
+#if _DEBUG && ENGINE_QUIVER
 					if (Q_stristr( hdr->pszName(), r_sequence_debug.GetString()) != NULL)
 					{
 						DevMsgRT( "%6.2f : %30s : %5.3f : %4.2f : %1d\n", currentTime, hdr->pSeqdesc( nSequence ).pszLabel(), fCycle, fWeight, i );

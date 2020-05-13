@@ -48,7 +48,10 @@ public:
 	LadderMove_t		*GetLadderMove() { return &m_HL2Local.m_LadderMove; }
 	virtual void		ExitLadder();
 	bool				IsSprinting() const { return m_fIsSprinting; }
-	
+
+	// NOTE: you NEED this in ASW, otherwise the player is stuck at the origin point
+	virtual bool        ShouldRegenerateOriginFromCellBits() const { return true; }
+
 	// Input handling
 	virtual bool	CreateMove( float flInputSampleTime, CUserCmd *pCmd );
 	void			PerformClientSideObstacleAvoidance( float flFrameTime, CUserCmd *pCmd );

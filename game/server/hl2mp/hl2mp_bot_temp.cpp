@@ -421,7 +421,9 @@ void Bot_Think( CHL2MP_Player *pBot )
 	}
 
 	// Fix up the m_fEffects flags
+#if ENGINE_NEW || ENGINE_QUIVER
 	pBot->PostClientMessagesSent();
+#endif
 
 	RunPlayerMove( pBot, pBot->GetLocalAngles(), forwardmove, sidemove, upmove, buttons, impulse, frametime );
 }

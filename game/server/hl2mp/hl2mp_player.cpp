@@ -54,6 +54,8 @@ IMPLEMENT_SERVERCLASS_ST(CHL2MP_Player, DT_HL2MP_Player)
 	SendPropEHandle( SENDINFO( m_hRagdoll ) ),
 	SendPropInt( SENDINFO( m_iSpawnInterpCounter), 4 ),
 	SendPropInt( SENDINFO( m_iPlayerSoundType), 3 ),
+
+	SendPropVector	(SENDINFO(m_vecOrigin), -1,  SPROP_NOSCALE|SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, SendProxy_Origin ),
 	
 	SendPropExclude( "DT_BaseAnimating", "m_flPoseParameter" ),
 	SendPropExclude( "DT_BaseFlex", "m_viewtarget" ),
@@ -119,7 +121,7 @@ CHL2MP_Player::CHL2MP_Player() : m_PlayerAnimState( this )
 
 	BaseClass::ChangeTeam( 0 );
 	
-	UseClientSideAnimation();
+	// UseClientSideAnimation();
 }
 
 CHL2MP_Player::~CHL2MP_Player( void )
@@ -340,7 +342,7 @@ void CHL2MP_Player::Spawn(void)
 			GiveDefaultItems();
 	}
 
-	RemoveEffects( EF_NOINTERP );
+	// RemoveEffects( EF_NOINTERP );
 
 	SetNumAnimOverlays( 3 );
 	ResetAnimation();

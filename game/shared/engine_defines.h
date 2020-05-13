@@ -23,12 +23,14 @@
 	#define Engine_UTIL_PointContents(vector, contentsMask) UTIL_PointContents(vector, contentsMask)
 	#define VectorCount() Count()
 	#define TypeDesc_FieldOffset(dataDesc, offset) dataDesc->fieldOffset
+	#define AmmoMaxCarry(iAmmoType, pPlayer) MaxCarry(iAmmoType, pPlayer)
 
 	#if CLIENT_DLL
 		// #define SteamUser() steamapicontext->SteamUser()
 	#elif GAME_DLL
 		#ifdef UTIL_H
 			#include "demez_util.h"
+			#define AI_GetSinglePlayer UTIL_Demez_GetLocalPlayer
 			#define UTIL_GetLocalPlayer UTIL_Demez_GetLocalPlayer
 		#endif
 
@@ -62,6 +64,7 @@
 	#define SetRenderAlpha   SetRenderColorA
 	#define VectorCount() Size()
 	#define TypeDesc_FieldOffset(dataDesc, offset) dataDesc->fieldOffset[offset]
+	#define AmmoMaxCarry(iAmmoType, pPlayer) MaxCarry(iAmmoType)
 
 	struct RenderableInstance_t {};
 

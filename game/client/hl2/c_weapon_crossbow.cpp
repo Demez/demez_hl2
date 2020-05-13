@@ -23,9 +23,9 @@ PRECACHE_REGISTER_END()
 // Crossbow bolt
 //
 
-class C_CrossbowBolt : public C_DemezCombatCharacter
+class C_CrossbowBolt : public C_BaseCombatCharacter
 {
-	DECLARE_CLASS( C_CrossbowBolt, C_DemezCombatCharacter );
+	DECLARE_CLASS( C_CrossbowBolt, C_BaseCombatCharacter );
 	DECLARE_CLIENTCLASS();
 public:
 	
@@ -41,7 +41,12 @@ public:
 	virtual void	ClientThink( void );
 
 	virtual void	OnDataChanged( DataUpdateType_t updateType );
+
+#if ENGINE_NEW
 	virtual int		DrawModel( int flags, const RenderableInstance_t &instance );
+#else
+	virtual int		DrawModel( int flags );
+#endif
 
 private:
 
@@ -82,7 +87,11 @@ void C_CrossbowBolt::OnDataChanged( DataUpdateType_t updateType )
 // Input  : flags - 
 // Output : int
 //-----------------------------------------------------------------------------
+#if ENGINE_NEW
 int C_CrossbowBolt::DrawModel( int flags, const RenderableInstance_t &instance )
+#else
+int C_CrossbowBolt::DrawModel( int flags )
+#endif
 {
 	// See if we're drawing the motion blur
 	if ( flags & STUDIO_TRANSPARENCY )
@@ -130,7 +139,12 @@ int C_CrossbowBolt::DrawModel( int flags, const RenderableInstance_t &instance )
 	}
 
 	// Draw the normal portion
+
+#if ENGINE_NEW
 	return BaseClass::DrawModel( flags, instance );
+#else
+	return BaseClass::DrawModel( flags );
+#endif
 }
 
 //-----------------------------------------------------------------------------

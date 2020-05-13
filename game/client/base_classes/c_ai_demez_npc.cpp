@@ -23,7 +23,7 @@ void C_AI_DemezNPC::ClientThink( void )
 {
 	BaseClass::ClientThink();
 
-	C_BaseHLPlayer *pPlayer = dynamic_cast<C_BaseHLPlayer*>( C_BasePlayer::GetLocalPlayer() );
+	/*C_BaseHLPlayer *pPlayer = dynamic_cast<C_BaseHLPlayer*>( C_BasePlayer::GetLocalPlayer() );
 
 	if ( pPlayer && m_flTimePingEffect > gpGlobals->curtime )
 	{
@@ -55,11 +55,13 @@ void C_AI_DemezNPC::ClientThink( void )
 			int g = 255 * fFade;
 			int b = 0 * fFade;
 
+#if ENGINE_NEW
 			debugoverlay->AddLineOverlay( p1, p2, r, g, b, true, 0.05f );
 			debugoverlay->AddLineOverlay( p2, p3, r, g, b, true, 0.05f );
 			debugoverlay->AddLineOverlay( p3, p1, r, g, b, true, 0.05f );
+#endif
 		}
-	}
+	}*/
 }
 
 

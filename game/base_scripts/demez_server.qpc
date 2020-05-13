@@ -34,13 +34,12 @@ include "base_scripts/demez_shared.qpc"
 files
 {
 	folder "Base"
-	{			
+	{
 		"$ENGINE_SRC/game/server/ai_relationship.cpp"
 		"$ENGINE_SRC/game/server/basegrenade_concussion.cpp"
 		"$ENGINE_SRC/game/server/basegrenade_contact.cpp"
 		"$ENGINE_SRC/game/server/basegrenade_timed.cpp"
 		"$ENGINE_SRC/game/server/EntityFlame.h"
-		"$ENGINE_SRC/game/server/hl2/Func_Monitor.cpp"
 		"$ENGINE_SRC/game/server/h_cycler.cpp"
 		"$ENGINE_SRC/game/server/h_cycler.h"
 		"$ENGINE_SRC/game/server/monstermaker.cpp"
@@ -401,8 +400,10 @@ files
 			"server/hl2/basehlcombatweapon.h"
 			"server/hl2/cbasehelicopter.cpp"
 			"server/hl2/cbasehelicopter.h"
-			"server/hl2/cbasespriteprojectile.cpp"
-			"server/hl2/cbasespriteprojectile.h"
+			
+			// asw has stuff moved from hl2 in the base code
+			"server/hl2/cbasespriteprojectile.cpp"  [$ENGINE_2013 || $ENGINE_QUIVER]
+			"server/hl2/cbasespriteprojectile.h"    [$ENGINE_2013 || $ENGINE_QUIVER]
 		}
 		
 		"server/hl2/info_darknessmode_lightsource.cpp"

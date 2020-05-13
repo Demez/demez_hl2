@@ -9,6 +9,7 @@
 #include "props.h"
 #include "items.h"
 #include "ammodef.h"
+#include "engine_defines.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -493,7 +494,8 @@ void CItem_DynamicResupply::ComputeAmmoRatios( CItem_DynamicResupply* pMaster, C
 		}
 		else
 		{
-			float flMax = GetAmmoDef()->MaxCarry( iAmmoType, pPlayer );
+			float flMax = GetAmmoDef()->AmmoMaxCarry( iAmmoType, pPlayer );
+
 			float flCurrentAmmo = pPlayer->GetAmmoCount( iAmmoType );
 			flCurrentAmmo += (pSpawnInfo[i].m_iPotentialItems * g_DynamicResupplyAmmoItems[i].iAmmoCount);
 			pSpawnInfo[i].m_flCurrentRatio = (flCurrentAmmo / flMax);

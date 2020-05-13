@@ -9,9 +9,9 @@
 #include "demez_combat_character.h"
 
 // full smile
-#define private public
+// #define private public
 #include "ai_basenpc.h"
-#undef private
+// #undef private
 
 #include "engine_defines.h"
 

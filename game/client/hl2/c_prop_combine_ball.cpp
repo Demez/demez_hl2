@@ -16,10 +16,15 @@
 #include "view_scene.h"
 #include "beamdraw.h"
 
-#include "engine_defines.h"
 #if ENGINE_OLD
+// what the fuck
+#define DECLARE_CLIENT_EFFECT( effectName, callbackFunction ) \
+		static CClientEffectRegistration ClientEffectReg_##callbackFunction( #effectName, callbackFunction );
 #include "ClientEffectPrecacheSystem.h"
 #endif
+
+#include "engine_defines.h"
+
 
 // Precache our effects
 PRECACHE_REGISTER_BEGIN( GLOBAL, PrecacheEffectCombineBall )

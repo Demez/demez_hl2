@@ -33,6 +33,7 @@ void CServerGameDLL::LevelInit_ParseAllEntities( const char *pMapEntities )
 //-----------------------------------------------------------------------------
 // Purpose: Called to apply lobby settings to a dedicated server
 //-----------------------------------------------------------------------------
+#if ENGINE_NEW
 void CServerGameDLL::ApplyGameSettings(KeyValues *pKV)
 {
 	if (!pKV)
@@ -97,3 +98,4 @@ void CServerGameDLL::ApplyGameSettings(KeyValues *pKV)
 	szBspName));
 	}*/
 }
+#endif

@@ -13,9 +13,9 @@
 #include "beamdraw.h"
 #include "c_ai_demez_npc.h"
 
-class C_RollerMine : public C_AI_DemezNPC
+class C_RollerMine : public C_AI_BaseNPC
 {
-	DECLARE_CLASS( C_RollerMine, C_AI_DemezNPC );
+	DECLARE_CLASS( C_RollerMine, C_AI_BaseNPC );
 public:
 	DECLARE_CLIENTCLASS();
 

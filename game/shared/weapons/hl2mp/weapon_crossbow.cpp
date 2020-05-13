@@ -34,6 +34,7 @@
 	#include "gamerules.h"
 	#include "soundent.h"
 	#include "game.h"
+	#include "demez_combat_character.h"
 #endif
 
 #include "weapon_hl2mpbasehlmpcombatweapon.h"

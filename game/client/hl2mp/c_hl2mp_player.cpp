@@ -1008,3 +1008,11 @@ void C_HL2MPRagdoll::SetupWeights( const matrix3x4_t *pBoneToWorld, int nFlexWei
 		}
 	}
 }
+
+void C_HL2MP_Player::PostThink( void )
+{
+	BaseClass::PostThink();
+
+	// Store the eye angles pitch so the client can compute its animation state correctly.
+	m_angEyeAngles = EyeAngles();
+}

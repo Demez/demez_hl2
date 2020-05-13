@@ -69,6 +69,12 @@ configuration
 		}
 	}
 	
+	linker
+	{
+		output_file "$GAMENAME/bin/$ENGINE_PLATFORM/$TYPE"
+		debug_file "$GAMENAME/bin/$ENGINE_PLATFORM/$TYPE"
+	}
+	
     debug
     {
         command     "$ENGINE_EXE"
@@ -80,6 +86,8 @@ configuration
 
 files
 {
+	- "$ENGINE_SRC_DIR/game/shared/activitylist.cpp"
+	
 	"$ENGINE_SHARED/predicted_viewmodel.cpp"
 	"$ENGINE_SHARED/predicted_viewmodel.h"
 	
@@ -92,12 +100,13 @@ files
 	{
 		"shared/engine_defines.h"
 		"shared/ai_activity.h"
+		"shared/activitylist.cpp"
 	}
 	
 	folder "Demez"
 	{
-		"shared/base_classes/demez_ammodef.cpp"
-		"shared/base_classes/demez_ammodef.h"
+	//	"shared/base_classes/demez_ammodef.cpp"
+	//	"shared/base_classes/demez_ammodef.h"
 	}
 	
 	folder "Game Base"

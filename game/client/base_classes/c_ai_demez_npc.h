@@ -9,10 +9,10 @@
 #include "c_demez_combat_character.h"
 
 // full smile
-#define private public
+// #define private public
 // #define C_BaseCombatCharacter C_DemezCombatCharacter
 #include "c_ai_basenpc.h"
-#undef private
+// #undef private
 // #undef C_BaseCombatCharacter
 
 #include "engine_defines.h"

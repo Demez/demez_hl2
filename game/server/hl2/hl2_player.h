@@ -118,7 +118,9 @@ public:
 
 	virtual void		CommanderMode();
 
-	virtual bool		ClientCommand( const CCommand &args );
+	// NOTE: you NEED this in ASW, otherwise the player is stuck at the origin point
+	virtual bool        ShouldRegenerateOriginFromCellBits() const { return true; }
+	virtual bool        ClientCommand( const CCommand &args );
 
 	// from cbasecombatcharacter
 	void				InitVCollision( const Vector &vecAbsOrigin, const Vector &vecAbsVelocity );
@@ -304,9 +306,6 @@ private:
 	void				OnSquadMemberKilled( inputdata_t &data );
 
 	Class_T				m_nControlClass;			// Class when player is controlling another entity
-	// This player's HL2 specific data that should only be replicated to 
-	//  the player and not to other players.
-	CNetworkVarEmbedded( CHL2PlayerLocalData, m_HL2Local );
 
 	float				m_flTimeAllSuitDevicesOff;
 
@@ -318,6 +317,10 @@ private:
 	CNetworkVarForDerived( bool, m_fIsWalking );
 
 protected:	// Jeep: Portal_Player needs access to this variable to overload PlayerUse for picking up objects through portals
+	// This player's HL2 specific data that should only be replicated to 
+	//  the player and not to other players.
+	CNetworkVarEmbedded( CHL2PlayerLocalData, m_HL2Local );
+
 	bool				m_bPlayUseDenySound;		// Signaled by PlayerUse, but can be unset by HL2 ladder code...
 
 private:

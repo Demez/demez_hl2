@@ -5,14 +5,20 @@
 // $NoKeywords: $
 //=============================================================================//
 #include "cbase.h"
+// why?
+#if ENGINE_NEW
+#include "c_func_brush.h"
+#else
+#define C_FuncBrush C_BaseEntity
+#endif
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-class C_FuncMonitor : public C_BaseEntity
+class C_FuncMonitor : public C_FuncBrush
 {
 public:
-	DECLARE_CLASS( C_FuncMonitor, C_BaseEntity );
+	DECLARE_CLASS( C_FuncMonitor, C_FuncBrush );
 	DECLARE_CLIENTCLASS();
 
 // C_BaseEntity.
@@ -27,3 +33,7 @@ bool C_FuncMonitor::ShouldDraw()
 {
 	return true;
 }
+
+#if ENGINE_OLD
+#undef C_FuncBrush
+#endif

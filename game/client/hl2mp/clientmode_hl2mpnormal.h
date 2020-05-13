@@ -41,7 +41,7 @@ public:
 	virtual void        InitViewport();
 
 #if ENGINE_NEW
-	virtual void        DoPostScreenSpaceEffects( const CViewSetup *pSetup ) { BaseClass::DoPostScreenSpaceEffects(pSetup); }
+	virtual void        DoPostScreenSpaceEffects( const CViewSetup *pSetup ) {}
 #endif
 };
 

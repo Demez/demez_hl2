@@ -10,8 +10,10 @@
 #include "clientmode_hl2mpnormal.h"
 #include "panelmetaclassmgr.h"
 
+#if ENGINE_NEW
 #include "c_gameinstructor.h"
 #include "c_baselesson.h"
+#endif
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -46,6 +48,10 @@ public:
 	virtual void	CreateMove( float flInputSampleTime, CUserCmd *cmd );
 	virtual void	LevelInit( const char *newmap );
 	virtual void	LevelShutdown( void );
+
+#if ENGINE_NEW
+	virtual void	DoPostScreenSpaceEffects( const CViewSetup *pSetup );
+#endif
 };
 
 CHLModeManager::CHLModeManager( void )
@@ -92,12 +98,12 @@ void CHLModeManager::LevelShutdown( void )
 	GetClientMode()->LevelShutdown();
 }
 
-
-static CHLModeManager g_HLModeManager;
-IVModeManager *modemanager = &g_HLModeManager;
-
-
+0
 #if ENGINE_NEW
+void CHLModeManager::DoPostScreenSpaceEffects( const CViewSetup *pSetup )
+{
+}
+
 // just gonna shove this here
 void CScriptedIconLesson::Mod_PreReadLessonsFromFile( void )
 {
@@ -113,3 +119,7 @@ bool C_GameInstructor::Mod_HiddenByOtherElements( void )
 	return false;
 }
 #endif
+
+
+static CHLModeManager g_HLModeManager;
+IVModeManager *modemanager = &g_HLModeManager;
