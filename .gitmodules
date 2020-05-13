@@ -8,6 +8,3 @@
 	path = branches/quiver
 	url = https://github.com/quiverteam/Engine
 	branch = upcoming
-[submodule "branches/asw"]
-	path = branches/asw
-	url = https://github.com/Demez/AlienSwarm
