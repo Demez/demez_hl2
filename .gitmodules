@@ -3,7 +3,7 @@
 	url = https://github.com/Demez/demez_source_2013
 [submodule "qpc"]
 	path = qpc
-	url = https://github.com/quiverteam/QuiverProjectCreator
+	url = https://github.com/quiverteam/QuiverProjectCreator.git
 [submodule "branches/quiver"]
 	path = branches/quiver
 	url = https://github.com/quiverteam/Engine
