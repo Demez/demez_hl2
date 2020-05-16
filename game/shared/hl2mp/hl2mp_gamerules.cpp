@@ -1459,6 +1459,50 @@ bool CHL2MPRules::IsAlyxInDarknessMode()
 	return (GlobalEntity_GetState("ep_alyx_darknessmode") == GLOBAL_ON);
 }
 
+float CHL2MPRules::GetAmmoDamage( CBaseEntity *pAttacker, CBaseEntity *pVictim, int nAmmoType )
+{
+	float flDamage = 0.0f;
+		CAmmoDef *pAmmoDef = GetAmmoDef();
+
+		if ( pAmmoDef->DamageType( nAmmoType ) & DMG_SNIPER )
+		{
+			// If this damage is from a SNIPER, we do damage based on what the bullet
+			// HITS, not who fired it. All other bullets have their damage values
+			// arranged according to the owner of the bullet, not the recipient.
+			if ( pVictim->IsPlayer() )
+			{
+				// Player
+				flDamage = pAmmoDef->PlrDamage( nAmmoType );
+			}
+			else
+			{
+				// NPC or breakable
+				flDamage = pAmmoDef->NPCDamage( nAmmoType );
+			}
+		}
+		else
+		{
+			flDamage = BaseClass::GetAmmoDamage( pAttacker, pVictim, nAmmoType );
+		}
+
+		if( pAttacker->IsPlayer() && pVictim->IsNPC() )
+		{
+			if( pVictim->MyCombatCharacterPointer() )
+			{
+				// Player is shooting an NPC. Adjust the damage! This protects breakables
+				// and other 'non-living' entities from being easier/harder to break
+				// in different skill levels.
+				flDamage = pAmmoDef->PlrDamage( nAmmoType );
+				flDamage = AdjustPlayerDamageInflicted( flDamage );
+			}
+		}
+
+		return flDamage;
+}
+
+
+
+// keep this at the end of the file because it's ugly
 // this is an awful function, should just be in a keyvalues file
 void CHL2MPRules::InitDefaultAIRelationships(void)
 {

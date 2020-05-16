@@ -122,11 +122,12 @@ public:
 	virtual int PlayerRelationship( CBaseEntity *pPlayer, CBaseEntity *pTarget );
 	virtual void GoToIntermission( void );
 	virtual void DeathNotice( CBasePlayer *pVictim, const CTakeDamageInfo &info );
-	virtual const char *GetGameDescription( void );
+
 	// derive this function if you mod uses encrypted weapon info files
-	virtual const unsigned char *GetEncryptionKey( void ) { return (unsigned char *)"x9Ke0BY7"; }
-	virtual const CViewVectors* GetViewVectors() const;
-	const HL2MPViewVectors* GetHL2MPViewVectors() const;
+	virtual const unsigned char*	GetEncryptionKey( void ) { return (unsigned char *)"x9Ke0BY7"; }
+	virtual const char*             GetGameDescription( void );
+	virtual const CViewVectors*     GetViewVectors() const;
+	const HL2MPViewVectors*         GetHL2MPViewVectors() const;
 
 	float GetMapRemainingTime();
 	void CleanUpMap();
@@ -144,8 +145,10 @@ public:
 	void	AddLevelDesignerPlacedObject( CBaseEntity *pEntity );
 	void	RemoveLevelDesignerPlacedObject( CBaseEntity *pEntity );
 	void	ManageObjectRelocation( void );
+
 	void    CheckChatForReadySignal( CHL2MP_Player *pPlayer, const char *chatmsg );
 	const char *GetChatFormat( bool bTeamOnly, CBasePlayer *pPlayer );
+	virtual float GetAmmoDamage( CBaseEntity *pAttacker, CBaseEntity *pVictim, int nAmmoType );
 
 	virtual bool IsAlyxInDarknessMode();
 
@@ -157,11 +160,11 @@ public:
 
 	void PlayerKilled( CBasePlayer *pVictim, const CTakeDamageInfo &info );
 
-	bool	IsTeamplay( void )		{ return m_bTeamPlayEnabled;	}
-	bool	IsDeathmatch( void )	{ return !m_bCoOpEnabled;		}
-	bool	IsCoOp( void )			{ return m_bCoOpEnabled;		}
+	bool	IsTeamplay( void )		{ return m_bTeamPlayEnabled; }
+	bool	IsDeathmatch( void )	{ return !m_bCoOpEnabled; }
+	bool	IsCoOp( void )			{ return m_bCoOpEnabled; }
 
-	bool	MegaPhyscannonActive( void ) { return m_bMegaPhysgun;	}
+	bool	MegaPhyscannonActive( void ) { return m_bMegaPhysgun; }
 
 	void	CheckAllPlayersReady( void );
 	
