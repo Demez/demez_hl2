@@ -1197,11 +1197,23 @@ int CHL2MP_Player::FlashlightIsOn( void )
 //-----------------------------------------------------------------------------
 void CHL2MP_Player::FlashlightTurnOn( void )
 {
-	if(demez_flashlight.GetInt() > 0 && IsAlive())
+	FlashlightTurnOn( true );
+}
+
+
+bool CHL2MP_Player::FlashlightTurnOn( bool playSound )
+{
+	if (demez_flashlight.GetBool() && IsAlive())
 	{
 		AddEffects( EF_DIMLIGHT );
-		EmitSound( "HL2Player.FlashlightOn" );
+
+		if (playSound)
+			EmitSound( "HL2Player.FlashlightOn" );
+
+		return true;
 	}
+	
+	return false;
 }
 
 
@@ -1209,13 +1221,21 @@ void CHL2MP_Player::FlashlightTurnOn( void )
 //-----------------------------------------------------------------------------
 void CHL2MP_Player::FlashlightTurnOff( void )
 {
+	FlashlightTurnOff( true );
+}
+
+
+void CHL2MP_Player::FlashlightTurnOff( bool playSound )
+{
 	RemoveEffects( EF_DIMLIGHT );
 	
-	if( IsAlive() )
+	if( IsAlive() && playSound )
 	{
 		EmitSound( "HL2Player.FlashlightOff" );
 	}
 }
+
+
 
 void CHL2MP_Player::Weapon_Drop( CBaseCombatWeapon *pWeapon, const Vector *pvecTarget, const Vector *pVelocity )
 {
@@ -1298,7 +1318,7 @@ void CHL2MP_Player::Event_Killed( const CTakeDamageInfo &info )
 		GetGlobalTeam( pAttacker->GetTeamNumber() )->AddScore( iScoreToAdd );
 	}
 
-	FlashlightTurnOff();
+	FlashlightTurnOff( true );
 
 	m_lifeState = LIFE_DEAD;
 
@@ -1351,16 +1371,21 @@ void CHL2MP_Player::DeathSound( const CTakeDamageInfo &info )
 	EmitSound( filter, entindex(), ep );
 }
 
+
+// in player.cpp
+extern CBaseEntity *FindPlayerStart(const char *pszClassName);
+
+
 CBaseEntity* CHL2MP_Player::EntSelectSpawnPoint( void )
 {
-	if ( HL2MPRules()->IsDeathmatch() )
-	{
-		CBaseEntity* pSpot = NULL;
-		CBaseEntity* pLastSpawnPoint = g_pLastSpawn;
-		edict_t* player = edict();
-		const char* pSpawnpointName = "info_player_deathmatch";
+	CBaseEntity* pSpot = NULL;
+	CBaseEntity* pLastSpawnPoint = g_pLastSpawn;
+	edict_t* player = edict();
+	const char* pSpawnpointName;
 
-		if (HL2MPRules()->IsTeamplay() == true)
+	if ( g_pGameRules->IsDeathmatch() )
+	{
+		if ( g_pGameRules->IsTeamplay() == true )
 		{
 			if (GetTeamNumber() == TEAM_COMBINE)
 			{
@@ -1378,6 +1403,10 @@ CBaseEntity* CHL2MP_Player::EntSelectSpawnPoint( void )
 				pSpawnpointName = "info_player_deathmatch";
 				pLastSpawnPoint = g_pLastSpawn;
 			}
+		}
+		else
+		{
+			pSpawnpointName = "info_player_deathmatch";
 		}
 
 		pSpot = pLastSpawnPoint;
@@ -1430,33 +1459,39 @@ CBaseEntity* CHL2MP_Player::EntSelectSpawnPoint( void )
 			if (pSpot)
 				goto ReturnSpot;
 		}
-
-	ReturnSpot:
-
-		if (HL2MPRules()->IsTeamplay() == true)
-		{
-			if (GetTeamNumber() == TEAM_COMBINE)
-			{
-				g_pLastCombineSpawn = pSpot;
-			}
-			else if (GetTeamNumber() == TEAM_REBELS)
-			{
-				g_pLastRebelSpawn = pSpot;
-			}
-		}
-
-		g_pLastSpawn = pSpot;
-
-		m_flSlamProtectTime = gpGlobals->curtime + 0.5;
-
-		return pSpot;
 	}
-	else
+	else if ( g_pGameRules->IsCoOp() )
 	{
-		return BaseClass::EntSelectSpawnPoint();
-	}
-} 
+		pSpawnpointName = "info_player_start";
 
+		pSpot = FindPlayerStart("info_player_coop");
+		if ( pSpot )
+			goto ReturnSpot;
+		pSpot = FindPlayerStart("info_player_start");
+		if ( pSpot ) 
+			goto ReturnSpot;
+	}
+
+ReturnSpot:
+
+	if (g_pGameRules->IsTeamplay() == true)
+	{
+		if (GetTeamNumber() == TEAM_COMBINE)
+		{
+			g_pLastCombineSpawn = pSpot;
+		}
+		else if (GetTeamNumber() == TEAM_REBELS)
+		{
+			g_pLastRebelSpawn = pSpot;
+		}
+	}
+
+	g_pLastSpawn = pSpot;
+
+	m_flSlamProtectTime = gpGlobals->curtime + 0.5;
+
+	return pSpot;
+}
 
 CON_COMMAND( timeleft, "prints the time remaining in the match" )
 {
@@ -1674,4 +1709,19 @@ bool CHL2MP_Player::CanHearAndReadChatFrom( CBasePlayer *pPlayer )
 		return false;
 
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Init the fog controller
+//-----------------------------------------------------------------------------
+void CHL2MP_Player::LevelInitPostEntity( void )
+{
+	// This is done in single player already
+	if ( gpGlobals->maxClients != 1 && 
+#if ENGINE_NEW
+	 m_PlayerFog.m_hCtrl.Get() == NULL )
+#else
+	m_Local.m_PlayerFog.m_hCtrl.Get() == NULL )
+#endif
+		InitFogController();
 }

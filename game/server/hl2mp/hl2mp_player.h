@@ -73,11 +73,17 @@ public:
 	virtual void Weapon_Drop( CBaseCombatWeapon *pWeapon, const Vector *pvecTarget = NULL, const Vector *pVelocity = NULL );
 	virtual void UpdateOnRemove( void );
 	virtual void DeathSound( const CTakeDamageInfo &info );
+	virtual void LevelInitPostEntity( void );
 	virtual CBaseEntity* EntSelectSpawnPoint( void );
 		
 	int FlashlightIsOn( void );
+
 	void FlashlightTurnOn( void );
+	bool FlashlightTurnOn( bool playSound = true );
+
 	void FlashlightTurnOff( void );
+	void FlashlightTurnOff( bool playSound = true );
+
 	void	PrecacheFootStepSounds( void );
 	bool	ValidatePlayerModel( const char *pModel );
 

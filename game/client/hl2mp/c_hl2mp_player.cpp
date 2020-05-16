@@ -361,11 +361,8 @@ const QAngle &C_HL2MP_Player::EyeAngles()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-#if ENGINE_OLD
-void C_HL2MP_Player::AddEntity( void )
+void C_HL2MP_Player::UpdateFlashlight( void )
 {
-	BaseClass::AddEntity();
-
 	QAngle vTempAngles = GetLocalAngles();
 	vTempAngles[PITCH] = m_angEyeAngles[PITCH];
 
@@ -376,7 +373,7 @@ void C_HL2MP_Player::AddEntity( void )
 	// Zero out model pitch, blending takes care of all of it.
 	SetLocalAnglesDim( X_INDEX, 0 );
 
-	if( this != C_BasePlayer::GetLocalPlayer() )
+	if( this == C_BasePlayer::GetLocalPlayer() )
 	{
 		if ( demez_cl_flashlight.GetBool() )
 		{
@@ -455,7 +452,6 @@ void C_HL2MP_Player::AddEntity( void )
 		}
 	}
 }
-#endif
 
 ShadowType_t C_HL2MP_Player::ShadowCastType( void ) 
 {

@@ -35,10 +35,7 @@ public:
 	static C_HL2MP_Player* GetLocalHL2MPPlayer();
 
 	virtual int	DrawModel( int flags RENDER_INSTANCE_INPUT );
-
-#if ENGINE_OLD
-	virtual void AddEntity( void );
-#endif
+	virtual void UpdateFlashlight( void );
 
 	QAngle GetAnimEyeAngles( void ) { return m_angEyeAngles; }
 	Vector GetAttackSpread( CBaseCombatWeapon *pWeapon, CBaseEntity *pTarget = NULL );
