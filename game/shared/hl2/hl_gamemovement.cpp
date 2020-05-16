@@ -17,8 +17,11 @@ static ConVar sv_ladderautomountdot( "sv_ladderautomountdot", "0.4", FCVAR_REPLI
 
 static ConVar sv_ladder_useonly( "sv_ladder_useonly", "0", FCVAR_REPLICATED, "If set, ladders can only be mounted by pressing +USE" );
 
-static ConVar demez_bhop_mode("demez_bhop_mode", "1", FCVAR_ARCHIVE, "0 - hl1, 1 - hl2 release, 2 - abh, 3 - afh");
-static ConVar demez_auto_bhop("demez_auto_bhop", "1", FCVAR_ARCHIVE);
+ConVar demez_bhop_mode("dmz_sv_bhop_mode", "1", FCVAR_ARCHIVE | FCVAR_REPLICATED, "0 - hl1, 1 - hl2 release, 2 - abh");
+ConVar demez_auto_bhop("dmz_sv_auto_bhop", "1", FCVAR_ARCHIVE | FCVAR_REPLICATED);
+
+ConVar dmz_bhop_other_mult("dmz_sv_bhop_other", "0.1", FCVAR_ARCHIVE | FCVAR_REPLICATED, "Multiplier to use for bhop mode 1 when sprint jumping");
+ConVar dmz_bhop_mult("dmz_sv_bhop", "0.5", FCVAR_ARCHIVE | FCVAR_REPLICATED, "Multiplier to use for bhop mode 1 for normal jumping when moving");
 
 extern ConVar sv_gravity;
 
@@ -642,7 +645,7 @@ bool CHL2GameMovement::CheckJumpButton(void)
 	vecForward.z = 0;
 	VectorNormalize(vecForward);
 
-	if (demez_bhop_mode.GetInt() == 3 || demez_bhop_mode.GetInt() == 2)
+	if (demez_bhop_mode.GetInt() == 2)
 	{
 		// We give a certain percentage of the current forward movement as a bonus to the jump speed.  That bonus is clipped
 		// to not accumulate over time.
@@ -659,10 +662,7 @@ bool CHL2GameMovement::CheckJumpButton(void)
 
 		if (mv->m_flForwardMove < 0.0f)
 		{
-			if (demez_bhop_mode.GetInt() == 3)
-				flSpeedAddition *= 1.0f;
-			else
-				flSpeedAddition *= -1.0f;
+			flSpeedAddition *= -1.0f;
 		}
 
 		// Add it on
@@ -674,14 +674,14 @@ bool CHL2GameMovement::CheckJumpButton(void)
 		{
 			for (int iAxis = 0; iAxis < 2; ++iAxis)
 			{
-				vecForward[iAxis] *= (mv->m_flForwardMove * 0.5f);
+				vecForward[iAxis] *= (mv->m_flForwardMove * dmz_bhop_mult.GetFloat());
 			}
 		}
 		else
 		{
 			for (int iAxis = 0; iAxis < 2; ++iAxis)
 			{
-				vecForward[iAxis] *= (mv->m_flForwardMove * 0.1f);
+				vecForward[iAxis] *= (mv->m_flForwardMove * dmz_bhop_other_mult.GetFloat());
 			}
 		}
 
