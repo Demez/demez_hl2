@@ -82,9 +82,6 @@ files
 	
 	folder "Demez"
 	{
-		"server/base_code/demez_util.cpp"
-		"server/base_code/demez_util.h"
-		
 		"server/base_classes/ai_demez_actor.cpp"
 		"server/base_classes/ai_demez_actor.h"
 		"server/base_classes/ai_demez_npc.cpp"

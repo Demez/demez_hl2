@@ -28,12 +28,6 @@
 	#if CLIENT_DLL
 		// #define SteamUser() steamapicontext->SteamUser()
 	#elif GAME_DLL
-		#ifdef UTIL_H
-			#include "demez_util.h"
-			#define AI_GetSinglePlayer UTIL_Demez_GetLocalPlayer
-			#define UTIL_GetLocalPlayer UTIL_Demez_GetLocalPlayer
-		#endif
-
 		#define GetAnimEvent( pEvent ) pEvent->Event()
 		#define SetAnimEvent( pEvent, newEvent ) pEvent->Event( newEvent )
 	#endif

@@ -154,6 +154,7 @@ files
 			"shared/weapons/hl2mp/weapon_hl2mpbase_machinegun.cpp"
 			"shared/weapons/hl2mp/weapon_hl2mpbase_machinegun.h"
 			"shared/weapons/hl2mp/weapon_hl2mpbasebasebludgeon.cpp"
+			"shared/weapons/hl2mp/weapon_hl2mpbasebasebludgeon.h"
 			"shared/weapons/hl2mp/weapon_hl2mpbasehlmpcombatweapon.cpp"
 			"shared/weapons/hl2mp/weapon_hl2mpbasehlmpcombatweapon.h"
 		}
