@@ -13,6 +13,7 @@
 #include "gamerules.h"
 #include "singleplay_gamerules.h"
 #include "hl2_shareddefs.h"
+#include "hl2mp_gamerules.h"
 
 #ifdef CLIENT_DLL
 	#define CHalfLife2 C_HalfLife2
@@ -104,9 +105,14 @@ private:
 //-----------------------------------------------------------------------------
 // Gets us at the Half-Life 2 game rules
 //-----------------------------------------------------------------------------
-inline CHalfLife2* HL2GameRules()
+inline CHalfLife2* ActualHL2GameRules()
 {
 	return static_cast<CHalfLife2*>(g_pGameRules);
+}
+
+inline CHL2MPRules* HL2GameRules()
+{
+	return static_cast<CHL2MPRules*>(g_pGameRules);
 }
 
 

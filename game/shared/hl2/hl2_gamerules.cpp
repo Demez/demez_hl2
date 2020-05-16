@@ -47,7 +47,7 @@ IMPLEMENT_NETWORKCLASS_ALIASED( HalfLife2Proxy, DT_HalfLife2Proxy )
 #ifdef CLIENT_DLL
 	void RecvProxy_HL2GameRules( const RecvProp *pProp, void **pOut, void *pData, int objectID )
 	{
-		CHalfLife2 *pRules = HL2GameRules();
+		CHalfLife2 *pRules = ActualHL2GameRules();
 		Assert( pRules );
 		*pOut = pRules;
 	}
@@ -58,7 +58,7 @@ IMPLEMENT_NETWORKCLASS_ALIASED( HalfLife2Proxy, DT_HalfLife2Proxy )
 #else
 	void* SendProxy_HL2GameRules( const SendProp *pProp, const void *pStructBase, const void *pData, CSendProxyRecipients *pRecipients, int objectID )
 	{
-		CHalfLife2 *pRules = HL2GameRules();
+		CHalfLife2 *pRules = ActualHL2GameRules();
 		Assert( pRules );
 		pRecipients->SetAllRecipients();
 		return pRules;
