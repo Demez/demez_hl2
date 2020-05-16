@@ -106,6 +106,6 @@ macro BASE_MULTIPLE_ENGINES "1" [$BASE_CSGO && ($BASE_QUIVER || $BASE_ASW || $BA
 
 include "_qpc_scripts/_default.qpc_base" "branches/quiver/src"      [$BASE_QUIVER && !$BASE_MULTIPLE_ENGINES]
 include "_qpc_scripts/_default.qpc_base" "branches/2013/src"        [$BASE_2013 && !$BASE_MULTIPLE_ENGINES]
-include "_qpc_scripts/_default.qpc_base" "branches/asw/src"         [$BASE_ASW && !$BASE_MULTIPLE_ENGINES]
+include "_qpc_scripts/_default.qpc_base" "branches/asw"             [$BASE_ASW && !$BASE_MULTIPLE_ENGINES]
 // include "_qpc_scripts/_default.qpc_base" "branches/csgo"            [$BASE_CSGO && !$BASE_MULTIPLE_ENGINES]
 
