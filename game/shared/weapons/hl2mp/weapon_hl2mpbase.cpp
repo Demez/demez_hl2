@@ -199,12 +199,14 @@ void CWeaponHL2MPBase::Materialize( void )
 	SetThink (NULL);
 }
 
+
 int CWeaponHL2MPBase::ObjectCaps()
 {
 	return BaseClass::ObjectCaps() & ~FCAP_IMPULSE_USE;
 }
 
 #endif
+
 
 void CWeaponHL2MPBase::FallInit( void )
 {
@@ -269,6 +271,7 @@ void CWeaponHL2MPBase::FallInit( void )
 #endif
 }
 
+
 const CHL2MPSWeaponInfo &CWeaponHL2MPBase::GetHL2MPWpnData() const
 {
 	const FileWeaponInfo_t *pWeaponInfo = &GetWpnData();
@@ -283,6 +286,8 @@ const CHL2MPSWeaponInfo &CWeaponHL2MPBase::GetHL2MPWpnData() const
 
 	return *pHL2MPInfo;
 }
+
+
 void CWeaponHL2MPBase::FireBullets( const FireBulletsInfo_t &info )
 {
 	FireBulletsInfo_t modinfo = info;

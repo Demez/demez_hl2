@@ -17,10 +17,12 @@
 #if defined( CLIENT_DLL )
 	#include "c_hl2mp_player.h"
 #else
+	#include "ai_condition.h"
 	#include "hl2mp_player.h"
 	#include "ndebugoverlay.h"
 	#include "te_effect_dispatch.h"
 	#include "ilagcompensationmanager.h"
+	#include "basebludgeonweapon.h"
 #endif
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -68,6 +70,28 @@ void CBaseHL2MPBludgeonWeapon::Precache( void )
 	//Call base class first
 	BaseClass::Precache();
 }
+
+#ifdef GAME_DLL
+int CBaseHL2MPBludgeonWeapon::CapabilitiesGet()
+{ 
+	return bits_CAP_WEAPON_MELEE_ATTACK1; 
+}
+
+int CBaseHL2MPBludgeonWeapon::WeaponMeleeAttack1Condition( float flDot, float flDist )
+{
+	if (flDist > 64)
+	{
+		return COND_TOO_FAR_TO_ATTACK;
+	}
+	else if (flDot < 0.7)
+	{
+		return COND_NOT_FACING_ATTACK;
+	}
+
+	return COND_CAN_MELEE_ATTACK1;
+}
+#endif
+
 
 //------------------------------------------------------------------------------
 // Purpose : Update weapon
