@@ -28,8 +28,9 @@ files
 {
 	folder "Base"
 	{
-		// is something fucked with conditions here?
-		- "$ENGINE_SRC_DIR/game/shared/weapon_parse_default.cpp" [$ENGINE_QUIVER || $ENGINE_ASW || $ENGINE_CSGO] //[!$ENGINE_2013]
+		// no clue what's going on here
+		- "$ENGINE_SRC_DIR/game/shared/weapon_parse_default.cpp" [$ENGINE_2013 == 0]
+		
 		- "$ENGINE_SRC_DIR/game/client/flashlighteffect.cpp"
 		- "$ENGINE_SRC_DIR/game/client/hl2/c_waterbullet.cpp" [$ENGINE_ASW]
 		- "$ENGINE_SRC_DIR/game/client/hl2/C_Func_Monitor.cpp" [$ENGINE_ASW || $ENGINE_QUIVER]

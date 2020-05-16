@@ -9,7 +9,7 @@ macro ENGINE_CSGO   "0" [!$ENGINE_CSGO]
 
 macro ENGINE_FOLDER "branches/quiver/src"   [$ENGINE_QUIVER]
 macro ENGINE_FOLDER "branches/2013/src"     [$ENGINE_2013]
-macro ENGINE_FOLDER "branches/asw/src"      [$ENGINE_ASW]
+macro ENGINE_FOLDER "branches/asw"          [$ENGINE_ASW]
 macro ENGINE_FOLDER "branches/csgo"         [$ENGINE_CSGO] // private repo currently
 
 macro ENGINE_TRAILBACK "../../.."           [$ENGINE_QUIVER || $ENGINE_2013 || $ENGINE_ASW]

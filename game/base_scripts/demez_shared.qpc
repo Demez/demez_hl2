@@ -21,7 +21,8 @@ macro SHARED_GAME		"$ENGINE_SHARED/$GAME_FOLDER"
 
 macro FULL_GAME_NAME "$GAME_FOLDER_$ENGINE_OUT_NAME"
 
-macro BASE_DEBUG_ARGS "-noborder -sw -novid -dev -game \"$ROOT_DIR/output/$FULL_GAME_NAME\""
+macro BASE_DEBUG_ARGS "-w 1920 -h 1080 -noborder -sw -novid -dev -game \"$ROOT_DIR/output/$FULL_GAME_NAME\""
+macro BASE_DEBUG_ARGS "-override_vpk $BASE_DEBUG_ARGS" [$ENGINE_ASW]
 
 configuration
 {
