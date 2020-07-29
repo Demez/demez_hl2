@@ -15,13 +15,16 @@ macro GAMENAME "$DEMEZ_SRC_DIR/output/demez_$ENGINE_OUT_NAME"
 include "$DEMEZ_SRC_DIR/$ENGINE_FOLDER/game/$TYPE/_$TYPE_base.qpc" [$ENGINE_QUIVER || $ENGINE_2013]
 include "$DEMEZ_SRC_DIR/$ENGINE_FOLDER/game/$TYPE/$TYPE_base.qpc"  [$ENGINE_CSGO || $ENGINE_ASW]
 
+// include "$DEMEZ_SRC_DIR/$ENGINE_FOLDER/game/$TYPE/$TYPE_vr_base.qpc"  [$ENGINE_ASW && $VR]
+// include "$DEMEZ_SRC_DIR/$ENGINE_FOLDER/game/$TYPE/_$TYPE_vr_base.qpc"  [$ENGINE_QUIVER && $VR]
+
 macro GAME_FOLDER		"demez"
 macro ENGINE_SHARED		"$ENGINE_SRC/game/shared"
 macro SHARED_GAME		"$ENGINE_SHARED/$GAME_FOLDER"
 
 macro FULL_GAME_NAME "$GAME_FOLDER_$ENGINE_OUT_NAME"
 
-macro BASE_DEBUG_ARGS "-w 1920 -h 1080 -noborder -sw -novid -dev -game \"$ROOT_DIR/output/$FULL_GAME_NAME\""
+macro BASE_DEBUG_ARGS "-w 1920 -h 1080 -noborder -sw -novid -dev -game \"$ROOT_DIR_ABS/output/$FULL_GAME_NAME\""
 macro BASE_DEBUG_ARGS "-override_vpk $BASE_DEBUG_ARGS" [$ENGINE_ASW]
 
 configuration
@@ -29,8 +32,8 @@ configuration
 	general
 	{
 		out_dir     "$GAMENAME/bin/$ENGINE_PLATFORM"
-		// out_dir     "$QPC_CONFIG/$PLATFORM/$FULL_GAME_NAME/$TYPE"
-		build_dir   "$QPC_CONFIG/$ENGINE_PLATFORM/$FULL_GAME_NAME/$TYPE"
+		// out_dir     "$CONFIG/$PLATFORM/$FULL_GAME_NAME/$TYPE"
+		build_dir   "$CONFIG/$ENGINE_PLATFORM/$FULL_GAME_NAME/$TYPE"
 		
 		include_directories
 		{

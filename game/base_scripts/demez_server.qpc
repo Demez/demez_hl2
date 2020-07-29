@@ -214,7 +214,11 @@ files
 			"server/hl2/npc_enemyfinder.cpp"
 			"server/hl2/npc_bullseye.cpp"
 			"server/hl2/npc_bullseye.h"
+			
 			"server/episodic/npc_puppet.cpp"  // unused in asw port, idk
+			{
+				build false
+			}
 		}
 		
 		folder "Other"

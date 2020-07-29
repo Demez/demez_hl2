@@ -16,12 +16,12 @@ macro ENGINE_TRAILBACK "../../.."           [$ENGINE_QUIVER || $ENGINE_2013 || $
 macro ENGINE_TRAILBACK "../.."              [$ENGINE_CSGO]
 
 // kind of hardcoded, but only used in debug options
-macro ENGINE_GAME "$ROOT_DIR\branches\quiver\game"     [$ENGINE_QUIVER]
-macro ENGINE_GAME "$ROOT_DIR\branches\csgo\game"       [$ENGINE_CSGO]
+macro ENGINE_GAME "$ROOT_DIR_ABS\branches\quiver\game"     [$ENGINE_QUIVER]
+macro ENGINE_GAME "$ROOT_DIR_ABS\branches\csgo\game"       [$ENGINE_CSGO]
 macro ENGINE_GAME "C:\Program Files (x86)\Steam\steamapps\common\Source SDK Base 2013 Multiplayer"  [$ENGINE_2013 && $WINDOWS]
 macro ENGINE_GAME "C:\Program Files (x86)\Steam\steamapps\common\Alien Swarm"                       [$ENGINE_ASW && $WINDOWS]
 
-macro ENGINE_EXE "$ENGINE_GAME\bin\$PLATFORM\quiver.exe"	[$ENGINE_QUIVER]
+macro ENGINE_EXE "$ENGINE_GAME\bin\$PLAT_DIR\quiver.exe"	[$ENGINE_QUIVER]
 macro ENGINE_EXE "$ENGINE_GAME\hl2.exe"     [$ENGINE_2013]
 macro ENGINE_EXE "$ENGINE_GAME\swarm.exe"   [$ENGINE_ASW]
 macro ENGINE_EXE "$ENGINE_GAME\csgo.exe"    [$ENGINE_CSGO]
@@ -31,9 +31,9 @@ macro ENGINE_OUT_NAME "2013"                [$ENGINE_2013]
 macro ENGINE_OUT_NAME "asw"                 [$ENGINE_ASW]
 macro ENGINE_OUT_NAME "csgo"                [$ENGINE_CSGO]
 
-macro ENGINE_PLATFORM "$PLATFORM"           [$ENGINE_QUIVER || $ENGINE_2013]
+macro ENGINE_PLATFORM "$PLATFORM"           [$ENGINE_2013]
 macro ENGINE_PLATFORM "$PLATSUBDIR"         [$ENGINE_ASW]
-macro ENGINE_PLATFORM "$PLAT_DIR"           [$ENGINE_CSGO]
+macro ENGINE_PLATFORM "$PLAT_DIR"           [$ENGINE_QUIVER || $ENGINE_CSGO]
 
 macro ENGINE_SRC "$DEMEZ_SRC_DIR/$ENGINE_FOLDER"
 
