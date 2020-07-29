@@ -1717,11 +1717,19 @@ bool CHL2MP_Player::CanHearAndReadChatFrom( CBasePlayer *pPlayer )
 void CHL2MP_Player::LevelInitPostEntity( void )
 {
 	// This is done in single player already
-	if ( gpGlobals->maxClients != 1 && 
+	if ( gpGlobals->maxClients != 1 )
+		return;
+
 #if ENGINE_NEW
-	 m_PlayerFog.m_hCtrl.Get() == NULL )
-#else
-	m_Local.m_PlayerFog.m_hCtrl.Get() == NULL )
-#endif
+	if ( m_PlayerFog.m_hCtrl.Get() == NULL )
+	{
 		InitFogController();
+		InitPostProcessController();
+	}
+#else
+	if ( m_Local.m_PlayerFog.m_hCtrl.Get() == NULL )
+	{
+		InitFogController();
+	}
+#endif
 }
