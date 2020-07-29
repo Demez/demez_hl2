@@ -24,6 +24,7 @@ group "demez_game"
 		folder "Demez - ASW" [$DEMEZ && $BASE_ASW]
 		{
 			"game/demez_client_asw.qpc"
+			// "game/demez_client_asw_vr.qpc"
 			"game/demez_server_asw.qpc"
 		}
 		
@@ -43,59 +44,13 @@ group "demez_game"
 	}
 }
 
-// group folders act odd in qpc currently, need to fix that
-/*group "gamedlls" "game" "binaries" "everything"
+group "game"
 {
-	folder "Game" [$BASE_QUIVER || $BASE_CSGO]
+	folder "Game"
 	{
-		folder "Game Binaries"
-		{
-			folder "Demez - Quiver" [$DEMEZ && $BASE_QUIVER]
-			{
-				"game/demez_client_quiver.qpc"
-				"game/demez_server_quiver.qpc"
-			}
-			
-			folder "Demez - CSGO" [$DEMEZ && $BASE_CSGO]
-			{
-				"game/demez_client_csgo.qpc"
-				"game/demez_server_csgo.qpc"
-			}
-			
-			folder "Other"
-			{
-				"client"
-				"server"
-			}
-		}
+		contains "demez_game"
 	}
-	
-	folder "Game Binaries" [$BASE_2013 || $BASE_ASW]
-	{
-		folder "Demez - 2013" [$DEMEZ && $BASE_2013]
-		{
-			"game/demez_client_2013.qpc"
-			"game/demez_server_2013.qpc"
-		}
-		
-		folder "Demez - ASW" [$DEMEZ && $BASE_ASW]
-		{
-			"game/demez_client_asw.qpc"
-			"game/demez_server_asw.qpc"
-		}
-		
-		folder "Other"
-		{
-			"client"
-			"server"
-		}
-	}
-
-	folder "Libraries"
-	{
-		// "vgui_controls" [$BASE_QUIVER]
-	}
-}*/
+}
 
 
 // if at least 2 of these macros are defined
