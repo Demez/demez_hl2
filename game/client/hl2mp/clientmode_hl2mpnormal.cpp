@@ -123,6 +123,8 @@ void ClientModeHL2MPNormal::Init()
 {
 	BaseClass::Init();
 
+	gameeventmanager->AddListener( this, "game_newmap", false );
+
 	// Load up the combine control panel scheme
 	g_hVGuiCombineScheme = vgui::scheme()->LoadSchemeFromFileEx( enginevgui->GetPanel( PANEL_CLIENTDLL ), "resource/CombinePanelScheme.res", "CombineScheme" );
 	if (!g_hVGuiCombineScheme)
@@ -184,6 +186,20 @@ public:
 	{
 	}
 };
+
+void ClientModeHL2MPNormal::FireGameEvent( IGameEvent *event )
+{
+	const char *eventname = event->GetName();
+
+	if ( Q_strcmp( "game_newmap", eventname ) == 0 )
+	{
+		engine->ClientCmd("exec newmapsettings\n");
+	}
+	else
+	{
+		BaseClass::FireGameEvent( event );
+	}
+}
 
 static ClientModeHL2MPNormalFullscreen g_FullscreenClientMode;
 IClientMode *GetFullscreenClientMode(void)

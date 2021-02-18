@@ -42,6 +42,7 @@ public:
 
 #if ENGINE_NEW
 	virtual void        DoPostScreenSpaceEffects( const CViewSetup *pSetup ) {}
+	virtual void        FireGameEvent( IGameEvent *event );
 #endif
 };
 
