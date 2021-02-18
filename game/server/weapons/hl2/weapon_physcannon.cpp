@@ -1724,9 +1724,14 @@ void CWeaponPhysCannon::Drop( const Vector &vecVelocity )
 {
 	ForceDrop();
 
-#ifndef CLIENT_DLL
-	UTIL_Remove( this );
-#endif
+	if ( HL2GameRules()->IsDeathmatch() )
+	{
+		UTIL_Remove( this );
+	}
+	else
+	{
+		BaseClass::Drop( vecVelocity );
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -3737,7 +3742,8 @@ void CWeaponPhysCannon::StopEffects( bool stopSound )
 	{
 		if ( m_hBeams[i] != NULL )
 		{
-			m_hBeams[i]->SetBrightness( 0 );
+			// m_hBeams[i]->SetBrightness( 0 );
+			m_hBeams[i]->TurnOn();
 		}
 	}
 
@@ -3785,7 +3791,10 @@ void CWeaponPhysCannon::StartEffects( void )
 	for ( i = 0; i < NUM_BEAMS; i++ )
 	{
 		if ( m_hBeams[i] )
+		{
+			m_hBeams[i]->TurnOff();
 			continue;
+		}
 
 		const char *beamAttachNames[] = 
 		{
@@ -3812,7 +3821,11 @@ void CWeaponPhysCannon::StartEffects( void )
 		m_hBeams[i]->SetNoise( random->RandomFloat( 8.0f, 16.0f ) );
 		m_hBeams[i]->SetColor( 255, 255, 255 );
 		m_hBeams[i]->SetScrollRate( 25 );
-		m_hBeams[i]->SetBrightness( 128 );
+
+		// doesn't do anything?
+		// m_hBeams[i]->SetBrightness( 128 );
+		m_hBeams[i]->SetBrightness( 8 );
+
 		m_hBeams[i]->SetWidth( 0 );
 		m_hBeams[i]->SetEndWidth( random->RandomFloat( 2, 4 ) );
 	}
@@ -3937,7 +3950,8 @@ void CWeaponPhysCannon::DoEffectClosed( void )
 	{
 		if ( m_hBeams[i] != NULL )
 		{
-			m_hBeams[i]->SetBrightness( 0 );
+			// m_hBeams[i]->SetBrightness( 0 );
+			m_hBeams[i]->TurnOn();
 		}
 	}
 
@@ -3990,7 +4004,8 @@ void CWeaponPhysCannon::DoMegaEffectClosed( void )
 	{
 		if ( m_hBeams[i] != NULL )
 		{
-			m_hBeams[i]->SetBrightness( 0 );
+			// m_hBeams[i]->SetBrightness( 0 );
+			m_hBeams[i]->TurnOn();
 		}
 	}
 
@@ -4043,7 +4058,8 @@ void CWeaponPhysCannon::DoEffectReady( )
 	{
 		if ( m_hBeams[i] != NULL )
 		{
-			m_hBeams[i]->SetBrightness( 0 );
+			// m_hBeams[i]->SetBrightness( 0 );
+			m_hBeams[i]->TurnOn();
 		}
 	}
 
@@ -4097,7 +4113,8 @@ void CWeaponPhysCannon::DoEffectHolding( )
 	{
 		if ( m_hBeams[i] != NULL )
 		{
-			m_hBeams[i]->SetBrightness( 128 );
+			// m_hBeams[i]->SetBrightness( 128 );
+			m_hBeams[i]->TurnOff();
 		}
 	}
 
@@ -4142,6 +4159,8 @@ void CWeaponPhysCannon::DoEffectLaunch( Vector *pos )
 
 	if ( pBeam != NULL )
 	{
+		pBeam->TurnOn();
+
 		pBeam->PointEntInit( endpos, this );
 		pBeam->SetEndAttachment( 1 );
 		pBeam->SetWidth( 6.4 );
@@ -4194,6 +4213,8 @@ void CWeaponPhysCannon::DoMegaEffectLaunch( Vector *pos )
 
 	if ( pBeam != NULL )
 	{
+		pBeam->TurnOn();
+
 		pBeam->PointEntInit( endpos, vm );
 		pBeam->SetEndAttachment( 1 );
 		pBeam->SetWidth( 2 );
@@ -4261,7 +4282,8 @@ void CWeaponPhysCannon::DoMegaEffectHolding( void )
 	{
 		if ( m_hBeams[i] != NULL )
 		{
-			m_hBeams[i]->SetBrightness( 128 );
+			// m_hBeams[i]->SetBrightness( 128 );
+			m_hBeams[i]->TurnOff();
 		}
 	}
 
@@ -4309,7 +4331,8 @@ void CWeaponPhysCannon::DoMegaEffectReady( void )
 	{
 		if ( m_hBeams[i] != NULL )
 		{
-			m_hBeams[i]->SetBrightness( 0 );
+			// m_hBeams[i]->SetBrightness( 0 );
+			m_hBeams[i]->TurnOn();
 		}
 	}
 
