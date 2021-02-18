@@ -248,6 +248,7 @@ CHL2MPRules::~CHL2MPRules( void )
 #endif
 }
 
+
 void CHL2MPRules::CreateStandardEntities( void )
 {
 
@@ -442,6 +443,147 @@ bool CHL2MPRules::CheckGameOver()
 
 	return false;
 }
+
+
+#ifndef CLIENT_DLL
+// Demez: TEMP, move to a keyvalues file
+static const char *s_hl2Maps[] =
+{
+	"background01",
+	"background02",
+	"background03",
+	"background04",
+	"background05",
+	"background06",
+	"background07",
+	"credits",
+	"d1_canals_01",
+	"d1_canals_01a",
+	"d1_canals_02",
+	"d1_canals_03",
+	"d1_canals_05",
+	"d1_canals_06",
+	"d1_canals_07",
+	"d1_canals_08",
+	"d1_canals_09",
+	"d1_canals_10",
+	"d1_canals_11",
+	"d1_canals_12",
+	"d1_canals_13",
+	"d1_eli_01",
+	"d1_eli_02",
+	"d1_town_01",
+	"d1_town_01a",
+	"d1_town_02",
+	"d1_town_02a",
+	"d1_town_03",
+	"d1_town_04",
+	"d1_town_05",
+	"d1_trainstation_01",
+	"d1_trainstation_02",
+	"d1_trainstation_03",
+	"d1_trainstation_04",
+	"d1_trainstation_05",
+	"d1_trainstation_06",
+	"d2_coast_01",
+	"d2_coast_02",
+	"d2_coast_03",
+	"d2_coast_04",
+	"d2_coast_05",
+	"d2_coast_07",
+	"d2_coast_08",
+	"d2_coast_09",
+	"d2_coast_10",
+	"d2_coast_11",
+	"d2_coast_12",
+	"d2_prison_01",
+	"d2_prison_02",
+	"d2_prison_03",
+	"d2_prison_04",
+	"d2_prison_05",
+	"d2_prison_06",
+	"d2_prison_07",
+	"d2_prison_08",
+	"d3_breen_01",
+	"d3_c17_01",
+	"d3_c17_02",
+	"d3_c17_02_camera",
+	"d3_c17_03",
+	"d3_c17_04",
+	"d3_c17_05",
+	"d3_c17_06a",
+	"d3_c17_06b",
+	"d3_c17_07",
+	"d3_c17_08",
+	"d3_c17_09",
+	"d3_c17_10a",
+	"d3_c17_10b",
+	"d3_c17_11",
+	"d3_c17_12",
+	"d3_c17_12b",
+	"d3_c17_13",
+	"d3_citadel_01",
+	"d3_citadel_02",
+	"d3_citadel_03",
+	"d3_citadel_04",
+	"d3_citadel_05",
+	"", // END Marker
+};
+
+
+static const char *s_ep1Maps[] =
+{
+	"", // END Marker
+};
+
+
+static const char *s_ep2Maps[] =
+{
+	"", // END Marker
+};
+
+
+bool CHL2MPRules::IsHL2()
+{
+	string_t mapName = gpGlobals->mapname;
+	return FindInList( s_hl2Maps, mapName.ToCStr() );
+}
+
+bool CHL2MPRules::IsEP1()
+{
+	string_t mapName = gpGlobals->mapname;
+	return FindInList( s_ep1Maps, mapName.ToCStr() );
+}
+
+bool CHL2MPRules::IsEP2()
+{
+	// funny lazy default
+	//string_t mapName = gpGlobals->mapname;
+	//return FindInList( s_ep2Maps, mapName.ToCStr() );
+	return true;
+}
+
+
+void CHL2MPRules::SetAICriteria( AI_CriteriaSet& set )
+{
+	// Demez: funny hl2 check
+	if ( IsHL2() )
+	{
+		set.AppendCriteria( "game_hl2", "1" );
+	}
+	else if ( IsEP1() )
+	{
+		set.AppendCriteria( "game_episodic", "1" );
+		set.AppendCriteria( "game_ep1", "1" );
+	}
+	else if ( IsEP2() )
+	{
+		set.AppendCriteria( "game_episodic", "1" );
+		set.AppendCriteria( "game_ep2", "1" );
+	}
+}
+#endif
+
 
 // when we are within this close to running out of entities,  items 
 // marked with the ITEM_FLAG_LIMITINWORLD will delay their respawn
@@ -905,7 +1047,30 @@ const char *CHL2MPRules::GetGameDescription( void )
 
 	else
 		return "Demez HL2 - Unknown"; 
-} 
+}
+
+
+void CHL2MPRules::SetGameMode( int gamemode )
+{
+	switch (gamemode)
+	{
+	case DEMEZ_GAMEMODE_DEATHMATCH:
+		m_bCoOpEnabled = false;
+		m_bTeamPlayEnabled = false;
+		break;
+
+	case DEMEZ_GAMEMODE_TEAMPLAY:
+		m_bCoOpEnabled = false;
+		m_bTeamPlayEnabled = true;
+		break;
+
+	case DEMEZ_GAMEMODE_COOP:
+	default:
+		m_bCoOpEnabled = true;
+		m_bTeamPlayEnabled = false;
+		break;
+	}
+}
 
 
 float CHL2MPRules::GetMapRemainingTime()
@@ -1222,15 +1387,18 @@ void CHL2MPRules::RestartGame()
 	m_flRestartGameTime = 0.0;		
 	m_bCompleteReset = false;
 
-	IGameEvent * event = gameeventmanager->CreateEvent( "round_start" );
-	if ( event )
+	if ( IsDeathmatch() )
 	{
-		event->SetInt("fraglimit", 0 );
-		event->SetInt( "priority", 6 ); // HLTV event priority, not transmitted
+		IGameEvent * event = gameeventmanager->CreateEvent( "round_start" );
+		if ( event )
+		{
+			event->SetInt("fraglimit", 0 );
+			event->SetInt( "priority", 6 ); // HLTV event priority, not transmitted
 
-		event->SetString("objective","DEATHMATCH");
+			event->SetString("objective", "DEATHMATCH");
 
-		gameeventmanager->FireEvent( event );
+			gameeventmanager->FireEvent( event );
+		}
 	}
 }
 
@@ -1461,43 +1629,46 @@ bool CHL2MPRules::IsAlyxInDarknessMode()
 
 float CHL2MPRules::GetAmmoDamage( CBaseEntity *pAttacker, CBaseEntity *pVictim, int nAmmoType )
 {
-	float flDamage = 0.0f;
-		CAmmoDef *pAmmoDef = GetAmmoDef();
+	if (pAttacker == NULL || pVictim == NULL)
+		return 0.0f;
 
-		if ( pAmmoDef->DamageType( nAmmoType ) & DMG_SNIPER )
+	float flDamage = 0.0f;
+	CAmmoDef *pAmmoDef = GetAmmoDef();
+
+	if ( pAmmoDef->DamageType( nAmmoType ) & DMG_SNIPER )
+	{
+		// If this damage is from a SNIPER, we do damage based on what the bullet
+		// HITS, not who fired it. All other bullets have their damage values
+		// arranged according to the owner of the bullet, not the recipient.
+		if ( pVictim->IsPlayer() )
 		{
-			// If this damage is from a SNIPER, we do damage based on what the bullet
-			// HITS, not who fired it. All other bullets have their damage values
-			// arranged according to the owner of the bullet, not the recipient.
-			if ( pVictim->IsPlayer() )
-			{
-				// Player
-				flDamage = pAmmoDef->PlrDamage( nAmmoType );
-			}
-			else
-			{
-				// NPC or breakable
-				flDamage = pAmmoDef->NPCDamage( nAmmoType );
-			}
+			// Player
+			flDamage = pAmmoDef->PlrDamage( nAmmoType );
 		}
 		else
 		{
-			flDamage = BaseClass::GetAmmoDamage( pAttacker, pVictim, nAmmoType );
+			// NPC or breakable
+			flDamage = pAmmoDef->NPCDamage( nAmmoType );
 		}
+	}
+	else
+	{
+		flDamage = BaseClass::GetAmmoDamage( pAttacker, pVictim, nAmmoType );
+	}
 
-		if( pAttacker->IsPlayer() && pVictim->IsNPC() )
+	if( pAttacker->IsPlayer() && pVictim->IsNPC() )
+	{
+		if( pVictim->MyCombatCharacterPointer() )
 		{
-			if( pVictim->MyCombatCharacterPointer() )
-			{
-				// Player is shooting an NPC. Adjust the damage! This protects breakables
-				// and other 'non-living' entities from being easier/harder to break
-				// in different skill levels.
-				flDamage = pAmmoDef->PlrDamage( nAmmoType );
-				flDamage = AdjustPlayerDamageInflicted( flDamage );
-			}
+			// Player is shooting an NPC. Adjust the damage! This protects breakables
+			// and other 'non-living' entities from being easier/harder to break
+			// in different skill levels.
+			flDamage = pAmmoDef->PlrDamage( nAmmoType );
+			flDamage = AdjustPlayerDamageInflicted( flDamage );
 		}
+	}
 
-		return flDamage;
+	return flDamage;
 }
 
 

@@ -152,6 +152,12 @@ public:
 
 	virtual bool IsAlyxInDarknessMode();
 
+	bool	IsHL2();
+	bool	IsEP1();
+	bool	IsEP2();
+
+	void	SetAICriteria( AI_CriteriaSet& set );
+
 #endif
 	virtual void ClientDisconnected( edict_t *pClient );
 
@@ -163,6 +169,8 @@ public:
 	bool	IsTeamplay( void )		{ return m_bTeamPlayEnabled; }
 	bool	IsDeathmatch( void )	{ return !m_bCoOpEnabled; }
 	bool	IsCoOp( void )			{ return m_bCoOpEnabled; }
+
+	void	SetGameMode( int gamemode );
 
 	bool	MegaPhyscannonActive( void ) { return m_bMegaPhysgun; }
 
