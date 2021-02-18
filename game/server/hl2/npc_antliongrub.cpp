@@ -583,7 +583,7 @@ void CAntlionGrub::IdleThink( void )
 	}
 
 	// See how close the player is
-	CBasePlayer *pPlayerEnt = AI_GetSinglePlayer();
+	CBasePlayer *pPlayerEnt = UTIL_GetNearestPlayer( GetAbsOrigin() );
 	float flDistToPlayerSqr = ( GetAbsOrigin() - pPlayerEnt->GetAbsOrigin() ).LengthSqr();
 
 	bool bFlinching = ( m_flFlinchTime > gpGlobals->curtime );

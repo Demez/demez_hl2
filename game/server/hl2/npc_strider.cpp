@@ -3144,7 +3144,8 @@ int CNPC_Strider::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 				// See if the person that injured me is an NPC.
 				CAI_BaseNPC *pAttacker = dynamic_cast<CAI_BaseNPC *>( info.GetAttacker() );
 
-				if( pAttacker && pAttacker->IsAlive() && UTIL_GetLocalPlayer() )
+				// if( pAttacker && pAttacker->IsAlive() && UTIL_GetLocalPlayer() )
+				if( pAttacker && pAttacker->IsAlive() && pAttacker->IsNPC() )
 				{
 					if( pAttacker->GetSquad() != NULL && pAttacker->IsInPlayerSquad() )
 					{

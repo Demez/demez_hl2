@@ -777,15 +777,18 @@ bool CAI_PassengerBehaviorCompanion::CanEnterVehicleImmediately( int *pResultSeq
 	if ( GetVehicleSpeed() > 150 )
 		return false;
 
-	// If the player can see us, then we can't enter immediately anyway
-	CBasePlayer *pPlayer = AI_GetSinglePlayer();	
-	if ( pPlayer == NULL )
-		return false;
-
-	Vector vecPosition = GetOuter()->WorldSpaceCenter();
 	float flRadius = GetOuter()->CollisionProp()->BoundingRadius2D();
-	if ( SphereWithinPlayerFOV( pPlayer, vecPosition, flRadius ) )
-		return false;
+
+	// If the player can see us, then we can't enter immediately anyway
+	UTIL_FOREACHPLAYER(i)
+	{
+		UTIL_GETNEXTPLAYER(i);
+
+		// wtf is this view check
+		Vector vecPosition = GetOuter()->WorldSpaceCenter();
+		if ( SphereWithinPlayerFOV( pPlayer, vecPosition, flRadius ) )
+			return false;
+	}
 
 	// Reserve an entry point
 	if ( ReserveEntryPoint( VEHICLE_SEAT_ANY ) == false )
@@ -835,7 +838,19 @@ bool CAI_PassengerBehaviorCompanion::CanEnterVehicleImmediately( int *pResultSeq
 			continue;
 
 		// See if the passenger would be visible if standing at this position
-		if ( SphereWithinPlayerFOV( pPlayer, (vecStartPos+vecPassengerOffset), flRadius ) )
+		bool visible = false;
+		UTIL_FOREACHPLAYER(i)
+		{
+			UTIL_GETNEXTPLAYER(i);
+
+			if ( SphereWithinPlayerFOV( pPlayer, (vecStartPos+vecPassengerOffset), flRadius ) )
+			{
+				visible = true;
+				break;
+			}
+		}
+
+		if ( visible )
 			continue;
 
 		// Otherwise distance is the deciding factor
@@ -1112,12 +1127,7 @@ bool CAI_PassengerBehaviorCompanion::FindPathToVehicleEntryPoint( void )
 //-----------------------------------------------------------------------------
 bool CAI_PassengerBehaviorCompanion::CanExitAtPosition( const Vector &vecTestPos )
 {
-	CBasePlayer *pPlayer = AI_GetSinglePlayer();
-	if ( pPlayer == NULL )
-		return false;
-
-	// Can't be in our potential view
-	if ( pPlayer->FInViewCone( vecTestPos ) )
+	if ( UTIL_IsAnyPlayerLookingAtEntity( vecTestPos ) )
 		return false;
 
 	// NOTE: There's no reason to do this since this is only called from a node's reported position
@@ -1834,8 +1844,7 @@ bool CAI_PassengerBehaviorCompanion::CanFidget( void )
 		return false;
 
 	// Must be visible to the player
-	CBasePlayer *pPlayer = AI_GetSinglePlayer();
-	if ( pPlayer && pPlayer->FInViewCone( GetOuter()->EyePosition() ) == false )
+	if ( !UTIL_IsAnyPlayerLookingAtEntity( GetOuter()->EyePosition() ) )
 		return false;
 
 	return true;

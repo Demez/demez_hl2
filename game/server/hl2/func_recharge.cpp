@@ -654,11 +654,14 @@ void CNewRecharge::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE 
 	// The citadel charger gives more per charge and also gives health
 	if ( HasSpawnFlags(	SF_CITADEL_RECHARGER ) )
 	{
-		nIncrementArmor = 10;
-		
-#ifdef HL2MP
-		nIncrementArmor = 2;
-#endif
+		if ( g_pGameRules->IsCoOp() )
+		{
+			nIncrementArmor = 10;
+		}
+		else
+		{
+			nIncrementArmor = 2;
+		}
 
 		// Also give health for the citadel version.
 		if ( pActivator->GetHealth() < pActivator->GetMaxHealth() && m_flNextCharge < gpGlobals->curtime )

@@ -455,12 +455,11 @@ void CPropJeepEpisodic::Spawn( void )
 
 	SetBlocksLOS( false );
 
-	CBasePlayer	*pPlayer = UTIL_GetLocalPlayer();
-	if ( pPlayer != NULL )
+	UTIL_FOREACHPLAYER(i)
 	{
+		UTIL_GETNEXTPLAYER(i);
 		pPlayer->m_Local.m_iHideHUD |= HIDEHUD_VEHICLE_CROSSHAIR;
 	}
-
 
 	SetBodygroup( JEEP_HOPPER_BODYGROUP, m_bBusterHopperVisible ? 1 : 0);
 	CreateCargoTrigger();

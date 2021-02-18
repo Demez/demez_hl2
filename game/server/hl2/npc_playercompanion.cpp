@@ -389,7 +389,7 @@ void CNPC_PlayerCompanion::GatherConditions()
 		m_AnnounceAttackTimer.Set( 4, 8 );
 	}
 
-	if ( GetFollowBehavior().GetFollowTarget() && 
+	if ( pPlayer && GetFollowBehavior().GetFollowTarget() && 
 			( GetFollowBehavior().GetFollowTarget()->IsPlayer() || GetCommandGoal() != vec3_invalid ) && 
 			GetFollowBehavior().IsMovingToFollowTarget() && 
 			GetFollowBehavior().GetGoalRange() > 0.1 &&
@@ -1514,6 +1514,9 @@ void CNPC_PlayerCompanion::Touch( CBaseEntity *pOther )
 void CNPC_PlayerCompanion::ModifyOrAppendCriteria( AI_CriteriaSet& set )
 {
 	BaseClass::ModifyOrAppendCriteria( set );
+
+	HL2MPRules()->SetAICriteria( set );
+
 	if ( GetEnemy() && IsMortar( GetEnemy() ) )
 	{
 		set.RemoveCriteria( "enemy" );
@@ -3081,7 +3084,7 @@ void CNPC_PlayerCompanion::InputOutsideTransition( inputdata_t &inputdata )
 	if ( IsInAVehicle() )
 		return;
 
-	CBaseEntity *pPlayer = UTIL_GetLocalPlayer();
+	CBaseEntity *pPlayer = UTIL_GetNearestPlayerPreferVisible( this );
 	const Vector &playerPos = pPlayer->GetAbsOrigin();
 
 	// Mark us as already having succeeded if we're vital or always meant to come with the player

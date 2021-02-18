@@ -1890,7 +1890,8 @@ QAngle CNPC_FloorTurret::PreferredCarryAngles( void )
 	static QAngle g_prefAngles;
 
 	Vector vecUserForward;
-	// DEMEZ_FIXME: maybe check if the player is holding this turret?
+
+	// DEMEZ_FIX: maybe check if the player is holding this turret?
 	CBasePlayer *pPlayer = UTIL_GetNearestPlayer( GetAbsOrigin() );
 	pPlayer->EyeVectors( &vecUserForward );
 

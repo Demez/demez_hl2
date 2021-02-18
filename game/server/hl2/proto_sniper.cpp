@@ -1368,7 +1368,7 @@ void CProtoSniper::Event_KilledOther( CBaseEntity *pVictim, const CTakeDamageInf
 {
 	if( pVictim && pVictim->IsPlayer() )
 	{
-		m_bKilledPlayer = true;
+		// m_bKilledPlayer = true;
 	}
 }
 

@@ -15,6 +15,7 @@
 #include <vgui/ILocalize.h>
 #include <vgui/ISurface.h>
 #include "engine_defines.h"
+#include "hl2mp_gamerules.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -328,8 +329,7 @@ void CHudAmmo::Paint( void )
 {
 	BaseClass::Paint();
 
-#ifndef HL2MP
-	if ( m_hCurrentVehicle == NULL && m_iconPrimaryAmmo )
+	if ( HL2MPRules()->IsCoOp() && m_hCurrentVehicle == NULL && m_iconPrimaryAmmo )
 	{
 		int nLabelHeight;
 		int nLabelWidth;
@@ -341,7 +341,6 @@ void CHudAmmo::Paint( void )
 		
 		m_iconPrimaryAmmo->DrawSelf( x, y, GetFgColor() );
 	}
-#endif // HL2MP
 }
 
 //-----------------------------------------------------------------------------
@@ -361,17 +360,19 @@ public:
 
 	void Init( void )
 	{
-#ifndef HL2MP
-		wchar_t *tempString = g_pVGuiLocalize->Find("#Valve_Hud_AMMO_ALT");
-		if (tempString)
+		// can't use this here, called before HL2MPRules is initialized
+		// if ( HL2MPRules()->IsCoOp() )
 		{
-			SetLabelText(tempString);
+			wchar_t *tempString = g_pVGuiLocalize->Find("#Valve_Hud_AMMO_ALT");
+			if (tempString)
+			{
+				SetLabelText(tempString);
+			}
+			else
+			{
+				SetLabelText(L"ALT");
+			}
 		}
-		else
-		{
-			SetLabelText(L"ALT");
-		}
-#endif // HL2MP
 	}
 
 	void VidInit( void )
@@ -416,8 +417,7 @@ public:
 	{
 		BaseClass::Paint();
 
-#ifndef HL2MP
-		if ( m_iconSecondaryAmmo )
+		if ( HL2MPRules()->IsCoOp() && m_iconSecondaryAmmo )
 		{
 			int nLabelHeight;
 			int nLabelWidth;
@@ -429,7 +429,6 @@ public:
 
 			m_iconSecondaryAmmo->DrawSelf( x, y, GetFgColor() );
 		}
-#endif // HL2MP
 	}
 
 protected:

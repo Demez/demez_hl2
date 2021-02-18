@@ -1442,7 +1442,7 @@ int CNPC_Citizen::TranslateSchedule( int scheduleType )
 
 			if( flDist < 50 * 12 )
 			{
-				if (AI_IsSinglePlayer())
+				// if (AI_IsSinglePlayer())
 					AddSpawnFlags( SF_CITIZEN_NOT_COMMANDABLE );
 				return SCHED_CITIZEN_MOURN_PLAYER;
 			}
@@ -3106,7 +3106,7 @@ void CNPC_Citizen::FixupPlayerSquad()
 	}
 	else
 	{
-		m_FollowBehavior.SetFollowTarget( UTIL_GetLocalPlayer() );
+		m_FollowBehavior.SetFollowTarget( UTIL_GetNearestPlayerPreferVisible( this ) );
 		m_FollowBehavior.SetParameters( AIF_SIMPLE );
 	}
 }
@@ -3152,10 +3152,11 @@ void CNPC_Citizen::UpdateFollowCommandPoint()
 		{
 			if ( IsFollowingCommandPoint() )
 				ClearFollowTarget();
-			if ( m_FollowBehavior.GetFollowTarget() != UTIL_GetNearestPlayer(GetAbsOrigin()) )
+			// if ( m_FollowBehavior.GetFollowTarget() != UTIL_GetNearestPlayer(GetAbsOrigin()) )
+			if ( m_FollowBehavior.GetFollowTarget() && !m_FollowBehavior.GetFollowTarget()->IsPlayer() )
 			{
 				DevMsg( "Expected to be following player, but not\n" );
-				m_FollowBehavior.SetFollowTarget( UTIL_GetLocalPlayer() );
+				m_FollowBehavior.SetFollowTarget( UTIL_GetNearestPlayerPreferVisible( this ) );
 				m_FollowBehavior.SetParameters( AIF_SIMPLE );
 			}
 		}

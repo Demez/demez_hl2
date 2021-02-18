@@ -147,6 +147,8 @@ private:
 	COutputEvent m_OnShatter;
 	COutputEvent m_OnShotDown;
 
+	CBasePlayer* m_pPlayer;
+
 friend bool StriderBuster_IsAttachedStriderBuster( CBaseEntity *pEntity, CBaseEntity * );
 
 };
@@ -643,19 +645,18 @@ inline bool CWeaponStriderBuster::IsAttachedToStrider( void ) const
 void CWeaponStriderBuster::Detonate( void )
 {
 	CBaseEntity *pVictim = GetOwnerEntity();
-	if ( !m_bDud && pVictim )
+	if ( !m_bDud && pVictim && m_pPlayer )
 	{
 		// Kill the strider (with magic effect)
-		CBasePlayer *pPlayer = AI_GetSinglePlayer();
-		CTakeDamageInfo info( pPlayer, this, RandomVector( -100.0f, 100.0f ), GetAbsOrigin(), pVictim->GetHealth(), DMG_GENERIC );
+		CTakeDamageInfo info( m_pPlayer, this, RandomVector( -100.0f, 100.0f ), GetAbsOrigin(), pVictim->GetHealth(), DMG_GENERIC );
 		pVictim->TakeDamage( info );
 
-		gamestats->Event_WeaponHit( ToBasePlayer( pPlayer ), true, GetClassname(), info );
+		gamestats->Event_WeaponHit( ToBasePlayer( m_pPlayer ), true, GetClassname(), info );
 
 		// Tracker 62293:  There's a bug where the inflictor/attacker are reversed when calling TakeDamage above so the player never gets
 		//  credit for the strider buster kills.  The code has a bunch of assumptions lower level, so it's safer to just fix it here by 
 		//  crediting a kill to the player directly.
-		gamestats->Event_PlayerKilledOther( pPlayer, pVictim, info );
+		gamestats->Event_PlayerKilledOther( m_pPlayer, pVictim, info );
 	}
 
 	m_OnDetonate.FireOutput( this, this );
@@ -828,6 +829,7 @@ void CWeaponStriderBuster::Launch( CBasePlayer *pPhysGunUser )
 	}
 
 	m_bLaunched = true;
+	m_pPlayer = pPhysGunUser;
 
 	// Notify all nearby hunters that we were launched.
 	Hunter_StriderBusterLaunched( this );

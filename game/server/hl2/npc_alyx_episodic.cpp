@@ -145,6 +145,8 @@ ConVar npc_alyx_readiness_transitions( "npc_alyx_readiness_transitions", "1" );
 ConVar npc_alyx_crouch( "npc_alyx_crouch", "1" );
 ConVar npc_alyx_broken( "npc_alyx_broken", "0" );
 
+// ConVar d_alyx_all_weapons("d_alyx_all_weapons", "1");
+
 // global pointer to Alyx for fast lookups
 CEntityClassList<CNPC_Alyx> g_AlyxList;
 template <> CNPC_Alyx *CEntityClassList<CNPC_Alyx>::m_pClassList = NULL;
@@ -897,17 +899,15 @@ void CNPC_Alyx::AnalyzeGunfireSound( CSound *pSound )
 
 	CBaseEntity *pSoundTarget = pSound->m_hTarget.Get();
 
-	CBasePlayer *pPlayer = AI_GetSinglePlayer();
-
-	Assert( pPlayer != NULL );
-
 	if( pSoundTarget == this )
 	{
 		// The shooter is firing at me. Assume if Alyx can hear the gunfire, she can deduce its origin.
 		UpdateEnemyMemory( pSoundOriginBCC, pSoundOriginBCC->GetAbsOrigin(), this );
 	}
-	else if( pSoundTarget == pPlayer )
+	else if( pSoundTarget->IsPlayer() )
 	{
+		CBasePlayer *pPlayer = (CBasePlayer*)pSoundTarget;
+
 		// The shooter is firing at the player. Assume Alyx can deduce the origin if the player COULD see the origin, and Alyx COULD see the player.
 		if( pPlayer->FVisible(pSoundOriginBCC) && FVisible(pPlayer) )
 		{
@@ -1035,9 +1035,7 @@ void CNPC_Alyx::EnemyIgnited( CAI_BaseNPC *pVictim )
 //-----------------------------------------------------------------------------
 void CNPC_Alyx::CombineBallSocketed( int iNumBounces )
 {
-	CBasePlayer *pPlayer = AI_GetSinglePlayer();
-	
-	if ( !pPlayer || !FVisible(pPlayer) )
+	if ( UTIL_IsAnyPlayerVisible( this ) )
 	{
 		return;
 	}
@@ -1181,8 +1179,6 @@ void CNPC_Alyx::DoCustomSpeechAI( void )
 {
 	BaseClass::DoCustomSpeechAI();
 
-	CBasePlayer *pPlayer = AI_GetSinglePlayer();
-
 	if ( HasCondition(COND_NEW_ENEMY) && GetEnemy() )
 	{
 		if ( GetEnemy()->Classify() == CLASS_HEADCRAB )
@@ -1256,7 +1252,8 @@ void CNPC_Alyx::DoCustomSpeechAI( void )
 				SpeakIfAllowed( "TLK_DARKNESS_LOSTENEMY_BY_FLASHLIGHT_EXPIRED" );
 			}
 			else if ( m_bDarknessSpeechAllowed && GetEnemy() && ( GetEnemy()->Classify() != CLASS_BULLSEYE ) && 
-				pPlayer && pPlayer->FlashlightIsOn() && !pPlayer->IsIlluminatedByFlashlight(GetEnemy(), NULL ) && 
+				// pPlayer && pPlayer->FlashlightIsOn() && !pPlayer->IsIlluminatedByFlashlight(GetEnemy(), NULL ) && 
+				UTIL_IsIlluminatedByFlashlight(GetEnemy(), NULL ) && 
 				FVisible( GetEnemy() ) )
 			{
 				SpeakIfAllowed( TLK_DARKNESS_ENEMY_IN_DARKNESS );
@@ -1290,7 +1287,7 @@ void CNPC_Alyx::DoCustomSpeechAI( void )
 			// First time we've seen this guy?
 			if ( gpGlobals->curtime - GetEnemies()->FirstTimeSeen(GetEnemy()) < 0.5 )
 			{
-				if ( pPlayer && pPlayer->IsIlluminatedByFlashlight(GetEnemy(), NULL ) && m_bDarknessSpeechAllowed && 
+				if ( UTIL_IsIlluminatedByFlashlight(GetEnemy(), NULL) && m_bDarknessSpeechAllowed && 
 					!LookerCouldSeeTargetInDarkness( this, GetEnemy() ) )
 				{
 					SpeakIfAllowed( "TLK_DARKNESS_FOUNDENEMY_BY_FLASHLIGHT" );
@@ -1311,7 +1308,7 @@ void CNPC_Alyx::DoCustomSpeechAI( void )
 			{
 				// Can't see the player?
 				if ( !HasCondition(COND_SEE_PLAYER) && !HasCondition( COND_TALKER_PLAYER_DEAD ) && !HasCondition( COND_SEE_ENEMY ) &&
-					( !pPlayer || pPlayer->GetAbsOrigin().DistToSqr(GetAbsOrigin()) > ALYX_DARKNESS_LOST_PLAYER_DIST ) )
+					PlayerInRange(GetAbsOrigin(), ALYX_DARKNESS_LOST_PLAYER_DIST) )
 				{
 					// only speak if player hasn't moved.
 					if ( m_MoveMonitor.TargetMoved( AI_GetSinglePlayer() ) )
@@ -1324,8 +1321,20 @@ void CNPC_Alyx::DoCustomSpeechAI( void )
 				}
 			}
 
+			// check if anyone within a good range has their flashlight on
+			bool flashlightOn = false;
+			UTIL_FOREACHPLAYER(i)
+			{
+				CBasePlayer* pPlayer = UTIL_PlayerByIndex(i);
+				if ( pPlayer && pPlayer->GetAbsOrigin().DistToSqr(GetAbsOrigin()) < ALYX_DARKNESS_LOST_PLAYER_DIST && pPlayer->FlashlightIsOn() )
+				{
+					flashlightOn = true;
+					break;
+				}
+			}
+
 			// Speech concepts that only occur when the player's flashlight is off
-			if ( pPlayer && !HasCondition( COND_TALKER_PLAYER_DEAD ) && !pPlayer->FlashlightIsOn() )
+			if ( !flashlightOn && !HasCondition( COND_TALKER_PLAYER_DEAD ) )
  			{
 				// When the player first turns off the light, don't talk about sounds for a bit
 				if ( HasCondition( COND_ALYX_PLAYER_TURNED_OFF_FLASHLIGHT ) || HasCondition( COND_ALYX_PLAYER_FLASHLIGHT_EXPIRED ) )
@@ -1569,7 +1578,7 @@ bool CNPC_Alyx::CanSeeEntityInDarkness( CBaseEntity *pEntity )
 	CBasePlayer *pPlayer = UTIL_GetNearestPlayerPreferVisible( this );
 	if ( pPlayer && pEntity != pPlayer )
 	{
-		if ( pPlayer->IsIlluminatedByFlashlight(pEntity, NULL ) )
+		if ( UTIL_IsIlluminatedByFlashlight(pEntity, NULL ) )
 			return true;
 	}
 

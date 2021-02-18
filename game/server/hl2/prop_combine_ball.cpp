@@ -1162,13 +1162,11 @@ bool CPropCombineBall::DissolveEntity( CBaseEntity *pEntity )
 	if( pEntity->IsEFlagSet( EFL_NO_DISSOLVE ) )
 		return false;
 
-#ifdef HL2MP
 	if ( pEntity->IsPlayer() )
 	{
 		m_bStruckEntity = true;
 		return false;
 	}
-#endif
 
 	if( !pEntity->IsNPC() && !(dynamic_cast<CRagdollProp*>(pEntity)) )
 		return false;

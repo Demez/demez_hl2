@@ -384,11 +384,11 @@ CHL2_Player::CHL2_Player()
 //
 #define SUITPOWER_CHARGE_RATE	12.5											// 100 units in 8 seconds
 
-#ifdef HL2MP
-	CSuitPowerDevice SuitDeviceSprint( bits_SUIT_DEVICE_SPRINT, 25.0f );				// 100 units in 4 seconds
-#else
-	CSuitPowerDevice SuitDeviceSprint( bits_SUIT_DEVICE_SPRINT, 12.5f );				// 100 units in 8 seconds
-#endif
+// #ifdef HL2MP
+// 	CSuitPowerDevice SuitDeviceSprint( bits_SUIT_DEVICE_SPRINT, 25.0f );				// 100 units in 4 seconds
+// #else
+ 	CSuitPowerDevice SuitDeviceSprint( bits_SUIT_DEVICE_SPRINT, 12.5f );				// 100 units in 8 seconds
+// #endif
 
 #ifdef HL2_EPISODIC
 	CSuitPowerDevice SuitDeviceFlashlight( bits_SUIT_DEVICE_FLASHLIGHT, 1.111 );	// 100 units in 90 second
@@ -1808,9 +1808,9 @@ void CHL2_Player::SuitPower_Update( void )
 			{
 				if( FlashlightIsOn() )
 				{
-#ifndef HL2MP
+// #ifndef HL2MP
 					FlashlightTurnOff();
-#endif
+// #endif
 				}
 			}
 		}
@@ -1820,9 +1820,9 @@ void CHL2_Player::SuitPower_Update( void )
 			// turn off flashlight a little bit after it hits below one aux power notch (5%)
 			if( m_HL2Local.m_flSuitPower < 4.8f && FlashlightIsOn() )
 			{
-#ifndef HL2MP
+// #ifndef HL2MP
 				FlashlightTurnOff();
-#endif
+// #endif
 			}
 		}
 	}
@@ -2015,10 +2015,9 @@ void CHL2_Player::FlashlightTurnOn( void )
 		if( !SuitPower_AddDevice( SuitDeviceFlashlight ) )
 			return;
 	}
-#ifdef HL2_DLL
+
 	if( !IsSuitEquipped() )
 		return;
-#endif
 
 	AddEffects( EF_DIMLIGHT );
 	EmitSound( "HL2Player.FlashLightOn" );
