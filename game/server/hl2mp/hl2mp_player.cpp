@@ -1203,7 +1203,10 @@ void CHL2MP_Player::FlashlightTurnOn( void )
 
 bool CHL2MP_Player::FlashlightTurnOn( bool playSound )
 {
-	if (demez_flashlight.GetBool() && IsAlive())
+	BaseClass::FlashlightTurnOn();
+	return FlashlightIsOn();
+
+	/*if (demez_flashlight.GetBool() && IsAlive())
 	{
 		AddEffects( EF_DIMLIGHT );
 
@@ -1213,7 +1216,7 @@ bool CHL2MP_Player::FlashlightTurnOn( bool playSound )
 		return true;
 	}
 	
-	return false;
+	return false;*/
 }
 
 
@@ -1227,12 +1230,14 @@ void CHL2MP_Player::FlashlightTurnOff( void )
 
 void CHL2MP_Player::FlashlightTurnOff( bool playSound )
 {
-	RemoveEffects( EF_DIMLIGHT );
+	BaseClass::FlashlightTurnOff();
+
+	/*RemoveEffects( EF_DIMLIGHT );
 	
 	if( IsAlive() && playSound )
 	{
 		EmitSound( "HL2Player.FlashlightOff" );
-	}
+	}*/
 }
 
 
