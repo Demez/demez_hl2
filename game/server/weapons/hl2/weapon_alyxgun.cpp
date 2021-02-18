@@ -95,15 +95,18 @@ IMPLEMENT_ACTTABLE(CWeaponAlyxGun);
 //=========================================================
 CWeaponAlyxGun::CWeaponAlyxGun( )
 {
-	m_fMinRange1		= 1;
-	m_fMaxRange1		= 5000;
+	if ( HL2MPRules()->IsHL2() )
+	{
+		m_fMinRange1		= 1;
+		m_fMaxRange1		= 5000;
+	}
+	else
+	{
+		m_fMinRange1		= 60;
+		m_fMaxRange1		= 2048;
+	}
 
 	m_flTooCloseTimer	= TOOCLOSETIMER_OFF;
-
-#ifdef HL2_EPISODIC
-	m_fMinRange1		= 60;
-	m_fMaxRange1		= 2048;
-#endif//HL2_EPISODIC
 }
 
 CWeaponAlyxGun::~CWeaponAlyxGun( )
@@ -235,16 +238,9 @@ void CWeaponAlyxGun::FireNPCPrimaryAttack( CBaseCombatCharacter *pOperator, bool
 
 	pOperator->DoMuzzleFlash();
 
-	if( hl2_episodic.GetBool() )
-	{
-		// Never fire Alyx's last bullet just in case there's an emergency
-		// and she needs to be able to shoot without reloading.
-		if( m_iClip1 > 1 )
-		{
-			m_iClip1 = m_iClip1 - 1;
-		}
-	}
-	else
+	// Never fire Alyx's last bullet just in case there's an emergency
+	// and she needs to be able to shoot without reloading.
+	if( m_iClip1 > 1 )
 	{
 		m_iClip1 = m_iClip1 - 1;
 	}
