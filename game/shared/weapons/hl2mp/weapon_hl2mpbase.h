@@ -57,6 +57,7 @@ public:
 	
 	CHL2MPSWeaponInfo const	&GetHL2MPWpnData() const;
 
+	virtual bool CanBePickedUpByNPCs() { return true; }
 
 	virtual void FireBullets( const FireBulletsInfo_t &info );
 	virtual void FallInit( void );

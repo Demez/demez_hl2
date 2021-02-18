@@ -55,6 +55,8 @@ public:
 	virtual bool	Holster( CBaseCombatWeapon *pSwitchingTo );
 	virtual void	WeaponIdle( void );
 
+	virtual bool	CanBePickedUpByNPCs() { return true; }
+
 	virtual void	AddViewmodelBob( CBaseViewModel *viewmodel, Vector &origin, QAngle &angles );
 	virtual	float	CalcViewmodelBob( void );
 

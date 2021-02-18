@@ -62,6 +62,8 @@ public:
 	
 	bool	Reload( void );
 
+	bool CanBePickedUpByNPCs() { return false; }
+
 #ifndef CLIENT_DLL
 	void Operator_HandleAnimEvent( animevent_t *pEvent, CBaseCombatCharacter *pOperator );
 #endif
@@ -437,6 +439,7 @@ void CWeaponFrag::ThrowGrenade( CBasePlayer *pPlayer )
 	vecThrow += vForward * 1200;
 	CBaseGrenade *pGrenade = Fraggrenade_Create( vecSrc, vec3_angle, vecThrow, AngularImpulse(600,random->RandomInt(-1200,1200),0), pPlayer, GRENADE_TIMER, false );
 
+	// only in hl2dm
 	if ( pGrenade )
 	{
 		if ( pPlayer && pPlayer->m_lifeState != LIFE_ALIVE )
@@ -450,8 +453,8 @@ void CWeaponFrag::ThrowGrenade( CBasePlayer *pPlayer )
 			}
 		}
 		
-		pGrenade->SetDamage( GetHL2MPWpnData().m_iPlayerDamage );
-		pGrenade->SetDamageRadius( GRENADE_DAMAGE_RADIUS );
+		// pGrenade->SetDamage( GetHL2MPWpnData().m_iPlayerDamage );
+		// pGrenade->SetDamageRadius( GRENADE_DAMAGE_RADIUS );
 	}
 #endif
 
@@ -481,12 +484,6 @@ void CWeaponFrag::LobGrenade( CBasePlayer *pPlayer )
 	pPlayer->GetVelocity( &vecThrow, NULL );
 	vecThrow += vForward * 350 + Vector( 0, 0, 50 );
 	CBaseGrenade *pGrenade = Fraggrenade_Create( vecSrc, vec3_angle, vecThrow, AngularImpulse(200,random->RandomInt(-600,600),0), pPlayer, GRENADE_TIMER, false );
-
-	if ( pGrenade )
-	{
-		pGrenade->SetDamage( GetHL2MPWpnData().m_iPlayerDamage );
-		pGrenade->SetDamageRadius( GRENADE_DAMAGE_RADIUS );
-	}
 #endif
 
 	WeaponSound( WPN_DOUBLE );
@@ -533,12 +530,6 @@ void CWeaponFrag::RollGrenade( CBasePlayer *pPlayer )
 	// roll it
 	AngularImpulse rotSpeed(0,0,720);
 	CBaseGrenade *pGrenade = Fraggrenade_Create( vecSrc, orientation, vecThrow, rotSpeed, pPlayer, GRENADE_TIMER, false );
-
-	if ( pGrenade )
-	{
-		pGrenade->SetDamage( GetHL2MPWpnData().m_iPlayerDamage );
-		pGrenade->SetDamageRadius( GRENADE_DAMAGE_RADIUS );
-	}
 
 #endif
 

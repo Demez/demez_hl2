@@ -32,6 +32,8 @@ public:
 
 	CWeapon357( void );
 
+	bool CanBePickedUpByNPCs() { return false; }
+
 	void	PrimaryAttack( void );
 	DECLARE_NETWORKCLASS(); 
 	DECLARE_PREDICTABLE();

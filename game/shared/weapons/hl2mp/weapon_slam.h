@@ -75,6 +75,7 @@ public:
 	bool				Deploy( void );
 	bool				Holster( CBaseCombatWeapon *pSwitchingTo = NULL );
 
+	bool				CanBePickedUpByNPCs() { return false; }
 
 	CWeapon_SLAM();
 

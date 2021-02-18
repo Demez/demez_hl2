@@ -79,7 +79,7 @@ public:
 	void BoltTouch( CBaseEntity *pOther );
 	bool CreateVPhysics( void );
 	unsigned int PhysicsSolidMaskForEntity() const;
-	static CCrossbowBolt *BoltCreate( const Vector &vecOrigin, const QAngle &angAngles, int iDamage, CBasePlayer *pentOwner = NULL );
+	static CCrossbowBolt *BoltCreate( const Vector &vecOrigin, const QAngle &angAngles, CBasePlayer *pentOwner = NULL );
 
 protected:
 
@@ -87,8 +87,6 @@ protected:
 
 	CHandle<CSprite>		m_pGlowSprite;
 	//CHandle<CSpriteTrail>	m_pGlowTrail;
-	
-	int		m_iDamage;
 
 	DECLARE_DATADESC();
 	DECLARE_SERVERCLASS();
@@ -109,7 +107,7 @@ END_DATADESC()
 IMPLEMENT_SERVERCLASS_ST( CCrossbowBolt, DT_CrossbowBolt )
 END_SEND_TABLE()
 
-CCrossbowBolt *CCrossbowBolt::BoltCreate( const Vector &vecOrigin, const QAngle &angAngles, int iDamage, CBasePlayer *pentOwner )
+CCrossbowBolt *CCrossbowBolt::BoltCreate( const Vector &vecOrigin, const QAngle &angAngles, CBasePlayer *pentOwner )
 {
 	// Create a new entity with CCrossbowBolt private data
 	CCrossbowBolt *pBolt = (CCrossbowBolt *)CreateEntityByName( "crossbow_bolt" );
@@ -118,7 +116,7 @@ CCrossbowBolt *CCrossbowBolt::BoltCreate( const Vector &vecOrigin, const QAngle 
 	pBolt->Spawn();
 	pBolt->SetOwnerEntity( pentOwner );
 
-	pBolt->m_iDamage = iDamage;
+	// pBolt->m_iDamage = iDamage;
 
 	return pBolt;
 }
@@ -243,7 +241,7 @@ void CCrossbowBolt::BoltTouch( CBaseEntity *pOther )
 
 		if( GetOwnerEntity() && GetOwnerEntity()->IsPlayer() && pOther->IsNPC() )
 		{
-			CTakeDamageInfo	dmgInfo( this, GetOwnerEntity(), m_iDamage, DMG_NEVERGIB );
+			CTakeDamageInfo	dmgInfo( this, GetOwnerEntity(), sk_plr_dmg_crossbow.GetFloat(), DMG_NEVERGIB );
 			dmgInfo.AdjustPlayerDamageInflictedForSkillLevel();
 			CalculateMeleeDamageForce( &dmgInfo, vecNormalizedVel, tr.endpos, 0.7f );
 			dmgInfo.SetDamagePosition( tr.endpos );
@@ -251,7 +249,7 @@ void CCrossbowBolt::BoltTouch( CBaseEntity *pOther )
 		}
 		else
 		{
-			CTakeDamageInfo	dmgInfo( this, GetOwnerEntity(), m_iDamage, DMG_BULLET | DMG_NEVERGIB );
+			CTakeDamageInfo	dmgInfo( this, GetOwnerEntity(), sk_plr_dmg_crossbow.GetFloat(), DMG_BULLET | DMG_NEVERGIB );
 			CalculateMeleeDamageForce( &dmgInfo, vecNormalizedVel, tr.endpos, 0.7f );
 			dmgInfo.SetDamagePosition( tr.endpos );
 			pOther->DispatchTraceAttack( dmgInfo, vecNormalizedVel, &tr );
@@ -262,6 +260,17 @@ void CCrossbowBolt::BoltTouch( CBaseEntity *pOther )
 		//Adrian: keep going through the glass.
 		if ( pOther->GetCollisionGroup() == COLLISION_GROUP_BREAKABLE_GLASS )
 			 return;
+
+		// in normal hl2 code
+		/*if ( !pOther->IsAlive() )
+		{
+			// We killed it! 
+			const surfacedata_t *pdata = physprops->GetSurfaceData( tr.surface.surfaceProps );
+			if ( pdata->game.material == CHAR_TEX_GLASS )
+			{
+				return;
+			}
+		}*/
 
 		SetAbsVelocity( Vector( 0, 0, 0 ) );
 
@@ -295,7 +304,13 @@ void CCrossbowBolt::BoltTouch( CBaseEntity *pOther )
 		SetTouch( NULL );
 		SetThink( NULL );
 
-		UTIL_Remove( this );
+		// UTIL_Remove( this );
+
+		// why does hl2dm always remove it in multiplayer
+		if ( !g_pGameRules->IsMultiplayer() )
+		{
+			UTIL_Remove( this );
+		}
 	}
 	else
 	{
@@ -436,6 +451,8 @@ public:
 	virtual bool	SendWeaponAnim( int iActivity );
 	virtual bool	IsWeaponZoomed() { return m_bInZoom; }
 
+	bool CanBePickedUpByNPCs() { return false; }
+
 #ifndef CLIENT_DLL
 	virtual void Operator_HandleAnimEvent( animevent_t *pEvent, CBaseCombatCharacter *pOperator );
 #endif
@@ -509,6 +526,7 @@ PRECACHE_WEAPON_REGISTER( weapon_crossbow );
 
 #ifndef CLIENT_DLL
 
+// NPC's can use this weapon because it's not an empty acttable, and none are required
 acttable_t	CWeaponCrossbow::m_acttable[] = 
 {
 	{ ACT_HL2MP_IDLE,					ACT_HL2MP_IDLE_CROSSBOW,					false },
@@ -688,7 +706,7 @@ void CWeaponCrossbow::FireBolt( void )
 	}
 #endif
 
-	CCrossbowBolt *pBolt = CCrossbowBolt::BoltCreate( vecSrc, angAiming, GetHL2MPWpnData().m_iPlayerDamage, pOwner );
+	CCrossbowBolt *pBolt = CCrossbowBolt::BoltCreate( vecSrc, angAiming, pOwner );
 
 	if ( pOwner->GetWaterLevel() == 3 )
 	{

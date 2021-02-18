@@ -38,6 +38,10 @@
 #define SMG1_GRENADE_DAMAGE 100.0f
 #define SMG1_GRENADE_RADIUS 250.0f
 
+ConVar sdd_npc_smg1_grenade("d_npc_smg1_grenade", "0", FCVAR_NONE);
+
+extern ConVar sk_npc_dmg_ar2_grenade;
+
 class CWeaponSMG1 : public CHL2MPMachineGun
 {
 public:
@@ -278,8 +282,9 @@ void CWeaponSMG1::Operator_HandleAnimEvent( animevent_t *pEvent, CBaseCombatChar
 		pGrenade->SetAbsVelocity( vecThrow );
 		pGrenade->SetLocalAngularVelocity( QAngle( 0, 400, 0 ) );
 		pGrenade->SetMoveType( MOVETYPE_FLYGRAVITY ); 
-		pGrenade->m_hOwner			= npc;
-		pGrenade->m_pMyWeaponAR2	= this;
+		// pGrenade->m_hOwner			= npc;
+		pGrenade->SetOwnerEntity( npc );
+		// pGrenade->m_pMyWeaponAR2	= this;
 		pGrenade->SetDamage(sk_npc_dmg_ar2_grenade.GetFloat());
 
 		// FIXME: arrgg ,this is hard coded into the weapon???

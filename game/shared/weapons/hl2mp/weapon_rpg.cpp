@@ -1698,8 +1698,6 @@ void CWeaponRPG::PrimaryAttack( void )
 		pMissile->SetGracePeriod( 0.3 );
 	}
 
-	pMissile->SetDamage( GetHL2MPWpnData().m_iPlayerDamage );
-
 	m_hMissile = pMissile;
 #endif
 

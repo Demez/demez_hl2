@@ -51,6 +51,7 @@ public:
 
 	void		Drop( const Vector &vecVelocity );
 
+	bool		CanBePickedUpByNPCs() { return false; }
 
 	// Animation event
 #ifndef CLIENT_DLL
