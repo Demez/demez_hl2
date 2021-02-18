@@ -33,6 +33,7 @@ files
 		
 		- "$ENGINE_SRC_DIR/game/client/flashlighteffect.cpp"
 		- "$ENGINE_SRC_DIR/game/client/hl2/c_waterbullet.cpp" [$ENGINE_ASW]
+		- "$ENGINE_SRC_DIR/game/client/hl2/C_WaterBullet.cpp" [$ENGINE_QUIVER]
 		- "$ENGINE_SRC_DIR/game/client/hl2/C_Func_Monitor.cpp" [$ENGINE_ASW || $ENGINE_QUIVER]
 		
 		"$ENGINE_SRC/game/client/c_team_objectiveresource.cpp"

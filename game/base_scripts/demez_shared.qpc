@@ -18,6 +18,8 @@ include "$DEMEZ_SRC_DIR/$ENGINE_FOLDER/game/$TYPE/$TYPE_base.qpc"  [$ENGINE_CSGO
 // include "$DEMEZ_SRC_DIR/$ENGINE_FOLDER/game/$TYPE/$TYPE_vr_base.qpc"  [$ENGINE_ASW && $VR]
 // include "$DEMEZ_SRC_DIR/$ENGINE_FOLDER/game/$TYPE/_$TYPE_vr_base.qpc"  [$ENGINE_QUIVER && $VR]
 
+include "$DEMEZ_SRC_DIR/game/vr_base/$TYPE_vr_base.qpc"
+
 macro GAME_FOLDER		"demez"
 macro ENGINE_SHARED		"$ENGINE_SRC/game/shared"
 macro SHARED_GAME		"$ENGINE_SHARED/$GAME_FOLDER"
@@ -31,7 +33,8 @@ configuration
 {
 	general
 	{
-		out_dir     "$GAMENAME/bin/$ENGINE_PLATFORM"
+		// out_dir     "$GAMENAME/bin/$ENGINE_PLATFORM"
+		out_dir     "$GAMENAME/bin/$ENGINE_OUT_DIR"
 		// out_dir     "$CONFIG/$PLATFORM/$FULL_GAME_NAME/$TYPE"
 		build_dir   "$CONFIG/$ENGINE_PLATFORM/$FULL_GAME_NAME/$TYPE"
 		
