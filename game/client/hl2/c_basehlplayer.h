@@ -14,13 +14,14 @@
 
 
 #include "c_baseplayer.h"
+#include "vr_cl_player.h"
 #include "c_hl2_playerlocaldata.h"
 #include "engine_defines.h"
 
-class C_BaseHLPlayer : public C_BasePlayer
+class C_BaseHLPlayer : public C_VRBasePlayer
 {
 public:
-	DECLARE_CLASS( C_BaseHLPlayer, C_BasePlayer );
+	DECLARE_CLASS( C_BaseHLPlayer, C_VRBasePlayer );
 	DECLARE_CLIENTCLASS();
 	DECLARE_PREDICTABLE();
 

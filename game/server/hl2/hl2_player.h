@@ -14,6 +14,7 @@
 #include "hl2_playerlocaldata.h"
 #include "simtimer.h"
 #include "soundenvelope.h"
+#include "vr_sv_player.h"
 #include "engine_defines.h"
 
 class CAI_Squad;
@@ -79,10 +80,10 @@ public:
 //=============================================================================
 // >> HL2_PLAYER
 //=============================================================================
-class CHL2_Player : public CBasePlayer
+class CHL2_Player : public CVRBasePlayer
 {
 public:
-	DECLARE_CLASS( CHL2_Player, CBasePlayer );
+	DECLARE_CLASS( CHL2_Player, CVRBasePlayer );
 
 	CHL2_Player();
 	~CHL2_Player( void );

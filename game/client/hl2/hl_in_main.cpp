@@ -7,6 +7,7 @@
 #include "cbase.h"
 #include "kbutton.h"
 #include "input.h"
+#include "vr_input.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -14,9 +15,12 @@
 //-----------------------------------------------------------------------------
 // Purpose: HL Input interface
 //-----------------------------------------------------------------------------
-class CHLInput : public CInput
+class CInput;
+
+class CHLInput : public CVRInput
 {
 public:
+	typedef CVRInput BaseClass;
 };
 
 static CHLInput g_Input;

@@ -544,7 +544,7 @@ void C_HL2MP_Player::ReleaseFlashlight( void )
 float C_HL2MP_Player::GetFOV( void )
 {
 	//Find our FOV with offset zoom value
-	float flFOVOffset = C_BasePlayer::GetFOV() + GetZoom();
+	float flFOVOffset = BaseClass::BaseClass::GetFOV() + GetZoom();
 
 	// Clamp FOV in MP
 	int min_fov = GetMinFOV();

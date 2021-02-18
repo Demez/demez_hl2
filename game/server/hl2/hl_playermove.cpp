@@ -14,13 +14,14 @@
 #include "hl2_player.h"
 #include "vehicle_base.h"
 #include "gamestats.h"
+#include "vr_player_move.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-class CHLPlayerMove : public CPlayerMove
+class CHLPlayerMove : public CVRPlayerMove
 {
-	DECLARE_CLASS( CHLPlayerMove, CPlayerMove );
+	DECLARE_CLASS( CHLPlayerMove, CVRPlayerMove );
 public:
 	CHLPlayerMove() :
 		m_bWasInVehicle( false ),
