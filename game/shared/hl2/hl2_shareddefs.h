@@ -16,6 +16,18 @@
 #include "engine_defines.h"
 
 
+#if ENGINE_CSGO && defined(CLIENT_DLL)
+	#define LINK_ENTITY_TO_CLASS_DUMB			LINK_ENTITY_TO_CLASS_CLIENTONLY
+#else
+	#define LINK_ENTITY_TO_CLASS_DUMB			LINK_ENTITY_TO_CLASS
+#endif
+
+#if ENGINE_ASW
+	#define LINK_ENTITY_TO_CLASS_ALIASED		LINK_ENTITY_TO_CLASS
+	#define LINK_ENTITY_TO_CLASS_CLIENTONLY		LINK_ENTITY_TO_CLASS
+#endif
+
+
 //--------------------------------------------------------------------------
 // Collision groups
 //--------------------------------------------------------------------------

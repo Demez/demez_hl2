@@ -61,7 +61,8 @@ END_NETWORK_TABLE()
 BEGIN_PREDICTION_DATA( CWeaponStunStick )
 END_PREDICTION_DATA()
 
-LINK_ENTITY_TO_CLASS( weapon_stunstick, CWeaponStunStick );
+LINK_ENTITY_TO_CLASS_DUMB( weapon_stunstick, CWeaponStunStick )
+// LINK_ENTITY_TO_CLASS_ALIASED( weapon_stunstick, WeaponStunStick );
 PRECACHE_WEAPON_REGISTER( weapon_stunstick );
 
 
@@ -806,6 +807,19 @@ void C_WeaponStunStick::DrawEffects( void )
 //-----------------------------------------------------------------------------
 // Purpose: Viewmodel was drawn
 //-----------------------------------------------------------------------------
+#if ENGINE_CSGO
+void C_WeaponStunStick::ViewModelDrawn( int flags, C_BaseViewModel *pBaseViewModel )
+{
+	// Don't bother when we're not deployed
+	if ( IsWeaponVisible() )
+	{
+		// Do all our special effects
+		DrawEffects();
+	}
+
+	BaseClass::ViewModelDrawn( flags, pBaseViewModel );
+}
+#else
 void C_WeaponStunStick::ViewModelDrawn( C_BaseViewModel *pBaseViewModel )
 {
 	// Don't bother when we're not deployed
@@ -817,6 +831,8 @@ void C_WeaponStunStick::ViewModelDrawn( C_BaseViewModel *pBaseViewModel )
 
 	BaseClass::ViewModelDrawn( pBaseViewModel );
 }
+#endif
+
 
 //-----------------------------------------------------------------------------
 // Purpose: Draw a cheap glow quad at our impact point (with sparks)

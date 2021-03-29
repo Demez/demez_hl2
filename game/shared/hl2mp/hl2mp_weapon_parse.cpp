@@ -12,6 +12,7 @@
 FileWeaponInfo_t* CreateWeaponInfo()
 {
 	return new CHL2MPSWeaponInfo;
+	// return new FileWeaponInfo_t;
 }
 
 

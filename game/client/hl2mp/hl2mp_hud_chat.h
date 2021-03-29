@@ -13,6 +13,10 @@
 
 #include <hud_basechat.h>
 
+#if ENGINE_CSGO
+#include "hl2_usermessages.pb.h"
+#endif
+
 class CHudChatLine : public CBaseHudChatLine
 {
 	DECLARE_CLASS_SIMPLE( CHudChatLine, CBaseHudChatLine );
@@ -22,9 +26,9 @@ public:
 
 	virtual void	ApplySchemeSettings(vgui::IScheme *pScheme);
 
+#if !ENGINE_CSGO
 	void			MsgFunc_SayText(bf_read &msg);
-
-
+#endif
 
 private:
 	CHudChatLine( const CHudChatLine & ); // not defined, not accessible
@@ -60,6 +64,20 @@ public:
 	int				GetChatInputOffset( void );
 
 	virtual Color	GetClientColor( int clientIndex );
+	
+#if ENGINE_CSGO
+	CUserMessageBinder m_UMCMsgSayText;
+	CUserMessageBinder m_UMCMsgSayText2;
+	CUserMessageBinder m_UMCMsgTextMsg;
+#endif
+
+/*#if ENGINE_CSGO
+	bool			MsgFunc_SayText(const CCSUsrMsg_SayText &msg);
+	CUserMessageBinder m_UMCMsgSayText;
+#else
+	void			MsgFunc_SayText(bf_read &msg);
+#endif*/
+
 };
 
 #endif	//CS_HUD_CHAT_H

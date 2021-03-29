@@ -44,6 +44,11 @@ public:
 	virtual void        DoPostScreenSpaceEffects( const CViewSetup *pSetup ) {}
 	virtual void        FireGameEvent( IGameEvent *event );
 #endif
+
+#if ENGINE_CSGO
+	virtual void OnColorCorrectionWeightsReset() {}
+	virtual float GetColorCorrectionScale() const { return 0.0f; }
+#endif
 };
 
 extern IClientMode *GetClientModeNormal();

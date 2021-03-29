@@ -1,0 +1,21 @@
+macro PROJECT_NAME "Server - Demez CSGO"
+macro ENGINE_CSGO "1"
+
+macro OUT_BIN_NAME "server"
+
+include "base_scripts/demez_server.qpc"
+
+include "demez_shared_csgo.qpc"
+
+
+files
+{
+	- "$ENGINE_SRC_DIR/game/server/logic_playerproxy.cpp"
+	- "$ENGINE_SRC_DIR/game/server/ai_activity.cpp"
+	
+	"server/ai_activity.cpp"
+	
+	folder "CSGO Branch Only"
+	{
+	}
+}

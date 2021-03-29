@@ -10,21 +10,21 @@ macro ENGINE_CSGO   "0" [!$ENGINE_CSGO]
 macro ENGINE_FOLDER "branches/quiver/src"   [$ENGINE_QUIVER]
 macro ENGINE_FOLDER "branches/2013/src"     [$ENGINE_2013]
 macro ENGINE_FOLDER "branches/asw"          [$ENGINE_ASW]
-macro ENGINE_FOLDER "branches/csgo"         [$ENGINE_CSGO] // private repo currently
+macro ENGINE_FOLDER "branches/cstrike15/cstrike15"         [$ENGINE_CSGO] // private repo currently
 
 macro ENGINE_TRAILBACK "../../.."           [$ENGINE_QUIVER || $ENGINE_2013 || $ENGINE_ASW]
 macro ENGINE_TRAILBACK "../.."              [$ENGINE_CSGO]
 
 // kind of hardcoded, but only used in debug options
 macro ENGINE_GAME "$ROOT_DIR_ABS\branches\quiver\game"     [$ENGINE_QUIVER]
-macro ENGINE_GAME "$ROOT_DIR_ABS\branches\csgo\game"       [$ENGINE_CSGO]
+macro ENGINE_GAME "$ROOT_DIR_ABS\branches\cstrike15\game"       [$ENGINE_CSGO]
 macro ENGINE_GAME "C:\Program Files (x86)\Steam\steamapps\common\Source SDK Base 2013 Multiplayer"  [$ENGINE_2013 && $WINDOWS]
 macro ENGINE_GAME "C:\Program Files (x86)\Steam\steamapps\common\Alien Swarm"                       [$ENGINE_ASW && $WINDOWS]
 
 macro ENGINE_EXE "$ENGINE_GAME\bin\$PLAT_DIR\quiver.exe"	[$ENGINE_QUIVER]
 macro ENGINE_EXE "$ENGINE_GAME\hl2.exe"     [$ENGINE_2013]
 macro ENGINE_EXE "$ENGINE_GAME\swarm.exe"   [$ENGINE_ASW]
-macro ENGINE_EXE "$ENGINE_GAME\csgo.exe"    [$ENGINE_CSGO]
+macro ENGINE_EXE "$ENGINE_GAME\default.exe"    [$ENGINE_CSGO]
 
 macro ENGINE_OUT_NAME "quiver"              [$ENGINE_QUIVER]
 macro ENGINE_OUT_NAME "2013"                [$ENGINE_2013]
@@ -43,5 +43,12 @@ macro ENGINE_SRC "$DEMEZ_SRC_DIR/$ENGINE_FOLDER"
 macro ENGINE_SRC_DIR "$SRC_DIR"             [$ENGINE_CSGO || $ENGINE_ASW]
 macro ENGINE_SRC_DIR "$SRCDIR"              [$ENGINE_QUIVER || $ENGINE_2013]
 
+macro ENGINE_ROOT_DIR "$ROOT_DIR/$ENGINE_FOLDER"
+
 macro QPC_CONFIG "$CONFIG"
+
+macro SRCDIR "$DEMEZ_SRC_DIR/$ENGINE_FOLDER"         [$ENGINE_QUIVER || $ENGINE_2013]
+macro SRC_DIR "$DEMEZ_SRC_DIR/$ENGINE_FOLDER"        [$ENGINE_ASW || $ENGINE_CSGO]
+macro SRC_DIR_ABS "$ROOT_DIR_ABS/game/$SRC_DIR"
+
 

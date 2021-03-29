@@ -50,7 +50,13 @@ public:
 	virtual void VidInit( void );
 	virtual void Reset( void );
 	virtual void OnThink();
-			void MsgFunc_Damage( bf_read &msg );
+
+#if ENGINE_CSGO
+	bool MsgFunc_Damage( const CCSUsrMsg_Damage &msg );
+	CUserMessageBinder m_UMCMsgDamage;
+#else
+	void MsgFunc_Damage( bf_read &msg );
+#endif
 
 private:
 	// old variables
@@ -145,6 +151,31 @@ void CHudHealth::OnThink()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
+#if ENGINE_CSGO
+bool CHudHealth::MsgFunc_Damage( const CCSUsrMsg_Damage &msg )
+{
+	int armor = 0; // msg.ReadByte();	// armor
+	int damageTaken = msg.amount();	// health
+	long bitsDamage = 0; // msg.ReadLong(); // damage bits
+
+	Vector vecFrom;
+	vecFrom.x = msg.inflictor_world_pos().x();
+	vecFrom.y = msg.inflictor_world_pos().y();
+	vecFrom.z = msg.inflictor_world_pos().z();
+
+	// Actually took damage?
+	if ( damageTaken > 0 || armor > 0 )
+	{
+		if ( damageTaken > 0 )
+		{
+			// start the animation
+			GetClientMode()->GetViewportAnimationController()->StartAnimationSequence("HealthDamageTaken");
+		}
+	}
+
+	return true;
+}
+#else
 void CHudHealth::MsgFunc_Damage( bf_read &msg )
 {
 
@@ -169,3 +200,4 @@ void CHudHealth::MsgFunc_Damage( bf_read &msg )
 		}
 	}
 }
+#endif

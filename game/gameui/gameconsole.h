@@ -43,6 +43,10 @@ public:
 	void SetParent( int parent );
 
 	static void OnCmdCondump();
+
+	// hides and deletes panel
+	void Shutdown( void ) {}
+
 private:
 
 	bool m_bInitialized;

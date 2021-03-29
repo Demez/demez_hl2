@@ -8,6 +8,11 @@
 #include "props.h"
 #include "items.h"
 #include "item_dynamic_resupply.h"
+#include "demez_items.h"
+#include "hl2mp_gamerules.h"
+#include "vehicle_base.h"
+#include "explode.h"
+#include "ai_basenpc.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -21,11 +26,15 @@ const char *pszItemCrateModelName[] =
 //-----------------------------------------------------------------------------
 // A breakable crate that drops items
 //-----------------------------------------------------------------------------
-class CItem_ItemCrate : public CPhysicsProp
+class CItem_ItemCrate : public CPhysicsProp // , CRespawnableEntity
+// class CItem_ItemCrate : public CDemezItem
 {
 public:
 	DECLARE_CLASS( CItem_ItemCrate, CPhysicsProp );
+	// DECLARE_CLASS( CItem_ItemCrate, CDemezItem );
 	DECLARE_DATADESC();
+
+	~CItem_ItemCrate();
 
 	void Precache( void );
 	void Spawn( void );
@@ -33,11 +42,13 @@ public:
 	virtual int	ObjectCaps() { return BaseClass::ObjectCaps() | FCAP_WCEDIT_POSITION; };
 
 	virtual int		OnTakeDamage( const CTakeDamageInfo &info );
+	virtual void	Event_Killed( const CTakeDamageInfo &info );
 
 	void InputKill( inputdata_t &data );
 
 	virtual void VPhysicsCollision( int index, gamevcollisionevent_t *pEvent );
 	virtual void OnPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunPickup_t reason );
+	virtual void Break( CBaseEntity *pBreaker, const CTakeDamageInfo &info );
 
 protected:
 	virtual void OnBreak( const Vector &vecVelocity, const AngularImpulse &angVel, CBaseEntity *pBreaker );
@@ -64,6 +75,8 @@ private:
 	CrateAppearance_t	m_CrateAppearance;
 
 	COutputEvent m_OnCacheInteraction;
+
+	bool m_bShouldRemoveOnKill = true;
 };
 
 
@@ -84,6 +97,11 @@ BEGIN_DATADESC( CItem_ItemCrate )
 	DEFINE_OUTPUT( m_OnCacheInteraction, "OnCacheInteraction" ),
 
 END_DATADESC()
+
+
+CItem_ItemCrate::~CItem_ItemCrate()
+{
+}
 
 
 //-----------------------------------------------------------------------------
@@ -110,7 +128,7 @@ void CItem_ItemCrate::Precache( void )
 // Purpose: 
 //-----------------------------------------------------------------------------
 void CItem_ItemCrate::Spawn( void )
-{ 
+{
 	if ( g_pGameRules->IsAllowedToSpawn( this ) == false )
 	{
 		UTIL_Remove( this );
@@ -131,6 +149,16 @@ void CItem_ItemCrate::Spawn( void )
 	SetModel( pszItemCrateModelName[m_CrateAppearance] );
 	AddEFlags( EFL_NO_ROTORWASH_PUSH );
 	BaseClass::Spawn( );
+
+	if ( V_strcmp(m_strItemClass.ToCStr(), "item_dynamic_resupply") == 0 )
+	{
+		m_bShouldRemoveOnKill = false;
+		HL2MPRules()->AddRespawnableEntity( this );
+		// SetRemoveOnBreak( false );
+	}
+
+	if ( IsEffectActive( EF_NODRAW ))
+		RemoveEffects( EF_NODRAW );
 }
 
 
@@ -157,6 +185,39 @@ int CItem_ItemCrate::OnTakeDamage( const CTakeDamageInfo &info )
 	}
 
 	return BaseClass::OnTakeDamage( info );
+}
+
+
+//-----------------------------------------------------------------------------
+// Don't remove the crate
+//-----------------------------------------------------------------------------
+void CItem_ItemCrate::Event_Killed( const CTakeDamageInfo &info )
+{
+	if( info.GetAttacker() )
+	{
+		info.GetAttacker()->Event_KilledOther(this, info);
+	}
+
+	IPhysicsObject *pPhysics = VPhysicsGetObject();
+	if ( pPhysics && !pPhysics->IsMoveable() )
+	{
+		pPhysics->EnableMotion( true );
+		VPhysicsTakeDamage( info );
+	}
+
+	Break( info.GetInflictor(), info );
+
+	if ( m_bShouldRemoveOnKill )
+	{
+		m_takedamage = DAMAGE_NO;
+		m_lifeState = LIFE_DEAD;
+
+		UTIL_Remove( this );
+	}
+	else
+	{
+		AddEffects( EF_NODRAW );
+	}
 }
 
 
@@ -233,6 +294,12 @@ void CItem_ItemCrate::OnBreak( const Vector &vecVelocity, const AngularImpulse &
 			pItem->ActivateWhenAtRest();
 		}
 
+		/*CDemezItem *pDemezItem = dynamic_cast<CDemezItem*>(pSpawn);
+		if ( pDemezItem )
+		{
+			pDemezItem->m_bCanRespawn = false;
+		}*/
+
 		pSpawn->Spawn();
 
 		// Avoid missing items drops by a dynamic resupply because they don't think immediately
@@ -249,6 +316,8 @@ void CItem_ItemCrate::OnBreak( const Vector &vecVelocity, const AngularImpulse &
 			pSpawn->SetNextThink( gpGlobals->curtime );
 		}
 	}
+
+	HL2MPRules()->SetEntityNeedsRespawn( this, true );
 }
 
 void CItem_ItemCrate::OnPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunPickup_t reason )
@@ -272,5 +341,239 @@ void CItem_ItemCrate::OnPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunPickup_
 		}
 
 		TakeDamage( CTakeDamageInfo( pPhysGunUser, pPhysGunUser, GetHealth(), DMG_GENERIC ) );
+	}
+}
+
+
+extern int g_BreakPropEvent;
+void CItem_ItemCrate::Break( CBaseEntity *pBreaker, const CTakeDamageInfo &info )
+{
+	const char *pModelName = STRING( GetModelName() );
+	if ( pModelName && Q_stristr( pModelName, "crate" ) )
+	{
+		bool bSmashed = false;
+		if ( pBreaker && pBreaker->IsPlayer() )
+		{
+			bSmashed = true;
+		}
+		else if ( m_hPhysicsAttacker.Get() && m_hPhysicsAttacker->IsPlayer() )
+		{
+			bSmashed = true;
+		}
+		else if ( pBreaker && dynamic_cast< CPropVehicleDriveable * >( pBreaker ) )
+		{
+			CPropVehicleDriveable *veh = static_cast< CPropVehicleDriveable * >( pBreaker );
+			CBaseEntity *driver = veh->GetDriver();
+			if ( driver && driver->IsPlayer() )
+			{
+				bSmashed = true;
+			}
+		}
+		if ( bSmashed )
+		{
+			// gamestats->Event_CrateSmashed();
+		}
+	}
+
+	IGameEvent * event = gameeventmanager->CreateEvent( "break_prop", false, &g_BreakPropEvent );
+
+	if ( event )
+	{
+		if ( pBreaker && pBreaker->IsPlayer() )
+		{
+			event->SetInt( "userid", ToBasePlayer( pBreaker )->GetUserID() );
+		}
+		else
+		{
+			event->SetInt( "userid", 0 );
+		}
+		event->SetInt( "entindex", entindex() );
+		gameeventmanager->FireEvent( event );
+	}
+
+	m_takedamage = DAMAGE_NO;
+	m_OnBreak.FireOutput( pBreaker, this );
+
+	Vector velocity;
+	AngularImpulse angVelocity;
+	IPhysicsObject *pPhysics = GetRootPhysicsObjectForBreak();
+
+	Vector origin;
+	QAngle angles;
+	AddSolidFlags( FSOLID_NOT_SOLID );
+	if ( pPhysics )
+	{
+		pPhysics->GetVelocity( &velocity, &angVelocity );
+		pPhysics->GetPosition( &origin, &angles );
+		pPhysics->RecheckCollisionFilter();
+	}
+	else
+	{
+		velocity = GetAbsVelocity();
+		QAngleToAngularImpulse( GetLocalAngularVelocity(), angVelocity );
+		origin = GetAbsOrigin();
+		angles = GetAbsAngles();
+	}
+
+	PhysBreakSound( this, VPhysicsGetObject(), GetAbsOrigin() );
+
+	bool bExploded = false;
+
+	CBaseEntity *pAttacker = info.GetAttacker();
+	if ( m_hLastAttacker )
+	{
+		// Pass along the person who made this explosive breakable explode.
+		// This way the player allies can get immunity from barrels exploded by the player.
+		pAttacker = m_hLastAttacker;
+	}
+	else if( m_hPhysicsAttacker )
+	{
+		// If I have a physics attacker and was influenced in the last 2 seconds,
+		// Make the attacker my physics attacker. This helps protect citizens from dying
+		// in the explosion of a physics object that was thrown by the player's physgun
+		// and exploded on impact.
+		if( gpGlobals->curtime - m_flLastPhysicsInfluenceTime <= 2.0f )
+		{
+			pAttacker = m_hPhysicsAttacker;
+		}
+	}
+
+	if ( m_explodeDamage > 0 || m_explodeRadius > 0 )
+	{
+		if( HasInteraction( PROPINTER_PHYSGUN_BREAK_EXPLODE ) )
+		{
+			ExplosionCreate( WorldSpaceCenter(), angles, pAttacker, m_explodeDamage, m_explodeRadius, 
+							SF_ENVEXPLOSION_NOSPARKS | SF_ENVEXPLOSION_NODLIGHTS | SF_ENVEXPLOSION_NOSMOKE | SF_ENVEXPLOSION_SURFACEONLY | SF_ENVEXPLOSION_NOSOUND,
+							0.0f, this );
+			EmitSound("PropaneTank.Burst");
+		}
+		else if( HasInteraction( PROPINTER_PHYSGUN_BREAK_EXPLODE_ICE ) )
+		{
+			ExplosionCreate( WorldSpaceCenter(), angles, pAttacker, m_explodeDamage, m_explodeRadius, 
+							SF_ENVEXPLOSION_NODAMAGE | SF_ENVEXPLOSION_NOSPARKS | SF_ENVEXPLOSION_NODLIGHTS | SF_ENVEXPLOSION_NOSMOKE | SF_ENVEXPLOSION_SURFACEONLY | SF_ENVEXPLOSION_NOSOUND | SF_ENVEXPLOSION_ICE,
+							0.0f, this );
+			EmitSound("PropaneTank.Burst");
+		}
+		else
+		{
+
+			float flScale = 1.0f;
+
+			ExplosionCreate( WorldSpaceCenter(), angles, pAttacker, m_explodeDamage * flScale, m_explodeRadius * flScale,
+							SF_ENVEXPLOSION_NOSPARKS | SF_ENVEXPLOSION_NODLIGHTS | SF_ENVEXPLOSION_NOSMOKE | SF_ENVEXPLOSION_SURFACEONLY,
+							0.0f, this );
+		}
+
+		bExploded = true;
+	}
+
+	// Allow derived classes to emit special things
+	OnBreak( velocity, angVelocity, pBreaker );
+
+	breakablepropparams_t params( origin, angles, velocity, angVelocity );
+	params.impactEnergyScale = m_impactEnergyScale;
+	params.defCollisionGroup = GetCollisionGroup();
+	if ( params.defCollisionGroup == COLLISION_GROUP_NONE )
+	{
+		// don't automatically make anything COLLISION_GROUP_NONE or it will
+		// collide with debris being ejected by breaking
+		params.defCollisionGroup = COLLISION_GROUP_INTERACTIVE;
+	}
+
+	params.defBurstScale = 100;
+	// in multiplayer spawn break models as clientside temp ents
+
+	if ( gpGlobals->maxClients > 1 /*&& breakable_multiplayer.GetBool()*/ )
+	{
+		CPASFilter filter( WorldSpaceCenter() );
+
+		Vector velocity; velocity.Init();
+
+		if ( pPhysics )
+			pPhysics->GetVelocity( &velocity, NULL );
+
+		switch ( GetMultiplayerBreakMode() )
+		{
+		case MULTIPLAYER_BREAK_DEFAULT:		// default is to break client-side
+		case MULTIPLAYER_BREAK_CLIENTSIDE:
+#if ENGINE_CSGO
+			te->PhysicsProp( filter, -1, GetModelIndex(), m_nSkin, GetAbsOrigin(), GetAbsAngles(), velocity, true, GetEffects(), GetRenderColor()  );
+#else
+			te->PhysicsProp( filter, -1, GetModelIndex(), m_nSkin, GetAbsOrigin(), GetAbsAngles(), velocity, true, GetEffects() );
+#endif
+			break;
+		case MULTIPLAYER_BREAK_SERVERSIDE:	// server-side break
+			if ( m_PerformanceMode != PM_NO_GIBS /*|| breakable_disable_gib_limit.GetBool()*/ )
+			{
+				PropBreakableCreateAll( GetModelIndex(), pPhysics, params, this, -1, ( m_PerformanceMode == PM_FULL_GIBS ), false );
+			}
+			break;
+		case MULTIPLAYER_BREAK_BOTH:	// pieces break from both dlls
+#if ENGINE_CSGO
+			te->PhysicsProp( filter, -1, GetModelIndex(), m_nSkin, GetAbsOrigin(), GetAbsAngles(), velocity, true, GetEffects(), GetRenderColor()  );
+#else
+			te->PhysicsProp( filter, -1, GetModelIndex(), m_nSkin, GetAbsOrigin(), GetAbsAngles(), velocity, true, GetEffects() );
+#endif
+			if ( m_PerformanceMode != PM_NO_GIBS /*|| breakable_disable_gib_limit.GetBool()*/ )
+			{
+				PropBreakableCreateAll( GetModelIndex(), pPhysics, params, this, -1, ( m_PerformanceMode == PM_FULL_GIBS ), false );
+			}
+			break;
+		}
+	}
+	// no damage/damage force? set a burst of 100 for some movement
+	else if ( m_PerformanceMode != PM_NO_GIBS /*|| breakable_disable_gib_limit.GetBool()*/ )
+	{
+		PropBreakableCreateAll( GetModelIndex(), pPhysics, params, this, -1, ( m_PerformanceMode == PM_FULL_GIBS ) );
+	}
+
+	if( HasInteraction( PROPINTER_PHYSGUN_BREAK_EXPLODE ) )
+	{
+		if ( bExploded == false )
+		{
+			ExplosionCreate( origin, angles, pAttacker, 1, m_explodeRadius, 
+							SF_ENVEXPLOSION_NODAMAGE | SF_ENVEXPLOSION_NOSPARKS | SF_ENVEXPLOSION_NODLIGHTS | SF_ENVEXPLOSION_NOSMOKE, 0.0f, this );			
+		}
+
+		// Find and ignite all NPC's within the radius
+		CBaseEntity *pEntity = NULL;
+		for ( CEntitySphereQuery sphere( origin, m_explodeRadius ); ( pEntity = sphere.GetCurrentEntity() ) != NULL; sphere.NextEntity() )
+		{
+			if( pEntity && pEntity->MyCombatCharacterPointer() )
+			{
+				// Check damage filters so we don't ignite friendlies
+				if ( pEntity->PassesDamageFilter( info ) )
+				{
+					pEntity->MyCombatCharacterPointer()->Ignite( 30 );
+				}
+			}
+		}
+	}
+
+	if( HasInteraction( PROPINTER_PHYSGUN_BREAK_EXPLODE_ICE ) )
+	{
+		if ( bExploded == false )
+		{
+			ExplosionCreate( origin, angles, pAttacker, 1, m_explodeRadius, 
+							SF_ENVEXPLOSION_NOSPARKS | SF_ENVEXPLOSION_NODLIGHTS | SF_ENVEXPLOSION_NOSMOKE | SF_ENVEXPLOSION_ICE, 0.0f, this );			
+		}
+
+		// Find and freeze all NPC's within the radius
+		CBaseEntity *pEntity = NULL;
+		for ( CEntitySphereQuery sphere( origin, m_explodeRadius ); ( pEntity = sphere.GetCurrentEntity() ) != NULL; sphere.NextEntity() )
+		{
+			if( pEntity && pEntity->MyCombatCharacterPointer() )
+			{
+				// Check damage filters so we don't ignite friendlies
+				if ( pEntity->PassesDamageFilter( info ) )
+				{
+					CAI_BaseNPC *pNPC = dynamic_cast<CAI_BaseNPC*>( pEntity );
+					if ( pNPC )
+					{
+						pNPC->Freeze( 4.0f, pAttacker );
+					}
+				}
+			}
+		}
 	}
 }

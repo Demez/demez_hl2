@@ -3477,7 +3477,12 @@ void CNPC_Hunter::StartTask( const Task_t *pTask )
 		case TASK_HUNTER_STAGGER:
 		{
 			// Stagger in the direction the impact force would push us.
+			#if 1 //  ENGINE_CSGO
+			VMatrix worldToLocalRotation( EntityToWorldTransform() );
+			#else
 			VMatrix worldToLocalRotation = EntityToWorldTransform();
+			#endif
+
 			Vector vecLocalStaggerDir = worldToLocalRotation.InverseTR().ApplyRotation( m_vecStaggerDir );
 			
 			float flStaggerYaw = VecToYaw( vecLocalStaggerDir );

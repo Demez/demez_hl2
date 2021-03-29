@@ -10,6 +10,7 @@
 
 CDemezItem::CDemezItem()
 {
+	m_bCanRespawn = true;
 }
 
 CDemezItem::~CDemezItem()
@@ -27,6 +28,12 @@ void CDemezItem::Spawn()
 
 	SetThink( &CDemezItem::FallThink );
 	SetNextThink( gpGlobals->curtime + 0.1f );
+}
+
+
+bool CDemezItem::CanRespawn()
+{
+	return m_bCanRespawn;
 }
 
 

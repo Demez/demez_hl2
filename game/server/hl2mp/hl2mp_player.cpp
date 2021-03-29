@@ -30,7 +30,7 @@
 // memdbgon must be the last include file in a .cpp file!!!
 // #include "tier0/memdbgon.h"
 
-static ConVar demez_flashlight("demez_sv_flashlight", "1", FCVAR_ARCHIVE, "Allow flashlights");
+static ConVar demez_flashlight("d_sv_flashlight", "1", FCVAR_ARCHIVE, "Allow flashlights");
 
 int g_iLastCitizenModel = 0;
 int g_iLastCombineModel = 0;
@@ -65,6 +65,25 @@ END_SEND_TABLE()
 
 BEGIN_DATADESC( CHL2MP_Player )
 END_DATADESC()
+
+
+BEGIN_ENT_SCRIPTDESC( CHL2MP_Player, CBaseEntity, "HL2MP Player" )
+
+	// DEFINE_SCRIPTFUNC_NAMED( ScriptGetAttachmentOrigin, "GetAttachmentOrigin", "Get the attachement id's origin vector"  )
+
+	DEFINE_SCRIPTFUNC( EquipSuit, "Equip the suit"  )
+	DEFINE_SCRIPTFUNC( RemoveSuit, "Remove the suit"  )
+
+	DEFINE_SCRIPTFUNC_NAMED( ScriptGiveNamedItem, "GiveNamedItem", "Give an item to the player"  )
+	DEFINE_SCRIPTFUNC_NAMED( ScriptGiveAmmo, "GiveAmmo", "Give ammo to the player"  )
+
+END_SCRIPTDESC();
+
+
+// make this a convar later maybe idk
+#define DEFAULT_MODEL "models/humans/group03/male_07.mdl"
+#define DEFAULT_TEAM TEAM_REBELS
+
 
 const char *g_ppszRandomCitizenModels[] = 
 {
@@ -116,16 +135,58 @@ CHL2MP_Player::CHL2MP_Player() : m_PlayerAnimState( this )
     m_bEnterObserver = false;
 	m_bReady = false;
 	m_bChangedLevel = false;
+	m_bInTransition = false;
 
 	BaseClass::ChangeTeam( 0 );
 	
 	// UseClientSideAnimation();
+
+	m_iszVScripts = MAKE_STRING("player.nut");
 }
 
 CHL2MP_Player::~CHL2MP_Player( void )
 {
 
 }
+
+
+bool CHL2MP_Player::ScriptGiveNamedItem( const char *szName )
+{
+	return (GiveNamedItem( szName ) != NULL);
+}
+
+
+int CHL2MP_Player::ScriptGiveAmmo( int iCount, const char *szName, bool bSuppressSound )
+{
+	return GiveAmmo( iCount, szName, bSuppressSound );
+}
+
+
+void CHL2MP_Player::RunOnPostSpawnScripts( void )
+{
+	/*if( m_iszVScripts == NULL_STRING )
+	{
+		return;
+	}*/
+
+	HSCRIPT hFuncConnect = g_pScriptVM->LookupFunction("ConnectOutputs");
+	if ( hFuncConnect )
+	{
+		g_pScriptVM->Call( hFuncConnect, NULL, true, NULL, (HSCRIPT)m_ScriptScope );
+		g_pScriptVM->ReleaseFunction( hFuncConnect );
+	}
+
+	HSCRIPT hFuncDisp = m_ScriptScope.LookupFunction( "DispatchOnPostSpawn" );
+	if ( hFuncDisp )
+	{
+		variant_t variant;
+		variant.SetString( MAKE_STRING("DispatchOnPostSpawn") );
+		g_EventQueue.AddEvent( this, "CallScriptFunction", variant, 0, this, this );
+		m_ScriptScope.ReleaseFunction( hFuncDisp );
+
+	}
+}
+
 
 void CHL2MP_Player::UpdateOnRemove( void )
 {
@@ -206,6 +267,9 @@ void CHL2MP_Player::GiveDefaultItems( void )
 	// TODO: store the players items when they die, and give them their previous items if they were in coop
 	// or are we able to just not remove the players items?
 
+	// vscript handles this now
+	return;
+
 	EquipSuit();
 
 	CBasePlayer::GiveAmmo( 255,	"Pistol");
@@ -242,6 +306,7 @@ void CHL2MP_Player::GiveDefaultItems( void )
 	}
 }
 
+
 // Save all the items, weapons, and ammo the player has, used in respawning
 void CHL2MP_Player::SaveCurrentWeapons( void )
 {
@@ -269,7 +334,10 @@ void CHL2MP_Player::HACK_GiveDefaultItems( void )
 
 void CHL2MP_Player::PickDefaultSpawnTeam( void )
 {
-	if ( GetTeamNumber() == 0 )
+	// nuke teams?
+	ChangeTeam( TEAM_REBELS );
+
+	/*if ( GetTeamNumber() == 0 )
 	{
 		if ( HL2MPRules()->IsTeamplay() == false )
 		{
@@ -282,7 +350,7 @@ void CHL2MP_Player::PickDefaultSpawnTeam( void )
 				{
 					char szReturnString[512];
 
-					Q_snprintf( szReturnString, sizeof (szReturnString ), "cl_playermodel models/combine_soldier.mdl\n" );
+					Q_snprintf( szReturnString, sizeof (szReturnString ), "cl_playermodel " DEFAULT_MODEL "\n" );
 					engine->ClientCommand ( edict(), szReturnString );
 				}
 
@@ -314,7 +382,7 @@ void CHL2MP_Player::PickDefaultSpawnTeam( void )
 				}
 			}
 		}
-	}
+	}*/
 }
 
 //-----------------------------------------------------------------------------
@@ -327,6 +395,11 @@ void CHL2MP_Player::Spawn(void)
 
 	PickDefaultSpawnTeam();
 
+	m_iszVScripts = MAKE_STRING("player.nut");
+
+	RunVScripts();
+	RunPrecacheScripts();
+
 	BaseClass::Spawn();
 
 	if ( !IsObserver() )
@@ -336,7 +409,7 @@ void CHL2MP_Player::Spawn(void)
 
 		RemoveEffects( EF_NODRAW );
 		
-		if (HL2MPRules()->IsDeathmatch() || !m_bChangedLevel)
+		if ( HL2MPRules()->IsDeathmatch() )
 			GiveDefaultItems();
 	}
 
@@ -369,6 +442,10 @@ void CHL2MP_Player::Spawn(void)
 	SetPlayerUnderwater(false);
 
 	m_bReady = false;
+
+	CreateVPhysics();
+
+	RunOnPostSpawnScripts();
 }
 
 bool CHL2MP_Player::ValidatePlayerModel( const char *pModel )
@@ -406,8 +483,8 @@ void CHL2MP_Player::SetPlayerTeamModel( void )
 
 	if ( modelIndex == -1 || ValidatePlayerModel( szModelName ) == false )
 	{
-		szModelName = "models/Combine_Soldier.mdl";
-		m_iModelType = TEAM_COMBINE;
+		szModelName = DEFAULT_MODEL;
+		m_iModelType = DEFAULT_TEAM;
 
 		char szReturnString[512];
 
@@ -459,7 +536,7 @@ void CHL2MP_Player::SetPlayerModel( void )
 
 		if ( ValidatePlayerModel( pszCurrentModelName ) == false )
 		{
-			pszCurrentModelName = "models/Combine_Soldier.mdl";
+			pszCurrentModelName = DEFAULT_MODEL;
 		}
 
 		Q_snprintf( szReturnString, sizeof (szReturnString ), "cl_playermodel %s\n", pszCurrentModelName );
@@ -468,16 +545,7 @@ void CHL2MP_Player::SetPlayerModel( void )
 		szModelName = pszCurrentModelName;
 	}
 
-	if ( GetTeamNumber() == TEAM_COMBINE )
-	{
-		int nHeads = ARRAYSIZE( g_ppszRandomCombineModels );
-		
-		g_iLastCombineModel = ( g_iLastCombineModel + 1 ) % nHeads;
-		szModelName = g_ppszRandomCombineModels[g_iLastCombineModel];
-
-		m_iModelType = TEAM_COMBINE;
-	}
-	else if ( GetTeamNumber() == TEAM_REBELS )
+	if ( GetTeamNumber() == TEAM_REBELS )
 	{
 		int nHeads = ARRAYSIZE( g_ppszRandomCitizenModels );
 
@@ -507,8 +575,8 @@ void CHL2MP_Player::SetPlayerModel( void )
 
 	if ( modelIndex == -1 )
 	{
-		szModelName = "models/Combine_Soldier.mdl";
-		m_iModelType = TEAM_COMBINE;
+		szModelName = DEFAULT_MODEL;
+		m_iModelType = DEFAULT_TEAM;
 
 		char szReturnString[512];
 

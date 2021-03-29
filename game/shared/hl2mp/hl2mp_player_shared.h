@@ -11,6 +11,7 @@
 
 #define HL2MP_PUSHAWAY_THINK_INTERVAL		(1.0f / 20.0f)
 #include "studio.h"
+#include "hl2_shareddefs.h"
 
 enum
 {

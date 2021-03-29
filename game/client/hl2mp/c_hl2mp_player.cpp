@@ -15,13 +15,14 @@
 #include "flashlighteffect.h"			// actual flashlight, convar toggle
 #include "r_efx.h"
 #include "dlight.h"
+#include "hl2_shareddefs.h"
 
 // Don't alias here
 #if defined( CHL2MP_Player )
 #undef CHL2MP_Player	
 #endif
 
-LINK_ENTITY_TO_CLASS( player, C_HL2MP_Player );
+LINK_ENTITY_TO_CLASS_CLIENTONLY( player, C_HL2MP_Player );
 
 IMPLEMENT_CLIENTCLASS_DT(C_HL2MP_Player, DT_HL2MP_Player, CHL2MP_Player)
 	RecvPropFloat( RECVINFO( m_angEyeAngles[0] ) ),
@@ -44,7 +45,7 @@ END_PREDICTION_DATA()
 static ConVar cl_playermodel( "cl_playermodel", "none", FCVAR_USERINFO | FCVAR_ARCHIVE | FCVAR_SERVER_CAN_EXECUTE, "Default Player Model");
 static ConVar cl_defaultweapon( "cl_defaultweapon", "weapon_physcannon", FCVAR_USERINFO | FCVAR_ARCHIVE, "Default Spawn Weapon");
 
-static ConVar demez_cl_flashlight( "demez_cl_flashlight", "1", FCVAR_ARCHIVE, "Use better flashlight or awful beam flashlight");
+static ConVar demez_cl_flashlight( "d_cl_flashlight", "1", FCVAR_ARCHIVE, "Use better flashlight or awful beam flashlight");
 
 void SpawnBlood (Vector vecSpot, const Vector &vecDir, int bloodColor, float flDamage);
 
@@ -233,6 +234,8 @@ void C_HL2MP_Player::UpdateLookAt( void )
 
 void C_HL2MP_Player::ClientThink( void )
 {
+	C_VRBasePlayer::ClientThink();
+
 	bool bFoundViewTarget = false;
 	
 	Vector vForward;
@@ -563,7 +566,7 @@ Vector C_HL2MP_Player::GetAutoaimVector( float flDelta )
 {
 	// Never autoaim a predicted weapon (for now)
 	Vector	forward;
-	AngleVectors( EyeAngles() + m_Local.m_vecPunchAngle, &forward );
+	AngleVectors( EyeAngles() + GetAimPunchAngle(), &forward );
 	return	forward;
 }
 
@@ -723,7 +726,7 @@ void C_HL2MP_Player::CalcView( Vector &eyeOrigin, QAngle &eyeAngles, float &zNea
 		AngleVectors( eyeAngles, &vForward );
 
 		VectorNormalize( vForward );
-#if ENGINE_QUIVER || ENGINE_ASW
+#if ENGINE_QUIVER || ENGINE_NEW
 		VectorMA( origin, -CHASE_CAM_DISTANCE, vForward, eyeOrigin );
 #elif ENGINE_2013
 		VectorMA( origin, -CHASE_CAM_DISTANCE_MAX, vForward, eyeOrigin );

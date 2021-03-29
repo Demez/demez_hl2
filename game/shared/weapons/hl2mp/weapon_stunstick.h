@@ -45,7 +45,12 @@ public:
 	virtual int				DrawModel( int flags RENDER_INSTANCE_INPUT );
 	virtual void			ClientThink( void );
 	virtual void			OnDataChanged( DataUpdateType_t updateType );
+
+#if ENGINE_CSGO
+	virtual void			ViewModelDrawn( int flags, C_BaseViewModel *pBaseViewModel );
+#else
 	virtual void			ViewModelDrawn( C_BaseViewModel *pBaseViewModel );
+#endif
 
 #if ENGINE_OLD
 	// Purpose: Tells us we're always a translucent entity

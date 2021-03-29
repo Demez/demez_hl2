@@ -40,8 +40,14 @@ public:
 	void Reset( void );
 	virtual bool ShouldDraw( void );
 
-	// Handler for our message
+#if ENGINE_CSGO
+	bool MsgFunc_Damage( const CCSUsrMsg_Damage &msg );
+	CUserMessageBinder m_UMCMsgDamage;
+#else
 	void MsgFunc_Damage( bf_read &msg );
+#endif
+
+	void HandleDamage( int armor, int damageTaken, long bitsDamage, Vector& vecFrom );
 
 private:
 	virtual void Paint();
@@ -321,9 +327,24 @@ void CHudDamageIndicator::Paint()
 	DrawDamageIndicator(1);
 }
 
-//-----------------------------------------------------------------------------
-// Purpose: Message handler for Damage message
-//-----------------------------------------------------------------------------
+
+#if ENGINE_CSGO
+bool CHudDamageIndicator::MsgFunc_Damage( const CCSUsrMsg_Damage &msg )
+{
+	int armor = 0; // msg.ReadByte();	// armor
+	int damageTaken = msg.amount();	// health
+	long bitsDamage = 0; // msg.ReadLong(); // damage bits
+
+	Vector vecFrom;
+	vecFrom.x = msg.inflictor_world_pos().x();
+	vecFrom.y = msg.inflictor_world_pos().y();
+	vecFrom.z = msg.inflictor_world_pos().z();
+
+	HandleDamage( armor, damageTaken, bitsDamage, vecFrom );
+
+	return true;
+}
+#else
 void CHudDamageIndicator::MsgFunc_Damage( bf_read &msg )
 {
 	int armor = msg.ReadByte();	// armor
@@ -336,6 +357,16 @@ void CHudDamageIndicator::MsgFunc_Damage( bf_read &msg )
 	vecFrom.y = msg.ReadFloat();
 	vecFrom.z = msg.ReadFloat();
 
+	HandleDamage( armor, damageTaken, bitsDamage, vecFrom );
+}
+#endif
+
+
+//-----------------------------------------------------------------------------
+// Purpose: Message handler for Damage message
+//-----------------------------------------------------------------------------
+void CHudDamageIndicator::HandleDamage( int armor, int damageTaken, long bitsDamage, Vector& vecFrom )
+{
 	C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
 	if ( !pPlayer )
 		return;

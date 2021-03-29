@@ -28,6 +28,7 @@
 #include <stdlib.h> // MAX_PATH define
 #include <stdio.h>
 #include "byteswap.h"
+#include "vgui_int.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -67,7 +68,7 @@ const char *GetStringTeamColor( int i )
 //-----------------------------------------------------------------------------
 // Purpose: Constructor
 //-----------------------------------------------------------------------------
-CTeamMenu::CTeamMenu(IViewPort *pViewPort) : Frame(NULL, PANEL_TEAM )
+CTeamMenu::CTeamMenu(IViewPort *pViewPort) : BaseClass(NULL, PANEL_TEAM)
 {
 	m_pViewPort = pViewPort;
 	m_iJumpKey = BUTTON_CODE_INVALID; // this is looked up in Activate()
@@ -90,6 +91,8 @@ CTeamMenu::CTeamMenu(IViewPort *pViewPort) : Frame(NULL, PANEL_TEAM )
 
 #if defined( ENABLE_HTML_WINDOW )
 	m_pMapInfoHTML = new HTML( this, "MapInfoHTML");
+#else
+	m_pMapInfoHTML = NULL;
 #endif
 
 	LoadControlSettings("Resource/UI/TeamMenu.res");
@@ -355,7 +358,7 @@ void CTeamMenu::OnTeamButton( int team )
 		else // next is spectate
 		{
 			// DuckMessage( "#Spec_Duck" );
-			gViewPortInterface->ShowBackGround( false );
+			GetViewPortInterface()->ShowBackGround( false );
 		}
 	}
 	else
@@ -389,11 +392,12 @@ void CTeamMenu::OnKeyCodePressed(KeyCode code)
 	}
 	else if ( m_iScoreBoardKey != BUTTON_CODE_INVALID && m_iScoreBoardKey == code )
 	{
-		gViewPortInterface->ShowPanel( PANEL_SCOREBOARD, true );
-		gViewPortInterface->PostMessageToPanel( PANEL_SCOREBOARD, new KeyValues( "PollHideCode", "code", code ) );
+		GetViewPortInterface()->ShowPanel( PANEL_SCOREBOARD, true );
+		GetViewPortInterface()->PostMessageToPanel( PANEL_SCOREBOARD, new KeyValues( "PollHideCode", "code", code ) );
 	}
 	else
 	{
 		BaseClass::OnKeyCodePressed( code );
 	}
 }
+

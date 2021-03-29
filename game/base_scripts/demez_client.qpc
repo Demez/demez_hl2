@@ -10,6 +10,8 @@ configuration
 		include_directories
 		{
 			"client/hl2mp/ui"
+			
+			"client/game_controls" [$ENGINE_ASW || $ENGINE_CSGO]
 		}
 	}
 
@@ -26,7 +28,7 @@ include "base_scripts/demez_shared.qpc"
 
 files
 {
-	folder "Base"
+	folder "Source Files"
 	{
 		// no clue what's going on here
 		- "$ENGINE_SRC_DIR/game/shared/weapon_parse_default.cpp" [$ENGINE_2013 == 0]
@@ -148,6 +150,24 @@ files
 			"client/hl2mp/ui/hl2mptextwindow.cpp"
 			"client/hl2mp/ui/hl2mptextwindow.h"
 			"client/hl2mp/hud_deathnotice.cpp"
+		}
+		
+		folder "Game Controls"
+		{
+			"client/game_controls/baseviewport.cpp"
+			"client/game_controls/basemodel_panel.cpp"
+			"client/game_controls/basemodel_panel.h"
+			"client/game_controls/ClientScoreBoardDialog.cpp"
+			"client/game_controls/commandmenu.cpp"
+			"client/game_controls/intromenu.cpp"
+			"client/game_controls/NavProgress.cpp"
+			"client/game_controls/vguitextwindow.cpp"
+			"client/game_controls/IconPanel.cpp"
+			
+			// Not used in csgo by default?
+			"client/game_controls/MapOverview.cpp"
+			"client/game_controls/SpectatorGUI.cpp"
+			"client/game_controls/teammenu.cpp"
 		}
 	}
 	

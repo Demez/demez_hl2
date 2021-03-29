@@ -73,6 +73,8 @@ CHL2_Background_Movie::~CHL2_Background_Movie()
 
 void CHL2_Background_Movie::SetCurrentMovie( const char *szFilename )
 {
+	return;
+
 	if ( Q_strcmp( m_szCurrentMovie, szFilename ) )
 	{
 #elif GAMEUI_SHARED

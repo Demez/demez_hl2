@@ -135,7 +135,7 @@ void CBuySubMenu::OnCommand( const char *command)
 	else 
 	{
 		GetWizardPanel()->Close();
-		gViewPortInterface->ShowBackGround( false );
+		GetViewPortInterface()->ShowBackGround( false );
 	
 		if ( Q_stricmp( command, "vguicancel" ) != 0 )
 			engine->ClientCmd( command );

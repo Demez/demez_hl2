@@ -59,6 +59,7 @@ public:
 
 	// progress
 	virtual bool UpdateProgressBar(float progress, const char *statusText);
+	virtual bool UpdateProgressBar(float progress, const char *statusText, bool showDialog) { return UpdateProgressBar(progress, statusText); }
 	// Shows progress desc, returns previous setting... (used with custom progress bars )
 	virtual bool SetShowProgressText( bool show );
 
@@ -86,6 +87,30 @@ public:
  	void ShowLoadingBackgroundDialog();
 	void HideLoadingBackgroundDialog();
 	bool HasLoadingBackgroundDialog();
+
+#if ENGINE_CSGO
+
+	virtual void StartLoadingScreenForCommand( const char* command ) {}
+	virtual void StartLoadingScreenForKeyValues( KeyValues* keyValues ) {}
+	virtual bool UpdateSecondaryProgressBar(float progress, const wchar_t *desc ) { return false; }  // download bar
+												
+	 // Xbox 360
+	virtual void ShowMessageDialog( const uint nType, vgui::Panel *pOwner = NULL ) {}
+	virtual void ShowMessageDialog( const char* messageID, const char* titleID ) {}
+
+	virtual void CreateCommandMsgBox( const char* pszTitle, const char* pszMessage, bool showOk = true, bool showCancel = false, const char* okCommand = NULL, const char* cancelCommand = NULL, const char* closedCommand = NULL, const char* pszLegend = NULL ) {}
+	virtual void CreateCommandMsgBoxInSlot( ECommandMsgBoxSlot slot, const char* pszTitle, const char* pszMessage, bool showOk = true, bool showCancel = false, const char* okCommand = NULL, const char* cancelCommand = NULL, const char* closedCommand = NULL, const char* pszLegend = NULL ) {}
+
+
+	virtual bool LoadingProgressWantsIsolatedRender( bool bContextValid ) { return false; }
+	virtual void RestoreTopLevelMenu() {}
+
+	virtual bool IsPlayingFullScreenVideo() { return false; }
+	virtual bool IsTransitionEffectEnabled() { return false; }
+
+#else
+
+#endif
 
 private:
 	void SendConnectedToGameMessage();

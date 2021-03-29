@@ -1,0 +1,65 @@
+"GameInfo"
+{
+	game 		"demez hl2 - csgo"
+	title 		"demez hl2"
+	type		multiplayer_only
+
+	FileSystem
+	{
+		SteamAppId		220	
+		
+		// asw uses vpk1, so fuck you
+		SearchPaths
+		{
+			game        |gameinfo_path|.
+			game        |gameinfo_path|custom/*
+			
+			vr          |gameinfo_path|.
+			
+			// particles test
+			// Game		"D:\sourceengine\csgoass"
+			
+			Game		"|gameinfo_path|..\assets_hl2_asw\test"
+			
+			// Game		"|gameinfo_path|..\assets_hl2_asw\content_release"
+			
+			// Game		"D:\projects\source\dead\hl2-revamped\content_wtf"
+			// Game		"D:\projects\source\dead\hl2-revamped\content_merged"
+			// // Game		"D:\projects\source\dead\hl2-revamped\content_ep2_recompiled"
+			// Game		"|gameinfo_path|..\content_hl2_asw"
+			// Game		"D:\projects\source\dead\hl2-revamped\content_ep2"
+			// Game		"D:\projects\source\dead\hl2-revamped\content_ep1"
+			// Game		"|gameinfo_path|..\assets_hl2_asw\content"
+			
+			// game        |gameinfo_path|../demez_base/custom/*
+			// game        |gameinfo_path|../ep2/custom/*
+			// game        |gameinfo_path|../episodic/custom/*
+			// game        |gameinfo_path|../hl2mp/custom/*
+			// game        |gameinfo_path|../hl2/custom/*
+			game        |gameinfo_path|../demez_base
+			
+			// mount maps
+			game        |gameinfo_path|../hlmaps
+			
+			// game        |gameinfo_path|../ep2
+			// game        |gameinfo_path|../episodic
+			// game        |gameinfo_path|../hl2  // this is needed, or else it will crash, idk what it is yet
+			// game        |gameinfo_path|../hl2mp
+			
+			// Game		"|gameinfo_path|..\content_asw"
+			
+			game        "C:\Program Files (x86)\Steam\steamapps\common\Alien Swarm\swarm"
+			game        "C:\Program Files (x86)\Steam\steamapps\common\Alien Swarm\swarm_base"
+            
+			game		|gameinfo_path|../assets_core_csgo/csgo
+			// game		|gameinfo_path|../assets_core_csgo/assets
+			platform	|gameinfo_path|../assets_core_csgo/platform
+			
+			game        platform
+			
+			platform    |gameinfo_path|.
+			platform    platform
+		}
+	}
+}
+

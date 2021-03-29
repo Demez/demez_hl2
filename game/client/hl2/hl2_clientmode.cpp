@@ -20,7 +20,7 @@
 #include "tier0/memdbgon.h"
 
 ConVar default_fov("default_fov", "90", FCVAR_ARCHIVE | FCVAR_USERINFO, "Sets the base field-of-view.");
-ConVar demez_fov("demez_fov", "90", FCVAR_ARCHIVE | FCVAR_USERINFO, "Sets the base field-of-view.");
+ConVar d_fov("d_fov", "90", FCVAR_ARCHIVE | FCVAR_USERINFO, "Sets the base field-of-view.");
 
 // The current client mode. Always ClientModeNormal in HL.
 #if ENGINE_NEW
@@ -103,7 +103,9 @@ void CHLModeManager::LevelShutdown( void )
 void CHLModeManager::DoPostScreenSpaceEffects( const CViewSetup *pSetup )
 {
 }
+#endif
 
+#if ENGINE_ASW
 // just gonna shove this here
 void CScriptedIconLesson::Mod_PreReadLessonsFromFile( void )
 {

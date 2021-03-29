@@ -464,7 +464,7 @@ void MuzzleFlash_Airboat( ClientEntityHandle_t hEntity, int attachmentIndex )
 	SimpleParticle *pParticle;
 	Vector			forward(1,0,0), offset; //NOTENOTE: All coords are in local space
 
-	float flScale = random->RandomFloat( 0.75f, IsXbox() ? 2.0f : 2.5f );
+	float flScale = random->RandomFloat( 0.75f, 2.5f );
 
 	PMaterialHandle pMuzzle[2];
 	pMuzzle[0] = pSimple->GetPMaterial( "effects/combinemuzzle1" );
@@ -481,7 +481,7 @@ void MuzzleFlash_Airboat( ClientEntityHandle_t hEntity, int attachmentIndex )
 			return;
 
 		pParticle->m_flLifetime		= 0.0f;
-		pParticle->m_flDieTime		= IsXbox() ? 0.0001f : 0.01f;
+		pParticle->m_flDieTime		= 0.01f;
 
 		pParticle->m_vecVelocity.Init();
 
@@ -529,8 +529,8 @@ void MuzzleFlash_Airboat( ClientEntityHandle_t hEntity, int attachmentIndex )
 	if ( muzzleflash_light.GetInt() )
 	{
 		// If the client hasn't seen this entity yet, bail.
-		matrix3x4_t	matAttachment;
-		if ( FX_GetAttachmentTransform( hEntity, attachmentIndex, matAttachment ) )
+		VMatrix	matAttachment;
+		if ( FX_GetAttachmentTransform( hEntity, attachmentIndex, matAttachment.As3x4() ) )
 		{
 			Vector		origin;
 			MatrixGetColumn( matAttachment, 3, &origin );
@@ -558,9 +558,9 @@ void MuzzleFlash_Chopper( ClientEntityHandle_t hEntity, int attachmentIndex )
 {
 	VPROF_BUDGET( "MuzzleFlash_Chopper", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
 
-	matrix3x4_t	matAttachment;
+	VMatrix	matAttachment;
 	// If the client hasn't seen this entity yet, bail.
-	if ( !FX_GetAttachmentTransform( hEntity, attachmentIndex, matAttachment ) )
+	if ( !FX_GetAttachmentTransform( hEntity, attachmentIndex, matAttachment.As3x4() ) )
 		return;
 	
 	CSmartPtr<CLocalSpaceEmitter> pSimple = CLocalSpaceEmitter::Create( "MuzzleFlash", hEntity, attachmentIndex );
@@ -624,8 +624,8 @@ void MuzzleFlash_Gunship( ClientEntityHandle_t hEntity, int attachmentIndex )
 	VPROF_BUDGET( "MuzzleFlash_Gunship", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
 
 	// If the client hasn't seen this entity yet, bail.
-	matrix3x4_t	matAttachment;
-	if ( !FX_GetAttachmentTransform( hEntity, attachmentIndex, matAttachment ) )
+	VMatrix	matAttachment;
+	if ( !FX_GetAttachmentTransform( hEntity, attachmentIndex, matAttachment.As3x4() ) )
 		return;
 
 	CSmartPtr<CLocalSpaceEmitter> pSimple = CLocalSpaceEmitter::Create( "MuzzleFlash", hEntity, attachmentIndex );
@@ -685,8 +685,8 @@ void MuzzleFlash_Hunter( ClientEntityHandle_t hEntity, int attachmentIndex )
 	VPROF_BUDGET( "MuzzleFlash_Hunter", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
 
 	// If the client hasn't seen this entity yet, bail.
-	matrix3x4_t	matAttachment;
-	if ( !FX_GetAttachmentTransform( hEntity, attachmentIndex, matAttachment ) )
+	VMatrix	matAttachment;
+	if ( !FX_GetAttachmentTransform( hEntity, attachmentIndex, matAttachment.As3x4() ) )
 		return;
 
 	// Grab the origin out of the transform for the attachment

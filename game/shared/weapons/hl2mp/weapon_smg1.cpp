@@ -103,7 +103,7 @@ END_NETWORK_TABLE()
 BEGIN_PREDICTION_DATA( CWeaponSMG1 )
 END_PREDICTION_DATA()
 
-LINK_ENTITY_TO_CLASS( weapon_smg1, CWeaponSMG1 );
+LINK_ENTITY_TO_CLASS_DUMB( weapon_smg1, CWeaponSMG1 );
 PRECACHE_WEAPON_REGISTER(weapon_smg1);
 
 #ifndef CLIENT_DLL
@@ -390,7 +390,7 @@ void CWeaponSMG1::SecondaryAttack( void )
 	Vector vecSrc = pPlayer->Weapon_ShootPosition();
 	Vector	vecThrow;
 	// Don't autoaim on grenade tosses
-	AngleVectors( pPlayer->EyeAngles() + pPlayer->GetPunchAngle(), &vecThrow );
+	AngleVectors( pPlayer->EyeAngles() + pPlayer->GetAimPunchAngle(), &vecThrow );
 	VectorScale( vecThrow, 1000.0f, vecThrow );
 	
 #ifndef CLIENT_DLL

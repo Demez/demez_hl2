@@ -26,6 +26,9 @@
 #include <game/client/iviewport.h>
 #include "commandmenu.h"
 #include "hltvcamera.h"
+#if defined( REPLAY_ENABLED )
+#include "replaycamera.h"
+#endif
 
 #include <vgui_controls/TextEntry.h>
 #include <vgui_controls/Panel.h>
@@ -56,7 +59,7 @@ using namespace vgui;
 ConVar cl_spec_mode(
 	"cl_spec_mode",
 	"1",
-	FCVAR_ARCHIVE | FCVAR_USERINFO | FCVAR_SERVER_CAN_EXECUTE,
+	FCVAR_USERINFO | FCVAR_SERVER_CAN_EXECUTE,
 	"spectator mode" );
 
 
@@ -80,7 +83,7 @@ private:
 //-----------------------------------------------------------------------------
 // Purpose: Constructor
 //-----------------------------------------------------------------------------
-CSpectatorMenu::CSpectatorMenu( IViewPort *pViewPort ) : Frame( NULL, PANEL_SPECMENU )
+CSpectatorMenu::CSpectatorMenu( IViewPort *pViewPort ) : BaseClass( NULL, PANEL_SPECMENU )
 {
 	m_iDuckKey = BUTTON_CODE_INVALID;
 		
@@ -119,12 +122,12 @@ CSpectatorMenu::CSpectatorMenu( IViewPort *pViewPort ) : Frame( NULL, PANEL_SPEC
 	m_pConfigSettings->SetOpenDirection( Menu::UP );
 
 	// create view config menu
-	CommandMenu * menu = new CommandMenu(m_pViewOptions, "spectatormenu", gViewPortInterface);
+	CommandMenu * menu = new CommandMenu(m_pViewOptions, "spectatormenu", GetViewPortInterface());
 	menu->LoadFromFile( "Resource/spectatormenu.res" );
 	m_pConfigSettings->SetMenu( menu );	// attach menu to combo box
 
 	// create view mode menu
-	menu = new CommandMenu(m_pViewOptions, "spectatormodes", gViewPortInterface);
+	menu = new CommandMenu(m_pViewOptions, "spectatormodes", GetViewPortInterface());
 	menu->LoadFromFile("Resource/spectatormodes.res");
 	m_pViewOptions->SetMenu( menu );	// attach menu to combo box
 
@@ -275,9 +278,14 @@ void CSpectatorMenu::ShowPanel(bool bShow)
 
 	bool bIsEnabled = true;
 	
-	 if ( engine->IsHLTV() && HLTVCamera()->IsPVSLocked() )
-	 {
-		 // when watching HLTV with a locked PVS, some elements are disabled
+#if defined( REPLAY_ENABLED )
+	 if ( (g_bEngineIsHLTV && HLTVCamera()->IsPVSLocked()) ||
+		  (engine->IsReplay() && ReplayCamera()->IsPVSLocked()) )
+#else
+	if ( g_bEngineIsHLTV && HLTVCamera()->IsPVSLocked() )
+#endif
+	{
+		 // when watching HLTV or Replay with a locked PVS, some elements are disabled
 		 bIsEnabled = false;
 	 }
 	
@@ -464,10 +472,10 @@ void CSpectatorGUI::OnThink()
 	{
 		if ( m_bSpecScoreboard != spec_scoreboard.GetBool() )
 		{
-			if ( !spec_scoreboard.GetBool() || !gViewPortInterface->GetActivePanel() )
+			if ( !spec_scoreboard.GetBool() || !GetViewPortInterface()->GetActivePanel() )
 			{
 				m_bSpecScoreboard = spec_scoreboard.GetBool();
-				gViewPortInterface->ShowPanel( PANEL_SCOREBOARD, m_bSpecScoreboard );
+				GetViewPortInterface()->ShowPanel( PANEL_SCOREBOARD, m_bSpecScoreboard );
 			}
 		}
 	}
@@ -532,7 +540,7 @@ void CSpectatorGUI::ShowPanel(bool bShow)
 	SetVisible( bShow );
 	if ( !bShow && m_bSpecScoreboard )
 	{
-		gViewPortInterface->ShowPanel( PANEL_SCOREBOARD, false );
+		GetViewPortInterface()->ShowPanel( PANEL_SCOREBOARD, false );
 	}
 }
 
@@ -555,7 +563,7 @@ void CSpectatorGUI::Update()
 	int specmode = GetSpectatorMode();
 	int playernum = GetSpectatorTarget();
 
-	IViewPortPanel *overview = gViewPortInterface->FindPanelByName( PANEL_OVERVIEW );
+	IViewPortPanel *overview = GetViewPortInterface()->FindPanelByName( PANEL_OVERVIEW );
 
 	if ( overview && overview->IsVisible() )
 	{
@@ -623,7 +631,7 @@ void CSpectatorGUI::Update()
 	wchar_t szTitleLabel[1024];
 	char tempstr[128];
 
-	if ( engine->IsHLTV() )
+	if ( g_bEngineIsHLTV )
 	{
 		// set spectator number and HLTV title
 		Q_snprintf(tempstr,sizeof(tempstr),"Spectators : %d", HLTVCamera()->GetNumSpectators() );
@@ -632,6 +640,17 @@ void CSpectatorGUI::Update()
 		Q_strncpy( tempstr, HLTVCamera()->GetTitleText(), sizeof(tempstr) );
 		g_pVGuiLocalize->ConvertANSIToUnicode(tempstr,szTitleLabel,sizeof(szTitleLabel));
 	}
+#if defined( REPLAY_ENABLED )
+	else if ( engine->IsReplay() )
+	{
+		// set spectator number and Replay title
+		Q_snprintf(tempstr,sizeof(tempstr),"Spectators : %d", ReplayCamera()->GetNumSpectators() );
+		g_pVGuiLocalize->ConvertANSIToUnicode(tempstr,szEtxraInfo,sizeof(szEtxraInfo));
+
+		Q_strncpy( tempstr, ReplayCamera()->GetTitleText(), sizeof(tempstr) );
+		g_pVGuiLocalize->ConvertANSIToUnicode(tempstr,szTitleLabel,sizeof(szTitleLabel));
+	}
+#endif
 	else
 	{
 		// otherwise show map name
@@ -691,7 +710,7 @@ CON_COMMAND_F( spec_next, "Spectate next player", FCVAR_CLIENTCMD_CAN_EXECUTE )
 	if ( !pPlayer || !pPlayer->IsObserver() )
 		return;
 
-	if ( engine->IsHLTV() )
+	if ( g_bEngineIsHLTV )
 	{
 		// handle the command clientside
 		if ( !HLTVCamera()->IsPVSLocked() )
@@ -699,6 +718,16 @@ CON_COMMAND_F( spec_next, "Spectate next player", FCVAR_CLIENTCMD_CAN_EXECUTE )
 			HLTVCamera()->SpecNextPlayer( false );
 		}
 	}
+#if defined( REPLAY_ENABLED )
+	else if ( engine->IsReplay() )
+	{
+		// handle the command clientside
+		if ( !ReplayCamera()->IsPVSLocked() )
+		{
+			ReplayCamera()->SpecNextPlayer( false );
+		}
+	}
+#endif
 	else
 	{
 		ForwardSpecCmdToServer( args );
@@ -712,7 +741,7 @@ CON_COMMAND_F( spec_prev, "Spectate previous player", FCVAR_CLIENTCMD_CAN_EXECUT
 	if ( !pPlayer || !pPlayer->IsObserver() )
 		return;
 
-	if ( engine->IsHLTV() )
+	if ( g_bEngineIsHLTV )
 	{
 		// handle the command clientside
 		if ( !HLTVCamera()->IsPVSLocked() )
@@ -720,6 +749,16 @@ CON_COMMAND_F( spec_prev, "Spectate previous player", FCVAR_CLIENTCMD_CAN_EXECUT
 			HLTVCamera()->SpecNextPlayer( true );
 		}
 	}
+#if defined( REPLAY_ENABLED )
+	else if ( engine->IsReplay() )
+	{
+		// handle the command clientside
+		if ( !ReplayCamera()->IsPVSLocked() )
+		{
+			ReplayCamera()->SpecNextPlayer( true );
+		}
+	}
+#endif
 	else
 	{
 		ForwardSpecCmdToServer( args );
@@ -733,7 +772,7 @@ CON_COMMAND_F( spec_mode, "Set spectator mode", FCVAR_CLIENTCMD_CAN_EXECUTE )
 	if ( !pPlayer || !pPlayer->IsObserver() )
 		return;
 
-	if ( engine->IsHLTV() )
+	if ( g_bEngineIsHLTV )
 	{
 		if ( HLTVCamera()->IsPVSLocked() )
 		{
@@ -763,9 +802,48 @@ CON_COMMAND_F( spec_mode, "Set spectator mode", FCVAR_CLIENTCMD_CAN_EXECUTE )
 			HLTVCamera()->SetMode( mode );
 		}
 
-			// turn off auto director once user tried to change view settings
+		// turn off auto director once user tried to change view settings
+#if ENGINE_CSGO
+		HLTVCamera()->SetAutoDirector( C_HLTVCamera::AUTODIRECTOR_OFF );
+#else
 		HLTVCamera()->SetAutoDirector( false );
+#endif
 	}
+#if defined( REPLAY_ENABLED )
+	else if ( engine->IsReplay() )
+	{
+		if ( ReplayCamera()->IsPVSLocked() )
+		{
+			// in locked mode we can only switch between first and 3rd person
+			ReplayCamera()->ToggleChaseAsFirstPerson();
+		}
+		else
+		{
+			// we can choose any mode, not loked to PVS
+			int mode;
+
+			if ( args.ArgC() == 2 )
+			{
+				// set specifc mode
+				mode = Q_atoi( args[1] );
+			}
+			else
+			{
+				// set next mode 
+				mode = ReplayCamera()->GetMode()+1;
+
+				if ( mode > LAST_PLAYER_OBSERVERMODE )
+					mode = OBS_MODE_IN_EYE;
+			}
+
+			// handle the command clientside
+			ReplayCamera()->SetMode( mode );
+		}
+
+		// turn off auto director once user tried to change view settings
+		ReplayCamera()->SetAutoDirector( false );
+	}
+#endif
 	else
 	{
 		// we spectate on a game server, forward command
@@ -783,7 +861,7 @@ CON_COMMAND_F( spec_player, "Spectate player by name", FCVAR_CLIENTCMD_CAN_EXECU
 	if ( args.ArgC() != 2 )
 		return;
 
-	if ( engine->IsHLTV() )
+	if ( g_bEngineIsHLTV )
 	{
 		// we can only switch primary spectator targets is PVS isnt locked by auto-director
 		if ( !HLTVCamera()->IsPVSLocked() )
@@ -791,6 +869,16 @@ CON_COMMAND_F( spec_player, "Spectate player by name", FCVAR_CLIENTCMD_CAN_EXECU
 			HLTVCamera()->SpecNamedPlayer( args[1] );
 		}
 	}
+#if defined( REPLAY_ENABLED )
+	else if ( engine->IsReplay() )
+	{
+		// we can only switch primary spectator targets is PVS isnt locked by auto-director
+		if ( !ReplayCamera()->IsPVSLocked() )
+		{
+			ReplayCamera()->SpecNamedPlayer( args[1] );
+		}
+	}
+#endif
 	else
 	{
 		ForwardSpecCmdToServer( args );

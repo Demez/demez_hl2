@@ -1,0 +1,58 @@
+macro ENGINE_CSGO    "1"
+
+include "$ENGINE_SRC_DIR/game/shared/cstrike15/cstrike15_gcmessages_include.qpc"
+// include "$ENGINE_SRC_DIR/game/shared/cstrike15/cstrike15_usermessages_include.qpc"
+
+include "$ENGINE_SRC_DIR/gcsdk/gcsdk_game_include.qpc"
+
+configuration
+{
+	compiler
+	{
+		preprocessor_definitions
+		{
+			"ALLOW_DEVELOPMENT_CVARS"
+			// "NO_STEAM"  // not compiling at the moment
+		}
+	}
+	
+	linker
+	{
+		libraries
+		{
+			"Ws2_32.lib" [$WINDOWS]
+		}
+	}
+}
+
+files
+{
+	- "$ENGINE_SRC_DIR/game/shared/ugc_utils.cpp"
+	- "$ENGINE_SRC_DIR/game/shared/ugc_request_manager.cpp"
+	
+	folder "CSGO Branch Only"
+	{
+		folder "Protobuf Files"
+		{
+			"$ENGINE_SRC_DIR/game/$TYPE/generated_proto/base_gcmessages.pb.cc"
+			{
+				precompiled_header "none"
+			}
+			
+			"$ENGINE_SRC_DIR/game/$TYPE/generated_proto/base_gcmessages.pb.h"
+			"$ENGINE_SRC_DIR/game/$TYPE/generated_proto/base_gcmessages.pb.proto"
+		}
+		
+		"$ENGINE_SRC_DIR/game/shared/bannedwords.cpp"
+		"$ENGINE_SRC_DIR/game/shared/bannedwords.h"
+		
+		"$ENGINE_SRC_DIR/common/platforminputdevice.h"
+		
+		"$ENGINE_SRC_DIR/common/platforminputdevice.cpp" \
+		"$ENGINE_SRC_DIR/common/steamid.cpp"
+		{
+			precompiled_header "none"
+		}
+	}
+}
+

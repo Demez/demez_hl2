@@ -20,6 +20,7 @@
 #include "sprite.h"
 #include "util.h"
 #include "weapon_physcannon.h"
+#include "weapon_physcannon_shared.h"
 #include "physics_saverestore.h"
 #include "ai_basenpc.h"
 #include "player_pickup.h"
@@ -46,11 +47,8 @@
 
 static const char *s_pWaitForUpgradeContext = "WaitForUpgrade";
 
-ConVar	g_debug_physcannon( "g_debug_physcannon", "0" );
-
 ConVar physcannon_minforce( "physcannon_minforce", "700" );
 ConVar physcannon_maxforce( "physcannon_maxforce", "1500" );
-ConVar physcannon_maxmass( "physcannon_maxmass", "250" );
 ConVar physcannon_tracelength( "physcannon_tracelength", "250" );
 ConVar physcannon_mega_tracelength( "physcannon_mega_tracelength", "850" );
 ConVar physcannon_chargetime("physcannon_chargetime", "2" );
@@ -59,7 +57,6 @@ ConVar physcannon_mega_pullforce( "physcannon_mega_pullforce", "8000" );
 ConVar physcannon_cone( "physcannon_cone", "0.97" );
 ConVar physcannon_ball_cone( "physcannon_ball_cone", "0.997" );
 ConVar physcannon_punt_cone( "physcannon_punt_cone", "0.997" );
-ConVar player_throwforce( "player_throwforce", "1000" );
 ConVar physcannon_dmg_glass( "physcannon_dmg_glass", "15" );
 ConVar physcannon_right_turrets( "physcannon_right_turrets", "0" );
 
@@ -432,30 +429,9 @@ static void ComputePlayerMatrix( CBasePlayer *pPlayer, matrix3x4_t &out )
 }
 
 
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-// derive from this so we can add save/load data to it
-struct game_shadowcontrol_params_t : public hlshadowcontrol_params_t
-{
-	DECLARE_SIMPLE_DATADESC();
-};
-
-BEGIN_SIMPLE_DATADESC( game_shadowcontrol_params_t )
-	
-	DEFINE_FIELD( targetPosition,		FIELD_POSITION_VECTOR ),
-	DEFINE_FIELD( targetRotation,		FIELD_VECTOR ),
-	DEFINE_FIELD( maxAngular, FIELD_FLOAT ),
-	DEFINE_FIELD( maxDampAngular, FIELD_FLOAT ),
-	DEFINE_FIELD( maxSpeed, FIELD_FLOAT ),
-	DEFINE_FIELD( maxDampSpeed, FIELD_FLOAT ),
-	DEFINE_FIELD( dampFactor, FIELD_FLOAT ),
-	DEFINE_FIELD( teleportDistance,	FIELD_FLOAT ),
-
-END_DATADESC()
 
 //-----------------------------------------------------------------------------
-class CGrabController : public IMotionEvent
+/*class CGrabController : public IMotionEvent
 {
 	DECLARE_SIMPLE_DATADESC();
 
@@ -513,9 +489,9 @@ private:
 	bool			m_bAllowObjectOverhead; // Can the player hold this object directly overhead? (Default is NO)
 
 	friend class CWeaponPhysCannon;
-};
+};*/
 
-BEGIN_SIMPLE_DATADESC( CGrabController )
+/*BEGIN_SIMPLE_DATADESC( CGrabController )
 
 	DEFINE_EMBEDDED( m_shadow ),
 
@@ -540,9 +516,9 @@ BEGIN_SIMPLE_DATADESC( CGrabController )
 	// Physptrs can't be inside embedded classes
 	// DEFINE_PHYSPTR( m_controller ),
 
-END_DATADESC()
+END_DATADESC()*/
 
-const float DEFAULT_MAX_ANGULAR = 360.0f * 10.0f;
+/*const float DEFAULT_MAX_ANGULAR = 360.0f * 10.0f;
 const float REDUCED_CARRY_MASS = 1.0f;
 
 CGrabController::CGrabController( void )
@@ -970,7 +946,7 @@ bool CGrabController::IsObjectAllowedOverhead( CBaseEntity *pEntity )
 		return true;
 
 	return false;
-}
+}*/
 
 //-----------------------------------------------------------------------------
 // Player pickup controller
@@ -1146,7 +1122,7 @@ void CPlayerPickupController::Use( CBaseEntity *pActivator, CBaseEntity *pCaller
 		}
 #endif
 		// +ATTACK will throw phys objects
-		if ( m_pPlayer->m_nButtons & IN_ATTACK )
+		if ( m_pPlayer->m_nButtons & IN_ATTACK && pPhys )
 		{
 			Shutdown( true );
 			Vector vecLaunch;
@@ -1182,9 +1158,6 @@ bool CPlayerPickupController::IsHoldingEntity( CBaseEntity *pEnt )
 
 void PlayerPickupObject( CBasePlayer *pPlayer, CBaseEntity *pObject )
 {
-	
-#ifndef CLIENT_DLL
-	
 	//Don't pick up if we don't have a phys object.
 	if ( pObject->VPhysicsGetObject() == NULL )
 		 return;
@@ -1195,9 +1168,6 @@ void PlayerPickupObject( CBasePlayer *pPlayer, CBaseEntity *pObject )
 		return;
 
 	pController->Init( pPlayer, pObject );
-
-#endif
-
 }
 
 //-----------------------------------------------------------------------------
@@ -1270,6 +1240,10 @@ public:
 	
 	bool	ShouldDisplayHUDHint() { return true; }
 
+	
+	CNetworkQAngle	( m_attachedAnglesPlayerSpace );
+	CNetworkVector	( m_attachedPositionObjectSpace );
+	CNetworkHandle( CBaseEntity, m_hAttachedObject );
 
 
 protected:
@@ -2795,130 +2769,7 @@ CBaseEntity *CWeaponPhysCannon::FindObjectInCone( const Vector &vecOrigin, const
 	return pNearest;
 }
 
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-bool CGrabController::UpdateObject( CBasePlayer *pPlayer, float flError )
-{
- 	CBaseEntity *pEntity = GetAttached();
-	if ( !pEntity || ComputeError() > flError || pPlayer->GetGroundEntity() == pEntity || !pEntity->VPhysicsGetObject() )
-	{
-		return false;
-	}
 
-	//Adrian: Oops, our object became motion disabled, let go!
-	IPhysicsObject *pPhys = pEntity->VPhysicsGetObject();
-	if ( pPhys && pPhys->IsMoveable() == false )
-	{
-		return false;
-	}
-
-	Vector forward, right, up;
-	QAngle playerAngles = pPlayer->EyeAngles();
-	AngleVectors( playerAngles, &forward, &right, &up );
-
-	if ( HL2MPRules()->MegaPhyscannonActive() )
-	{
-		Vector los = ( pEntity->WorldSpaceCenter() - pPlayer->Weapon_ShootPosition() );
-		VectorNormalize( los );
-
-		float flDot = DotProduct( los, forward );
-
-		//Let go of the item if we turn around too fast.
-		if ( flDot <= 0.35f )
-			return false;
-	}
-	
-	float pitch = AngleDistance(playerAngles.x,0);
-
-	if( !m_bAllowObjectOverhead )
-	{
-		playerAngles.x = clamp( pitch, -75, 75 );
-	}
-	else
-	{
-		playerAngles.x = clamp( pitch, -90, 75 );
-	}
-
-	
-	
-	// Now clamp a sphere of object radius at end to the player's bbox
-	Vector radial = physcollision->CollideGetExtent( pPhys->GetCollide(), vec3_origin, pEntity->GetAbsAngles(), -forward );
-	Vector player2d = pPlayer->CollisionProp()->OBBMaxs();
-	float playerRadius = player2d.Length2D();
-	float radius = playerRadius + fabs(DotProduct( forward, radial ));
-
-	float distance = 24 + ( radius * 2.0f );
-
-	// Add the prop's distance offset
-	distance += m_flDistanceOffset;
-
-	Vector start = pPlayer->Weapon_ShootPosition();
-	Vector end = start + ( forward * distance );
-
-	trace_t	tr;
-	CTraceFilterSkipTwoEntities traceFilter( pPlayer, pEntity, COLLISION_GROUP_NONE );
-	Ray_t ray;
-	ray.Init( start, end );
-	enginetrace->TraceRay( ray, MASK_SOLID_BRUSHONLY, &traceFilter, &tr );
-
-	if ( tr.fraction < 0.5 )
-	{
-		end = start + forward * (radius*0.5f);
-	}
-	else if ( tr.fraction <= 1.0f )
-	{
-		end = start + forward * ( distance - radius );
-	}
-	Vector playerMins, playerMaxs, nearest;
-	pPlayer->CollisionProp()->WorldSpaceAABB( &playerMins, &playerMaxs );
-	Vector playerLine = pPlayer->CollisionProp()->WorldSpaceCenter();
-	CalcClosestPointOnLine( end, playerLine+Vector(0,0,playerMins.z), playerLine+Vector(0,0,playerMaxs.z), nearest, NULL );
-
-	if( !m_bAllowObjectOverhead )
-	{
-		Vector delta = end - nearest;
-		float len = VectorNormalize(delta);
-		if ( len < radius )
-		{
-			end = nearest + radius * delta;
-		}
-	}
-
-	//Show overlays of radius
-	if ( g_debug_physcannon.GetBool() )
-	{
-		NDebugOverlay::Box( end, -Vector( 2,2,2 ), Vector(2,2,2), 0, 255, 0, true, 0 );
-
-		NDebugOverlay::Box( GetAttached()->WorldSpaceCenter(), 
-							-Vector( radius, radius, radius), 
-							Vector( radius, radius, radius ),
-							255, 0, 0,
-							true,
-							0.0f );
-	}
-
-	QAngle angles = TransformAnglesFromPlayerSpace( m_attachedAnglesPlayerSpace, pPlayer );
-	
-	// If it has a preferred orientation, update to ensure we're still oriented correctly.
-	Pickup_GetPreferredCarryAngles( pEntity, pPlayer, pPlayer->EntityToWorldTransform(), angles );
-
-	// We may be holding a prop that has preferred carry angles
-	if ( m_bHasPreferredCarryAngles )
-	{
-		matrix3x4_t tmp;
-		ComputePlayerMatrix( pPlayer, tmp );
-		angles = TransformAnglesToWorldSpace( m_vecPreferredCarryAngles, tmp );
-	}
-
-	matrix3x4_t attachedToWorld;
-	Vector offset;
-	AngleMatrix( angles, attachedToWorld );
-	VectorRotate( m_attachedPositionObjectSpace, attachedToWorld, offset );
-
-	SetTargetPosition( end - offset, angles );
-
-	return true;
-}
 
 void CWeaponPhysCannon::UpdateObject( void )
 {

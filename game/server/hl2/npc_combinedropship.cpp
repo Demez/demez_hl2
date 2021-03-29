@@ -496,8 +496,14 @@ void CCombineDropshipContainer::CreateCorpse()
 	Vector vecAbsPoint;
 	CPASFilter filter( GetAbsOrigin() );
 	CollisionProp()->RandomPointInBounds( vecNormalizedMins, vecNormalizedMaxs, &vecAbsPoint);
+
+#if ENGINE_CSGO
+	te->Explosion( filter, 0.0f, vecAbsPoint, g_sModelIndexFireball, 
+		random->RandomInt( 4, 10 ), random->RandomInt( 8, 15 ), TE_EXPLFLAG_NOPARTICLES, 100, 0 );
+#else
 	te->Explosion( filter, 0.0f, &vecAbsPoint, g_sModelIndexFireball, 
 		random->RandomInt( 4, 10 ), random->RandomInt( 8, 15 ), TE_EXPLFLAG_NOPARTICLES, 100, 0 );
+#endif
 
 	// Break into chunks
 	Vector angVelocity;
@@ -2296,7 +2302,7 @@ void CNPC_CombineDropship::PrescheduleThink( void )
 					*/
 					{
 						// Grab the target
-						m_hContainer = m_hPickupTarget;
+						m_hContainer = (CBaseAnimating*)m_hPickupTarget.Get();
 						m_hPickupTarget = NULL;
 						m_iContainerMoveType = m_hContainer->GetMoveType();
 						if ( m_bInvulnerable && m_hContainer )

@@ -704,6 +704,10 @@ void BaseModHybridButton::OnThink()
 	BaseClass::OnThink();
 }
 
+#if ENGINE_ASW
+#define V_isdigit isdigit
+#endif
+
 void BaseModHybridButton::ApplySettings( KeyValues * inResourceData )
 {
 	BaseClass::ApplySettings( inResourceData );
@@ -873,7 +877,7 @@ void BaseModHybridButton::ApplySettings( KeyValues * inResourceData )
 		{
 			m_iUsablePlayerIndex = USE_NOBODY;
 		}
-		else if ( isdigit( pszValue[0] ) )
+		else if ( V_isdigit( pszValue[0] ) )
 		{
 			m_iUsablePlayerIndex = atoi( pszValue );
 		}

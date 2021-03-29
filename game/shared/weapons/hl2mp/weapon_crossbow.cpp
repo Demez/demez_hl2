@@ -520,7 +520,7 @@ BEGIN_PREDICTION_DATA( CWeaponCrossbow )
 END_PREDICTION_DATA()
 #endif
 
-LINK_ENTITY_TO_CLASS( weapon_crossbow, CWeaponCrossbow );
+LINK_ENTITY_TO_CLASS_DUMB( weapon_crossbow, CWeaponCrossbow );
 
 PRECACHE_WEAPON_REGISTER( weapon_crossbow );
 

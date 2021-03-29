@@ -5,6 +5,7 @@
 //=============================================================================//
 
 #include "gamemovement.h"
+#include "vr_gamemovement.h"
 #include "func_ladder.h"
 
 #if defined( CLIENT_DLL )
@@ -29,9 +30,9 @@ struct NearbyDismount_t
 //-----------------------------------------------------------------------------
 // Purpose: HL2 specific movement code
 //-----------------------------------------------------------------------------
-class CHL2GameMovement : public CGameMovement
+class CHL2GameMovement : public CVRGameMovement
 {
-	typedef CGameMovement BaseClass;
+	typedef CVRGameMovement BaseClass;
 public:
 
 	CHL2GameMovement();

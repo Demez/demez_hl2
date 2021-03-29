@@ -57,8 +57,8 @@ AchievementListItem::AchievementListItem( IAchievement *pAchievement ) : BaseCla
 	m_ImgAchievementIcon = new ImagePanel( this, "ImgAchievementIcon" );
 	m_LblHowTo = new Label( this, "LblHowTo", "" );
 	m_PrgProgress = new ContinuousProgressBar(this, "PrgProgress" );
-	m_PrgProgress->SetImage( "progressbar", PROGRESS_TEXTURE_FG );
-	m_PrgProgress->SetImage( "progressbar_bg", PROGRESS_TEXTURE_BG );
+	// m_PrgProgress->SetImage( "progressbar", PROGRESS_TEXTURE_FG );
+	// m_PrgProgress->SetImage( "progressbar_bg", PROGRESS_TEXTURE_BG );
 	m_LblCurrProgress = new Label( this, "LblCurrProgress", "0" );
 	m_LblGamerscore = new Label( this, "LblGamerScore", "" );
 
@@ -486,8 +486,8 @@ BaseClass(parent, panelName, false, true)
 	m_GplAwards = NULL;
 
 	m_pProgressBar = new ContinuousProgressBar( this, "ProTotalProgress" );
-	m_pProgressBar->SetImage( "progressbar", PROGRESS_TEXTURE_FG );
-	m_pProgressBar->SetImage( "progressbar_bg", PROGRESS_TEXTURE_BG );
+	// m_pProgressBar->SetImage( "progressbar", PROGRESS_TEXTURE_FG );
+	// m_pProgressBar->SetImage( "progressbar_bg", PROGRESS_TEXTURE_BG );
 
 	SetUpperGarnishEnabled(true);
 	SetLowerGarnishEnabled( true );

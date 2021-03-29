@@ -17,7 +17,11 @@
 			game		|gameinfo_path|../episodic/custom/*
 			game		|gameinfo_path|../hl2mp/custom/*
 			game		|gameinfo_path|../hl2/custom/*
-			game		|gameinfo_path|../demez_base
+			game+mod	|gameinfo_path|../demez_base
+			
+			game		|gameinfo_path|.
+			
+			vr			|gameinfo_path|.
             
             game		|gameinfo_path|../ep2/ep2_pak.vpk
 			game		|gameinfo_path|../episodic/ep1_pak.vpk

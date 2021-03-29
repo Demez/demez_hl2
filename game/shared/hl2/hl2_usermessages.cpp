@@ -14,6 +14,7 @@
 
 void RegisterUserMessages( void )
 {
+#if !ENGINE_CSGO
 	usermessages->Register( "Geiger", 1 );
 	usermessages->Register( "Train", 1 );
 	usermessages->Register( "HudText", -1 );
@@ -42,4 +43,5 @@ void RegisterUserMessages( void )
 	usermessages->Register( "LogoTimeMsg", 4 );
 	usermessages->Register( "AchievementEvent", -1 );
 	usermessages->Register( "UpdateJalopyRadar", -1 );
+#endif
 }

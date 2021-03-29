@@ -9,6 +9,7 @@
 #include "props.h"
 #include "items.h"
 #include "ammodef.h"
+#include "hl2mp_gamerules.h"
 #include "engine_defines.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -236,6 +237,8 @@ void CItem_DynamicResupply::Activate( void )
 			Warning( "item_dynamic_resupply set to 'Use Master', but no item_dynamic_resupply master exists.\n" );
 		}
 	}
+
+	HL2MPRules()->AddRespawnableEntity( this );
 }
 
 
@@ -613,7 +616,7 @@ void CItem_DynamicResupply::SpawnDynamicItem( CBasePlayer *pPlayer )
 	}
 
 	SetThink( NULL );
-	UTIL_Remove( this );
+	// UTIL_Remove( this );
 }
 
 //-----------------------------------------------------------------------------

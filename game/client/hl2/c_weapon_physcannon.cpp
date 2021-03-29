@@ -11,6 +11,8 @@
 #include "particles_localspace.h"
 #include "view.h"
 #include "particles_attractor.h"
+#include "weapon_physcannon_shared.h"
+#include "hl2_shareddefs.h"
 #include "engine_defines.h"
 
 
@@ -25,6 +27,7 @@ public:
 
 	virtual void OnDataChanged( DataUpdateType_t updateType );
 	virtual void ClientThink( void );
+	virtual void ItemPreFrame( void );
 
 #if ENGINE_NEW
 	virtual int	DrawModel( int flags, const RenderableInstance_t &instance );
@@ -36,6 +39,14 @@ private:
 
 	bool	SetupEmitter( void );
 
+	CGrabController &GetGrabController() { return m_grabController; }
+
+	void	UpdateObject( void );
+	void	ManagePredictedObject( void );
+	bool	DropIfEntityHeld( C_BaseEntity *pTarget );
+	void	ForceDrop();
+	void	DetachObject( bool playSound = true, bool wasLaunched = false );
+
 	bool	m_bIsCurrentlyUpgrading;
 	float	m_flTimeForceView;
 	float	m_flTimeIgnoreForceView;
@@ -44,9 +55,22 @@ private:
 	CSmartPtr<CLocalSpaceEmitter>	m_pLocalEmitter;
 	CSmartPtr<CSimpleEmitter>		m_pEmitter;
 	CSmartPtr<CParticleAttractor>	m_pAttractor;
+	
+	// QAngle m_attachedAnglesPlayerSpace;
+
+	CNetworkQAngle	( m_attachedAnglesPlayerSpace );
+	CNetworkVector	( m_attachedPositionObjectSpace );
+	CNetworkHandle( C_BaseEntity, m_hAttachedObject );
+
+	EHANDLE m_hOldAttachedObject;
+
+	CGrabController		m_grabController;
 };
 
-STUB_WEAPON_CLASS_IMPLEMENT( weapon_physcannon, C_WeaponPhysCannon );
+LINK_ENTITY_TO_CLASS_CLIENTONLY( weapon_physcannon, C_WeaponPhysCannon );
+
+BEGIN_PREDICTION_DATA( C_WeaponPhysCannon ) 
+END_PREDICTION_DATA()
 
 IMPLEMENT_CLIENTCLASS_DT( C_WeaponPhysCannon, DT_WeaponPhysCannon, CWeaponPhysCannon )
 	RecvPropBool( RECVINFO( m_bIsCurrentlyUpgrading ) ),
@@ -445,4 +469,128 @@ void C_WeaponPhysCannon::ClientThink( void )
 	return BaseClass::ClientThink();
 }
 
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void C_WeaponPhysCannon::ItemPreFrame()
+{
+	BaseClass::ItemPreFrame();
+
+	C_BasePlayer *localplayer = C_BasePlayer::GetLocalPlayer();
+
+	if ( localplayer && !localplayer->IsObserver() )
+		ManagePredictedObject();
+
+	// Update the object if the weapon is switched on.
+	if ( m_hAttachedObject )
+	{
+		UpdateObject();
+	}
+}
+
+
+void C_WeaponPhysCannon::UpdateObject( void )
+{
+	CBasePlayer *pPlayer = ToBasePlayer( GetOwner() );
+	Assert( pPlayer );
+
+	float flError = 12;
+	if ( !m_grabController.UpdateObject( pPlayer, flError ) )
+	{
+		DetachObject();
+		return;
+	}
+}
+
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void C_WeaponPhysCannon::DetachObject( bool playSound, bool wasLaunched )
+{
+	m_grabController.DetachEntity( wasLaunched );
+
+	if ( m_hAttachedObject )
+	{
+		m_hAttachedObject->VPhysicsDestroyObject();
+	}
+}
+
+
+void C_WeaponPhysCannon::ManagePredictedObject( void )
+{
+	C_BaseEntity *pAttachedObject = m_hAttachedObject.Get();
+
+	if ( m_hAttachedObject )
+	{
+		// NOTE :This must happen after OnPhysGunPickup because that can change the mass
+		if ( pAttachedObject != GetGrabController().GetAttached() )
+		{
+			IPhysicsObject *pPhysics = pAttachedObject->VPhysicsGetObject();
+
+			if ( pPhysics == NULL )
+			{
+				solid_t tmpSolid;
+				PhysModelParseSolid( tmpSolid, m_hAttachedObject, pAttachedObject->GetModelIndex() );
+
+				pAttachedObject->VPhysicsInitNormal( SOLID_VPHYSICS, 0, false, &tmpSolid );
+			}
+
+			pPhysics = pAttachedObject->VPhysicsGetObject();
+
+			if ( pPhysics )
+			{
+				m_grabController.SetIgnorePitch( false );
+				m_grabController.SetAngleAlignment( 0 );
+
+				GetGrabController().AttachEntity( ToBasePlayer( GetOwner() ), pAttachedObject, pPhysics, false, vec3_origin, false );
+				GetGrabController().m_attachedPositionObjectSpace = m_attachedPositionObjectSpace;
+				GetGrabController().m_attachedAnglesPlayerSpace = m_attachedAnglesPlayerSpace;
+			}
+		}
+	}
+	else
+	{
+		if ( m_hOldAttachedObject && m_hOldAttachedObject->VPhysicsGetObject() )
+		{
+			GetGrabController().DetachEntity( false );
+
+			m_hOldAttachedObject->VPhysicsDestroyObject();
+		}
+	}
+
+	m_hOldAttachedObject = m_hAttachedObject;
+}
+
+
+//-----------------------------------------------------------------------------
+// Purpose: Drops its held entity if it matches the entity passed in
+// Input  : *pTarget - 
+// Output : Returns true on success, false on failure.
+//-----------------------------------------------------------------------------
+bool C_WeaponPhysCannon::DropIfEntityHeld( C_BaseEntity *pTarget )
+{
+	if ( pTarget == NULL )
+		return false;
+
+	C_BaseEntity *pHeld = m_grabController.GetAttached();
+
+	if ( pHeld == NULL )
+		return false;
+
+	if ( pHeld == pTarget )
+	{
+		ForceDrop();
+		return true;
+	}
+
+	return false;
+}
+
+
+void C_WeaponPhysCannon::ForceDrop( void )
+{
+	// CloseElements();
+	DetachObject();
+	// StopEffects();
+}
 

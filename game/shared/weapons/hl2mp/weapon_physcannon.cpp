@@ -14,7 +14,7 @@
 	#include "beamdraw.h"
 	#include "c_te_effect_dispatch.h"
 	#include "model_types.h"
-	#include "ClientEffectPrecacheSystem.h"
+	// #include "ClientEffectPrecacheSystem.h"
 	#include "fx_interpvalue.h"
 #else
 	#include "hl2mp_player.h"
@@ -71,14 +71,45 @@ extern ConVar hl2_walkspeed;
 
 #define PHYSCANNON_BEAM_SPRITE "sprites/orangelight1.vmt"
 #define PHYSCANNON_BEAM_SPRITE_NOZ "sprites/orangelight1_noz.vmt"
-#define PHYSCANNON_GLOW_SPRITE "sprites/glow04_noz"
-#define PHYSCANNON_ENDCAP_SPRITE "sprites/orangeflare1"
-#define PHYSCANNON_CENTER_GLOW "sprites/orangecore1"
-#define PHYSCANNON_BLAST_SPRITE "sprites/orangecore2"
+#define PHYSCANNON_GLOW_SPRITE "sprites/glow04_noz.vmt"
+#define PHYSCANNON_ENDCAP_SPRITE "sprites/orangeflare1.vmt"
+#define PHYSCANNON_CENTER_GLOW "sprites/orangecore1.vmt"
+#define PHYSCANNON_BLAST_SPRITE "sprites/orangecore2.vmt"
+ 
+#define MEGACANNON_BEAM_SPRITE "sprites/lgtning_noz.vmt"
+#define MEGACANNON_GLOW_SPRITE "sprites/blueflare1_noz.vmt"
+#define MEGACANNON_ENDCAP_SPRITE "sprites/blueflare1_noz.vmt"
+#define MEGACANNON_CENTER_GLOW "effects/fluttercore.vmt"
+#define MEGACANNON_BLAST_SPRITE "effects/fluttercore.vmt"
+
+#define MEGACANNON_RAGDOLL_BOOGIE_SPRITE "sprites/lgtning_noz.vmt"
+
+#define	MEGACANNON_MODEL "models/weapons/v_superphyscannon.mdl"
+#define	MEGACANNON_SKIN	1
 
 #ifdef CLIENT_DLL
 
 	//Precahce the effects
+#if ENGINE_NEW
+	PRECACHE_REGISTER_BEGIN( GLOBAL, PrecacheEffectPhysCannon )
+
+	PRECACHE( MATERIAL, "sprites/orangelight1" )
+	PRECACHE( MATERIAL, "sprites/orangelight1_noz" )
+	PRECACHE( MATERIAL, PHYSCANNON_GLOW_SPRITE )
+	PRECACHE( MATERIAL, PHYSCANNON_ENDCAP_SPRITE )
+	PRECACHE( MATERIAL, PHYSCANNON_CENTER_GLOW )
+	PRECACHE( MATERIAL, PHYSCANNON_BLAST_SPRITE )
+
+	PRECACHE( MATERIAL, MEGACANNON_BEAM_SPRITE )
+	PRECACHE( MATERIAL, MEGACANNON_GLOW_SPRITE )
+	PRECACHE( MATERIAL, MEGACANNON_ENDCAP_SPRITE )
+	PRECACHE( MATERIAL, MEGACANNON_CENTER_GLOW )
+	PRECACHE( MATERIAL, MEGACANNON_BLAST_SPRITE )
+
+	PRECACHE( MATERIAL, MEGACANNON_RAGDOLL_BOOGIE_SPRITE )
+
+	PRECACHE_REGISTER_END()
+#else
 	CLIENTEFFECT_REGISTER_BEGIN( PrecacheEffectPhysCannon )
 	CLIENTEFFECT_MATERIAL( "sprites/orangelight1" )
 	CLIENTEFFECT_MATERIAL( "sprites/orangelight1_noz" )
@@ -87,6 +118,7 @@ extern ConVar hl2_walkspeed;
 	CLIENTEFFECT_MATERIAL( PHYSCANNON_CENTER_GLOW )
 	CLIENTEFFECT_MATERIAL( PHYSCANNON_BLAST_SPRITE )
 	CLIENTEFFECT_REGISTER_END()
+#endif
 
 #endif	// CLIENT_DLL
 
@@ -94,18 +126,23 @@ extern ConVar hl2_walkspeed;
 
 void PhysCannonBeginUpgrade( CBaseAnimating *pAnim )
 {
-
+	CWeaponPhysCannon *pWeaponPhyscannon = assert_cast<	CWeaponPhysCannon* >( pAnim );
+	pWeaponPhyscannon->BeginUpgrade();
 }
 
 bool PlayerHasMegaPhysCannon( void )
 {
-	return false;
+	return ( HL2MPRules()->MegaPhyscannonActive() == true );
 }
 
 bool PhysCannonAccountableForObject( CBaseCombatWeapon *pPhysCannon, CBaseEntity *pObject )
 {
-	// BRJ: FIXME! This can't be implemented trivially, so I'm leaving it to Steve or Adrian
-	Assert( 0 );
+	CWeaponPhysCannon *pCannon = dynamic_cast<CWeaponPhysCannon *>(pPhysCannon);
+	if ( pCannon )
+	{
+		return pCannon->IsAccountableForObject(pObject);
+	}
+
 	return false;
 }
 
@@ -1098,6 +1135,17 @@ public:
 
 	virtual void SetViewModel( void );
 	virtual const char *GetShootSound( int iIndex ) const;
+
+#ifndef CLIENT_DLL
+	void	InputBecomeMegaCannon( inputdata_t &inputdata );
+	void	BeginUpgrade();
+
+	void	RecordThrownObject( CBaseEntity *pObject );
+	void	PurgeThrownObjects();
+	bool	IsAccountableForObject( CBaseEntity *pObject );
+
+	bool	ShouldDisplayHUDHint() { return true; }
+#endif
 	
 #ifndef CLIENT_DLL
 	CNetworkQAngle	( m_attachedAnglesPlayerSpace );
@@ -1119,6 +1167,7 @@ protected:
 		OBJECT_BEING_DETACHED,
 	};
 
+	void	DoMegaEffect( int effectType, Vector *pos = NULL );
 	void	DoEffect( int effectType, Vector *pos = NULL );
 
 	void	OpenElements( void );
@@ -1131,6 +1180,8 @@ protected:
 #ifndef CLIENT_DLL
 	bool	AttachObject( CBaseEntity *pObject, const Vector &vPosition );
 	FindObjectResult_t		FindObject( void );
+	void					FindObjectTrace( CBasePlayer *pPlayer, trace_t *pTraceResult );
+	CBaseEntity *MegaPhysCannonFindObjectInCone( const Vector &vecOrigin, const Vector &vecDir, float flCone, float flCombineBallCone, bool bOnlyCombineBalls );
 	CBaseEntity *FindObjectInCone( const Vector &vecOrigin, const Vector &vecDir, float flCone );
 #endif	// !CLIENT_DLL
 
@@ -1144,6 +1195,7 @@ protected:
 	// Punt objects - this is pointing at an object in the world and applying a force to it.
 	void	PuntNonVPhysics( CBaseEntity *pEntity, const Vector &forward, trace_t &tr );
 	void	PuntVPhysics( CBaseEntity *pEntity, const Vector &forward, trace_t &tr );
+	void	PuntRagdoll( CBaseEntity *pEntity, const Vector &forward, trace_t &tr );
 
 	// Velocity-based throw common to punt and launch code.
 	void	ApplyVelocityBasedForce( CBaseEntity *pEntity, const Vector &forward );
@@ -1156,8 +1208,19 @@ protected:
 	void	DoEffectNone( void );
 	void	DoEffectIdle( void );
 
+	void	DoMegaEffectClosed( void );
+	void	DoMegaEffectReady( void );
+	void	DoMegaEffectHolding( void );
+	void	DoMegaEffectLaunch( Vector *pos );
+
 	// Trace length
 	float	TraceLength();
+
+	// Do we have the super-phys gun?
+	inline bool	IsMegaPhysCannon()
+	{
+		return PlayerHasMegaPhysCannon();
+	}
 
 	// Sprite scale factor 
 	float	SpriteScaleFactor();
@@ -1200,7 +1263,7 @@ protected:
 
 #define	NUM_PHYSCANNON_BEAMS	3
 
-	virtual int		DrawModel( int flags );
+	virtual int		DrawModel( int flags, const RenderableInstance_t &instance );
 	virtual void	ViewModelDrawn( C_BaseViewModel *pBaseViewModel );
 	virtual bool	IsTransparent( void );
 	virtual void	OnDataChanged( DataUpdateType_t type );
@@ -1214,7 +1277,11 @@ protected:
 	void			UpdateElementPosition( void );
 
 	// We need to render opaque and translucent pieces
+#if ENGINE_NEW
+	RenderGroup_t	GetRenderGroup( void ) {	return RENDER_GROUP_TRANSLUCENT;	    }
+#else
 	RenderGroup_t	GetRenderGroup( void ) {	return RENDER_GROUP_TWOPASS;	}
+#endif
 
 	CInterpolatedValue		m_ElementParameter;							// Used to interpolate the position of the articulated elements
 	CPhysCannonEffect		m_Parameters[NUM_PHYSCANNON_PARAMETERS];	// Interpolated parameters for the effects
@@ -1267,6 +1334,9 @@ BEGIN_NETWORK_TABLE( CWeaponPhysCannon, DT_WeaponPhysCannon )
 	RecvPropFloat( RECVINFO( m_attachedAnglesPlayerSpace[2] ) ),
 	RecvPropInt( RECVINFO( m_EffectState ) ),
 	RecvPropBool( RECVINFO( m_bOpen ) ),
+
+	RecvPropBool( RECVINFO( m_bIsCurrentlyUpgrading ) ),
+
 #else
 	SendPropBool( SENDINFO( m_bActive ) ),
 	SendPropEHandle( SENDINFO( m_hAttachedObject ) ),
@@ -1276,6 +1346,8 @@ BEGIN_NETWORK_TABLE( CWeaponPhysCannon, DT_WeaponPhysCannon )
 	SendPropAngle( SENDINFO_VECTORELEM(m_attachedAnglesPlayerSpace, 2 ), 11 ),
 	SendPropInt( SENDINFO( m_EffectState ) ),
 	SendPropBool( SENDINFO( m_bOpen ) ),
+
+	SendPropBool( SENDINFO( m_bIsCurrentlyUpgrading ) ),
 #endif
 END_NETWORK_TABLE()
 
@@ -1348,7 +1420,18 @@ void CWeaponPhysCannon::Precache( void )
 	PrecacheModel( PHYSCANNON_BEAM_SPRITE );
 	PrecacheModel( PHYSCANNON_BEAM_SPRITE_NOZ );
 
+	// Precache our alternate model
+	PrecacheModel( MEGACANNON_MODEL );
+
 	PrecacheScriptSound( "Weapon_PhysCannon.HoldSound" );
+	PrecacheScriptSound( "Weapon_Physgun.Off" );
+
+	PrecacheScriptSound( "Weapon_MegaPhysCannon.DryFire" );
+	PrecacheScriptSound( "Weapon_MegaPhysCannon.Launch" );
+	PrecacheScriptSound( "Weapon_MegaPhysCannon.Pickup");
+	PrecacheScriptSound( "Weapon_MegaPhysCannon.Drop");
+	PrecacheScriptSound( "Weapon_MegaPhysCannon.HoldSound");
+	PrecacheScriptSound( "Weapon_MegaPhysCannon.ChargeZap");
 
 	BaseClass::Precache();
 }
@@ -3292,7 +3375,7 @@ void CWeaponPhysCannon::DoEffectLaunch( Vector *pos )
 	data.m_nEntIndex = entindex();
 #endif
 
-	te->DispatchEffect( filter, 0.0, data.m_vOrigin, "PhyscannonImpact", data );
+	// te->DispatchEffect( filter, 0.0, data.m_vOrigin, "PhyscannonImpact", data );
 
 #ifdef CLIENT_DLL
 
@@ -3384,7 +3467,11 @@ const char *CWeaponPhysCannon::GetShootSound( int iIndex ) const
 
 #ifdef CLIENT_DLL
 
-extern void FormatViewModelAttachment( Vector &vOrigin, bool bInverse );
+#if ENGINE_NEW
+	extern void FormatViewModelAttachment( C_BasePlayer *pPlayer, Vector &vOrigin, bool bInverse );
+#else
+	extern void FormatViewModelAttachment( Vector &vOrigin, bool bInverse );
+#endif
 
 //-----------------------------------------------------------------------------
 // Purpose: Gets the complete list of values needed to render an effect from an
@@ -3421,7 +3508,11 @@ void CWeaponPhysCannon::GetEffectParameters( EffectType_t effectID, color32 &col
 		if ( pOwner != NULL )
 		{
 			pOwner->GetViewModel()->GetAttachment( attachment, vecAttachment, angles );
+#if ENGINE_NEW
+			::FormatViewModelAttachment( pOwner, vecAttachment, true );
+#else
 			::FormatViewModelAttachment( vecAttachment, true );
+#endif
 		}
 	}
 	else
@@ -3492,7 +3583,7 @@ void CWeaponPhysCannon::DrawEffects( void )
 //-----------------------------------------------------------------------------
 // Purpose: Third-person function call to render world model
 //-----------------------------------------------------------------------------
-int CWeaponPhysCannon::DrawModel( int flags )
+int CWeaponPhysCannon::DrawModel( int flags, const RenderableInstance_t &instance )
 {
 	// Only render these on the transparent pass
 	if ( flags & STUDIO_TRANSPARENCY )
@@ -3502,7 +3593,7 @@ int CWeaponPhysCannon::DrawModel( int flags )
 	}
 
 	// Only do this on the opaque pass
-	return BaseClass::DrawModel( flags );
+	return BaseClass::DrawModel( flags, instance );
 }
 
 //-----------------------------------------------------------------------------
@@ -3652,7 +3743,11 @@ void CallbackPhyscannonImpact( const CEffectData &data )
 		}
 
 		// Format attachment for first-person view!
+#if ENGINE_NEW
+		::FormatViewModelAttachment( pPlayer, vecAttachment, true );
+#else
 		::FormatViewModelAttachment( vecAttachment, true );
+#endif
 
 		// Explosions at the impact point
 		FX_GaussExplosion( data.m_vOrigin, -dir, 0 );
@@ -3693,6 +3788,6 @@ void CallbackPhyscannonImpact( const CEffectData &data )
 	}
 }
 
-DECLARE_CLIENT_EFFECT( "PhyscannonImpact", CallbackPhyscannonImpact );
+DECLARE_CLIENT_EFFECT( PhyscannonImpact, CallbackPhyscannonImpact );
 
 #endif

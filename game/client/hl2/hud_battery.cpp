@@ -18,6 +18,10 @@
 #include "iclientmode.h"
 #include "engine_defines.h"
 
+#if ENGINE_CSGO
+#include "hl2_usermessages.pb.h"
+#endif
+
 #include "vgui_controls/AnimationController.h"
 #include "vgui/ILocalize.h"
 
@@ -39,7 +43,14 @@ public:
 	void Reset( void );
 	void VidInit( void );
 	void OnThink( void );
-	void MsgFunc_Battery(bf_read &msg );
+
+#if ENGINE_CSGO
+	bool MsgFunc_Battery( const CCSUsrMsg_Battery &msg );
+	CUserMessageBinder m_UMCMsgBattery;
+#else
+	void MsgFunc_Battery( bf_read &msg );
+#endif
+
 	bool ShouldDraw();
 	
 private:
@@ -142,7 +153,15 @@ void CHudBattery::OnThink( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
+#if ENGINE_CSGO
+bool CHudBattery::MsgFunc_Battery( const CCSUsrMsg_Battery &msg )
+{
+	m_iNewBat = msg.battery();
+	return true;
+}
+#else
 void CHudBattery::MsgFunc_Battery( bf_read &msg )
 {
 	m_iNewBat = msg.ReadShort();
 }
+#endif

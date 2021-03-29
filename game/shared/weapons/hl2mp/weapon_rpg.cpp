@@ -1398,7 +1398,7 @@ void CAPCMissile::ComputeActualDotPosition( CLaserDot *pLaserDot, Vector *pActua
 // RPG
 //=============================================================================
 
-LINK_ENTITY_TO_CLASS( weapon_rpg, CWeaponRPG );
+LINK_ENTITY_TO_CLASS_DUMB( weapon_rpg, CWeaponRPG );
 PRECACHE_WEAPON_REGISTER(weapon_rpg);
 
 IMPLEMENT_NETWORKCLASS_ALIASED( WeaponRPG, DT_WeaponRPG )
@@ -2300,6 +2300,15 @@ int	CWeaponRPG::DrawModel( int flags RENDER_INSTANCE_INPUT )
 //-----------------------------------------------------------------------------
 // Purpose: Called after first-person viewmodel is drawn
 //-----------------------------------------------------------------------------
+#if ENGINE_CSGO
+void CWeaponRPG::ViewModelDrawn( int flags, C_BaseViewModel *pBaseViewModel )
+{
+	// Draw our laser effects
+	DrawEffects();
+	
+	BaseClass::ViewModelDrawn( flags, pBaseViewModel );
+}
+#else
 void CWeaponRPG::ViewModelDrawn( C_BaseViewModel *pBaseViewModel )
 {
 	// Draw our laser effects
@@ -2307,6 +2316,7 @@ void CWeaponRPG::ViewModelDrawn( C_BaseViewModel *pBaseViewModel )
 	
 	BaseClass::ViewModelDrawn( pBaseViewModel );
 }
+#endif
 
 //-----------------------------------------------------------------------------
 // Purpose: Used to determine sorting of model when drawn
@@ -2343,7 +2353,7 @@ void CWeaponRPG::NotifyShouldTransmit( ShouldTransmitState_t state )
 // Laser Dot
 //=============================================================================
 
-LINK_ENTITY_TO_CLASS( env_laserdot, CLaserDot );
+LINK_ENTITY_TO_CLASS_DUMB( env_laserdot, CLaserDot );
 
 BEGIN_DATADESC( CLaserDot )
 	DEFINE_FIELD( m_vecSurfaceNormal,	FIELD_VECTOR ),

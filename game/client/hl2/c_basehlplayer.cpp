@@ -28,6 +28,9 @@ extern ConVar sensitivity;
 ConVar cl_npc_speedmod_intime( "cl_npc_speedmod_intime", "0.25", FCVAR_CLIENTDLL | FCVAR_ARCHIVE );
 ConVar cl_npc_speedmod_outtime( "cl_npc_speedmod_outtime", "1.5", FCVAR_CLIENTDLL | FCVAR_ARCHIVE );
 
+
+ConVar fuck("fuck", "1");
+
 IMPLEMENT_CLIENTCLASS_DT(C_BaseHLPlayer, DT_HL2_Player, CHL2_Player)
 	RecvPropDataTable( RECVINFO_DT(m_HL2Local),0, &REFERENCE_RECV_TABLE(DT_HL2Local) ),
 	RecvPropBool( RECVINFO( m_fIsSprinting ) ),
@@ -58,8 +61,14 @@ static ConCommand dropprimary("dropprimary", CC_DropPrimary, "dropprimary: Drops
 //-----------------------------------------------------------------------------
 C_BaseHLPlayer::C_BaseHLPlayer()
 {
+#if ENGINE_CSGO
+	AddVar( &m_Local.m_viewPunchAngle, &m_Local.m_iv_viewPunchAngle, LATCH_SIMULATION_VAR );
+	AddVar( &m_Local.m_aimPunchAngle, &m_Local.m_iv_aimPunchAngle, LATCH_SIMULATION_VAR );
+	AddVar( &m_Local.m_aimPunchAngleVel, &m_Local.m_iv_aimPunchAngleVel, LATCH_SIMULATION_VAR );
+#else
 	AddVar( &m_Local.m_vecPunchAngle, &m_Local.m_iv_vecPunchAngle, LATCH_SIMULATION_VAR );
 	AddVar( &m_Local.m_vecPunchAngleVel, &m_Local.m_iv_vecPunchAngleVel, LATCH_SIMULATION_VAR );
+#endif
 
 	m_flZoomStart		= 0.0f;
 	m_flZoomEnd			= 0.0f;
@@ -67,6 +76,7 @@ C_BaseHLPlayer::C_BaseHLPlayer()
 	m_flZoomStartTime	= 0.0f;
 	m_flSpeedMod		= cl_forwardspeed.GetFloat();
 }
+
 
 //-----------------------------------------------------------------------------
 // Purpose: 

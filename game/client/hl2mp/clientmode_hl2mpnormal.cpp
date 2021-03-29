@@ -175,7 +175,7 @@ public:
 		// Load up the combine control panel scheme
 		if (!g_hVGuiCombineScheme)
 		{
-			g_hVGuiCombineScheme = vgui::scheme()->LoadSchemeFromFileEx(enginevgui->GetPanel(PANEL_CLIENTDLL), IsXbox() ? "resource/ClientScheme.res" : "resource/CombinePanelScheme.res", "CombineScheme");
+			g_hVGuiCombineScheme = vgui::scheme()->LoadSchemeFromFileEx(enginevgui->GetPanel(PANEL_CLIENTDLL), "resource/CombinePanelScheme.res", "CombineScheme");
 			if (!g_hVGuiCombineScheme)
 			{
 				Warning("Couldn't load combine panel scheme!\n");

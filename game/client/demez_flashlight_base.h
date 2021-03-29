@@ -46,11 +46,11 @@ static ConVar r_flashlightbacktraceoffset( "r_flashlightbacktraceoffset", "0.4",
 static ConVar r_flashlighttracedistcutoff( "r_flashlighttracedistcutoff", "0", FCVAR_CHEAT, "If the trace at this distance hits the wall, fuck you and die  The distance until flashlight gets closer to wall" );
 
 // demez stuff
-static ConVar r_flashlight_fov( "demez_lightfov", "90.0", FCVAR_ARCHIVE);
-static ConVar r_flashlight_filtersize( "demez_lightfiltersize", "1.0", FCVAR_ARCHIVE );
+static ConVar r_flashlight_fov( "d_lightfov", "90.0", FCVAR_ARCHIVE);
+static ConVar r_flashlight_filtersize( "d_lightfiltersize", "1.0", FCVAR_ARCHIVE );
 
-static ConVar r_flashlight_constant(  "demez_lightconstant",    "0.0" );
-static ConVar r_flashlight_linear(    "demez_lightlinear",      "0.0" );
-static ConVar r_flashlight_quadratic( "demez_lightquadratic",   "15000.0" );
+static ConVar r_flashlight_constant(  "d_lightconstant",    "0.0" );
+static ConVar r_flashlight_linear(    "d_lightlinear",      "0.0" );
+static ConVar r_flashlight_quadratic( "d_lightquadratic",   "15000.0" );
 
 

@@ -245,8 +245,13 @@ public:
 
 	virtual void	NotifyShouldTransmit( ShouldTransmitState_t state );
 	virtual int		DrawModel( int flags RENDER_INSTANCE_INPUT );
-	virtual void	ViewModelDrawn( C_BaseViewModel *pBaseViewModel );
 	virtual bool	IsTranslucent( void );
+
+#if ENGINE_CSGO
+	virtual void	ViewModelDrawn( int flags, C_BaseViewModel *pBaseViewModel );
+#else
+	virtual void	ViewModelDrawn( C_BaseViewModel *pBaseViewModel );
+#endif
 
 	void			InitBeam( void );
 	void			GetWeaponAttachment( int attachmentId, Vector &outVector, Vector *dir = NULL );

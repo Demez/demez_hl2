@@ -70,7 +70,7 @@ void FinishClientPutInServer( CHL2MP_Player *pPlayer, bool bLoadGame )
 		ClientPrint( pPlayer, HUD_PRINTTALK, "You are on team %s1\n", pPlayer->GetTeam()->GetName() );
 	}
 
-	if (!bLoadGame)
+	/*if (!bLoadGame)
 	{
 		const ConVar *hostname = cvar->FindVar( "hostname" );
 		const char *title = (hostname) ? hostname->GetString() : "MESSAGE OF THE DAY";
@@ -83,7 +83,7 @@ void FinishClientPutInServer( CHL2MP_Player *pPlayer, bool bLoadGame )
 		pPlayer->ShowViewPortPanel( PANEL_INFO, true, data );
 
 		data->deleteThis();
-	}
+	}*/
 }
 
 /*

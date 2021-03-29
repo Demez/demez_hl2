@@ -31,16 +31,19 @@ extern INetworkStringTable *g_pStringTableInfoPanel;
 
 #define TEMP_HTML_FILE	"textwindow_temp.html"
 
+#define MINI_MOTD_FADE_TIME 2.5f
+#define MINI_MOTD_HOLD_TIME 5.0f;
+
 
 CON_COMMAND( showinfo, "Shows a info panel: <type> <title> <message> [<command>]" )
 {
-	if ( !gViewPortInterface )
+	if ( !GetViewPortInterface() )
 		return;
 	
 	if ( args.ArgC() < 4 )
 		return;
 		
-	IViewPortPanel * panel = gViewPortInterface->FindPanelByName( PANEL_INFO );
+	IViewPortPanel * panel = GetViewPortInterface()->FindPanelByName( PANEL_INFO );
 
 	 if ( panel )
 	 {
@@ -54,7 +57,7 @@ CON_COMMAND( showinfo, "Shows a info panel: <type> <title> <message> [<command>]
 
 		 panel->SetData( kv );
 
-		 gViewPortInterface->ShowPanel( panel, true );
+		 GetViewPortInterface()->ShowPanel( panel, true );
 
 		 kv->deleteThis();
 	 }
@@ -67,7 +70,7 @@ CON_COMMAND( showinfo, "Shows a info panel: <type> <title> <message> [<command>]
 //-----------------------------------------------------------------------------
 // Purpose: Constructor
 //-----------------------------------------------------------------------------
-CTextWindow::CTextWindow(IViewPort *pViewPort) : Frame(NULL, PANEL_INFO	)
+CTextWindow::CTextWindow(IViewPort *pViewPort) : BaseClass(NULL, PANEL_INFO	)
 {
 	// initialize dialog
 	m_pViewPort = pViewPort;
@@ -83,8 +86,6 @@ CTextWindow::CTextWindow(IViewPort *pViewPort) : Frame(NULL, PANEL_INFO	)
 	SetMoveable(false);
 	SetSizeable(false);
 	SetProportional(true);
-
-	// hide the system buttons
 	SetTitleBarVisible( false );
 
 	m_pTextMessage = new TextEntry(this, "TextMessage");
@@ -97,6 +98,11 @@ CTextWindow::CTextWindow(IViewPort *pViewPort) : Frame(NULL, PANEL_INFO	)
 	m_pOK->SetCommand("okay");
 	m_pTextMessage->SetMultiline( true );
 	m_nContentType = TYPE_TEXT;
+	m_iFadeStatus = FADE_STATUS_IN;
+
+	m_bMiniMode = false;
+
+	ListenForGameEvent( "game_newmap" );
 }
 
 //-----------------------------------------------------------------------------
@@ -106,9 +112,15 @@ void CTextWindow::ApplySchemeSettings( IScheme *pScheme )
 {
 	BaseClass::ApplySchemeSettings( pScheme );
 
-	LoadControlSettings("Resource/UI/TextWindow.res");
+	if ( !m_bMiniMode )
+	{
+		LoadControlSettings("Resource/UI/TextWindow.res");
+	}
+	else
+	{
+		LoadControlSettings("Resource/UI/MiniMOTD.res");
+	}
 
-	Reset();
 }
 
 //-----------------------------------------------------------------------------
@@ -125,8 +137,18 @@ void CTextWindow::Reset( void )
 	Q_strcpy( m_szTitle, "This could be your Title." );
 	Q_strcpy( m_szMessage, "Just for 10 Euros a week!" );
 	m_szExitCommand[0] = 0;
-	m_nContentType = TYPE_TEXT;
-	Update();
+
+	if ( m_bMiniMode )
+	{
+		m_iFadeStatus = FADE_STATUS_OFF;
+		SetAlpha( 0 );
+	}
+	else
+	{
+		SetAlpha( 255 );
+	}
+
+	UpdateContents();
 }
 
 void CTextWindow::ShowText( const char *text)
@@ -201,6 +223,9 @@ void CTextWindow::ShowFile( const char *filename )
 		g_pFullFileSystem->GetLocalPath( filename, pPathData, sizeof(pPathData) );
 		Q_strncat( localURL, pPathData, sizeof( localURL ), COPY_ALL_CHARACTERS );
 
+		// force steam to dump a local copy
+		filesystem->GetLocalCopy( pPathData );
+
 		ShowURL( localURL );
 	}
 	else
@@ -226,14 +251,113 @@ void CTextWindow::ShowFile( const char *filename )
 
 void CTextWindow::Update( void )
 {
+	if ( IsVisible() == false )
+		return;
+
+	if ( m_bMiniMode )
+	{
+		if ( m_iFadeStatus == FADE_STATUS_IN )
+		{
+			float flDeltaTime = ( m_flNextFadeTime - gpGlobals->curtime );
+
+			SetAlpha ( MAX( 0, RemapValClamped( flDeltaTime, MINI_MOTD_FADE_TIME, 0, -128, 255 ) ) );
+
+			if ( flDeltaTime <= 0.0f )
+			{
+				m_iFadeStatus = FADE_STATUS_HOLD;
+				m_flNextFadeTime = gpGlobals->curtime + MINI_MOTD_HOLD_TIME
+			}
+		}
+		else if ( m_iFadeStatus == FADE_STATUS_HOLD )
+		{
+			float flDeltaTime = ( m_flNextFadeTime - gpGlobals->curtime );
+
+			if ( flDeltaTime <= 0.0f )
+			{
+				m_iFadeStatus = FADE_STATUS_OUT;
+				m_flNextFadeTime = gpGlobals->curtime + MINI_MOTD_FADE_TIME;
+			}
+		}
+		else if ( m_iFadeStatus == FADE_STATUS_OUT )
+		{
+			float flDeltaTime = ( m_flNextFadeTime - gpGlobals->curtime );
+
+			SetAlpha ( RemapValClamped( flDeltaTime, 0.0f, MINI_MOTD_FADE_TIME, 0, 255 ) );
+
+			if ( flDeltaTime <= 0.0f )
+			{
+				m_iFadeStatus = FADE_STATUS_OFF;
+				SetVisible( false );
+			}
+		}
+	}
+}
+
+void CTextWindow::OnCommand( const char *command)
+{
+    if (!Q_strcmp(command, "okay"))
+    {
+		if ( m_szExitCommand[0] )
+		{
+			engine->ClientCmd( m_szExitCommand );
+		}
+		
+		m_pViewPort->ShowPanel( this, false );
+	}
+
+	BaseClass::OnCommand(command);
+}
+
+void CTextWindow::SetData(KeyValues *data)
+{
+	if ( IsVisible() == true )
+		return;
+
+	SetData( data->GetInt( "type" ), data->GetString( "title"), data->GetString( "msg" ), data->GetString( "cmd" ) );
+}
+
+void CTextWindow::SetData( int type, const char *title, const char *message, const char *command )
+{
+	Q_strncpy(  m_szTitle, title, sizeof( m_szTitle ) );
+	Q_strncpy(  m_szMessage, message, sizeof( m_szMessage ) );
+	
+	if ( command )
+	{
+		Q_strncpy( m_szExitCommand, command, sizeof(m_szExitCommand) );
+	}
+	else
+	{
+		m_szExitCommand[0]=0;
+	}
+
+	m_nContentType = type;
+
+	UpdateContents();
+}
+
+void CTextWindow::UpdateContents( void )
+{
 	SetTitle( m_szTitle, false );
 
-	m_pTitleLabel->SetText( m_szTitle );
+	if ( m_pTitleLabel )
+	{
+		m_pTitleLabel->SetText( m_szTitle );
+	}
 
 #if defined( ENABLE_HTMLWINDOW )
-	m_pHTMLMessage->SetVisible( false );
+	if ( m_pHTMLMessage )
+	{
+		m_pHTMLMessage->SetVisible( false );
+	}
 #endif
-	m_pTextMessage->SetVisible( false );
+
+	if ( m_pTextMessage )
+	{
+		m_pTextMessage->SetVisible( false );
+	}
+
+	if ( m_bMiniMode )
+		return;
 
 	if ( m_nContentType == TYPE_INDEX )
 	{
@@ -257,60 +381,77 @@ void CTextWindow::Update( void )
 	}
 }
 
-void CTextWindow::OnCommand( const char *command)
-{
-    if (!Q_strcmp(command, "okay"))
-    {
-		if ( m_szExitCommand[0] )
-		{
-			engine->ClientCmd( m_szExitCommand );
-		}
-		
-		m_pViewPort->ShowPanel( this, false );
-	}
-
-	BaseClass::OnCommand(command);
-}
-
-void CTextWindow::SetData(KeyValues *data)
-{
-	SetData( data->GetInt( "type" ), data->GetString( "title"), data->GetString( "msg" ), data->GetString( "cmd" ) );
-}
-
-void CTextWindow::SetData( int type, const char *title, const char *message, const char *command )
-{
-	Q_strncpy(  m_szTitle, title, sizeof( m_szTitle ) );
-	Q_strncpy(  m_szMessage, message, sizeof( m_szMessage ) );
-	
-	if ( command )
-	{
-		Q_strncpy( m_szExitCommand, command, sizeof(m_szExitCommand) );
-	}
-	else
-	{
-		m_szExitCommand[0]=0;
-	}
-
-	m_nContentType = type;
-
-	Update();
-}
-
 void CTextWindow::ShowPanel( bool bShow )
 {
+	if ( IsX360() )
+	{
+		// Say no to MOTD from Xbox 360 clients!
+		bShow = false;
+	}
+
 	if ( BaseClass::IsVisible() == bShow )
 		return;
 
 	m_pViewPort->ShowBackGround( bShow );
 
+	m_bMiniMode = false;
+	if ( m_szMessage && m_szMessage[0] )
+	{
+		if ( !Q_strncmp( m_szMessage, "hostfile", 8 ) )
+		{
+			m_bMiniMode = true;
+		}
+	}
+
+	if ( bShow )
+	{
+		InvalidateLayout( true, true );
+	}
+
+	UpdateContents();
+
 	if ( bShow )
 	{
 		Activate();
-		SetMouseInputEnabled( true );
+
+		if ( !m_bMiniMode )
+		{
+			SetVisible( true );
+			SetMouseInputEnabled( true );
+			SetKeyBoardInputEnabled( true );
+			SetAlpha( 255 );
+		}
+		else
+		{
+			m_iFadeStatus = FADE_STATUS_IN;
+			m_flNextFadeTime = gpGlobals->curtime + MINI_MOTD_FADE_TIME;
+			SetAlpha( 0 );
+
+			SetMouseInputEnabled( false );
+			SetKeyBoardInputEnabled( false );
+		}
 	}
 	else
 	{
 		SetVisible( false );
-		SetMouseInputEnabled( false );
+
+		if ( !m_bMiniMode )
+		{
+			SetMouseInputEnabled( false );
+		}
 	}
+}
+
+void CTextWindow::FireGameEvent( IGameEvent *event )
+{
+	const char *name = event->GetName();
+	if ( Q_strcmp( name, "game_newmap" ) == 0 )
+	{
+		m_bIgnoreMultipleShowRequests = false;
+	}
+}
+
+bool CTextWindow::WantsBackgroundBlurred( void )
+{
+	return (!m_bMiniMode);
 }

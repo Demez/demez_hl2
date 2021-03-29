@@ -34,6 +34,11 @@ void CServerGameDLL::LevelInit_ParseAllEntities( const char *pMapEntities )
 // Purpose: Called to apply lobby settings to a dedicated server
 //-----------------------------------------------------------------------------
 #if ENGINE_NEW
+
+#if ENGINE_CSGO
+extern KeyValues* FindLaunchOptionByValue( KeyValues *pLaunchOptions, char const *szLaunchOption );
+#endif
+
 void CServerGameDLL::ApplyGameSettings(KeyValues *pKV)
 {
 	if (!pKV)

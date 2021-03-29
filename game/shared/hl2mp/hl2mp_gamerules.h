@@ -18,10 +18,19 @@
 #include "gamerules.h"
 #include "teamplay_gamerules.h"
 #include "gamevars_shared.h"
+#include "hl2_shareddefs.h"
 #include "engine_defines.h"
 
 #ifndef CLIENT_DLL
 #include "hl2mp_player.h"
+#include "triggers.h"
+#include "trigger_checkpoint.h"
+#include "d_changelevel.h"
+#endif
+
+#if ENGINE_CSGO
+#include "cstrike15_usermessages.pb.h"
+#include "hl2_usermessages.pb.h"
 #endif
 
 #define VEC_CROUCH_TRACE_MIN	HL2MPRules()->GetHL2MPViewVectors()->m_vCrouchTraceMin
@@ -91,6 +100,30 @@ public:
 	Vector m_vCrouchTraceMax;	
 };
 
+
+#ifdef GAME_DLL
+class CEntityRespawnInfo
+{
+public:
+	CEntityRespawnInfo( CBaseEntity *pEntity );
+	~CEntityRespawnInfo();
+
+	void SetNeedsRespawn( bool enabled );
+	CBaseEntity* CreateEntity();
+
+	CBaseEntity* m_pEntity;
+
+	bool    m_bCanRespawn;
+	bool    m_bNeedsRespawn;
+
+	float   m_flNextRespawnTime;
+
+	Vector		m_vSpawnOrigin;
+	QAngle		m_vSpawnAngles;
+};
+#endif
+
+// TODO: not inherit from CTeamplayRules (probably never lol)
 class CHL2MPRules : public CTeamplayRules
 {
 public:
@@ -107,6 +140,8 @@ public:
 	
 	CHL2MPRules();
 	virtual ~CHL2MPRules();
+
+	virtual void LevelInitPostEntity();
 
 	virtual void Precache( void );
 	virtual bool ShouldCollide( int collisionGroup0, int collisionGroup1 );
@@ -135,6 +170,9 @@ public:
 	void RestartGame();
 	
 #ifndef CLIENT_DLL
+	HSCRIPT GetScriptInstance();
+	bool ValidateScriptScope();
+
 	virtual Vector VecItemRespawnSpot( CItem *pItem );
 	virtual QAngle VecItemRespawnAngles( CItem *pItem );
 	virtual float	FlItemRespawnTime( CItem *pItem );
@@ -158,6 +196,22 @@ public:
 
 	void	SetAICriteria( AI_CriteriaSet& set );
 
+	void StartTransitionTimer( CChangeLevel* changeLevel );
+	void EndTransitionTimer();
+
+	CEntityRespawnInfo* GetEntityRespawnInfo( CBaseEntity* pEntity );
+	void AddRespawnableEntity( CBaseEntity* pEntity );
+	void RemoveRespawnableEntity( CBaseEntity* pEntity );
+	void SetEntityNeedsRespawn( CBaseEntity* pEntity, bool needed = true );
+	void RespawnEntities();
+
+	void PlayerSpawn( CBasePlayer* pPlayer );
+
+	void RegisterCheckpoint( CCheckpoint* checkpoint );
+	bool SetCheckpoint( CCheckpoint* checkpoint );
+	CCheckpoint* m_pCheckpoint;
+	// CUtlVector< CTriggerCheckpoint* > m_vecCheckpoints;
+
 #endif
 	virtual void ClientDisconnected( edict_t *pClient );
 
@@ -175,6 +229,10 @@ public:
 	bool	MegaPhyscannonActive( void ) { return m_bMegaPhysgun; }
 
 	void	CheckAllPlayersReady( void );
+
+	int ItemShouldRespawn( CItem *pItem );
+
+	void RegisterScriptFunctions();
 	
 private:
 	
@@ -190,12 +248,46 @@ private:
 	bool m_bAwaitingReadyRestart;
 	bool m_bHeardAllPlayersReady;
 
+#ifdef GAME_DLL
+	CBaseEntity* m_pProxy;
 
+public:
+	float m_flTransitionTimerEnd;
+
+private:
+	bool m_bTransitionTimerOn;
+	CChangeLevel* m_pChangeLevel;
+
+	// CUtlVector< CRespawnableEntity* > m_vecRespawnableEntities;
+	CUtlVector<CEntityRespawnInfo*> m_vecRespawnableEntities;
+
+	CScriptScope	m_ScriptScope;
+	HSCRIPT			m_hScriptInstance;
+	string_t		m_iszScriptId;
+
+#if ENGINE_CSGO
+	float m_flIntermissionEndTime;
+#endif
+
+#endif
 };
 
 inline CHL2MPRules* HL2MPRules()
 {
 	return static_cast<CHL2MPRules*>(g_pGameRules);
+}
+
+
+typedef CHL2MPRules CDemezGameRules;
+
+inline CDemezGameRules* DemezGameRules()
+{
+	return static_cast<CDemezGameRules*>(g_pGameRules);
+}
+
+inline CDemezGameRules* DGameRules()
+{
+	return static_cast<CDemezGameRules*>(g_pGameRules);
 }
 
 #endif //HL2MP_GAMERULES_H

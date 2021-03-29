@@ -195,6 +195,9 @@ public:
 	void			AddInsignia();
 	void			RemoveInsignia();
 	bool			SpeakCommandResponse( AIConcept_t concept, const char *modifiers = NULL );
+
+	// Demez: Health regeneration for these guys so they're less useless
+	virtual bool ShouldRegenerateHealth( void ) { return CanJoinPlayerSquad(); }
 	
 	//---------------------------------
 	// Scanner interaction

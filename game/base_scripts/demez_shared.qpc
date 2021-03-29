@@ -3,28 +3,23 @@
 // kind of a mess here, oh well
 // honestly, it might be a good idea to include client and server base files for each engine here, but idk
 // ---------------------------------------------------------------
+macro DEMEZ_HL2 "1"
 macro DEMEZ_SRC_DIR ".."
 
 include "base_scripts/engine_macros.qpc"
-
-macro SRCDIR "$DEMEZ_SRC_DIR/$ENGINE_FOLDER"         [$ENGINE_QUIVER || $ENGINE_2013]
-macro SRC_DIR "$DEMEZ_SRC_DIR/$ENGINE_FOLDER"        [$ENGINE_ASW || $ENGINE_CSGO]
 
 macro GAMENAME "$DEMEZ_SRC_DIR/output/demez_$ENGINE_OUT_NAME"
 
 include "$DEMEZ_SRC_DIR/$ENGINE_FOLDER/game/$TYPE/_$TYPE_base.qpc" [$ENGINE_QUIVER || $ENGINE_2013]
 include "$DEMEZ_SRC_DIR/$ENGINE_FOLDER/game/$TYPE/$TYPE_base.qpc"  [$ENGINE_CSGO || $ENGINE_ASW]
 
-// include "$DEMEZ_SRC_DIR/$ENGINE_FOLDER/game/$TYPE/$TYPE_vr_base.qpc"  [$ENGINE_ASW && $VR]
-// include "$DEMEZ_SRC_DIR/$ENGINE_FOLDER/game/$TYPE/_$TYPE_vr_base.qpc"  [$ENGINE_QUIVER && $VR]
-
 include "$DEMEZ_SRC_DIR/game/vr_base/$TYPE_vr_base.qpc"
+include "shared/protobuf/hl2_usermessages_include.qpc" [$ENGINE_CSGO]
 
 macro GAME_FOLDER		"demez"
 macro ENGINE_SHARED		"$ENGINE_SRC/game/shared"
 macro SHARED_GAME		"$ENGINE_SHARED/$GAME_FOLDER"
-
-macro FULL_GAME_NAME "$GAME_FOLDER_$ENGINE_OUT_NAME"
+macro FULL_GAME_NAME	"$GAME_FOLDER_$ENGINE_OUT_NAME"
 
 macro BASE_DEBUG_ARGS "-w 1920 -h 1080 -noborder -sw -console -novid -dev -game \"$ROOT_DIR_ABS/output/$FULL_GAME_NAME\""
 macro BASE_DEBUG_ARGS "-override_vpk $BASE_DEBUG_ARGS" [$ENGINE_ASW]
@@ -36,7 +31,7 @@ configuration
 		// out_dir     "$GAMENAME/bin/$ENGINE_PLATFORM"
 		out_dir     "$GAMENAME/bin/$ENGINE_OUT_DIR"
 		// out_dir     "$CONFIG/$PLATFORM/$FULL_GAME_NAME/$TYPE"
-		build_dir   "$CONFIG/$ENGINE_PLATFORM/$FULL_GAME_NAME/$TYPE"
+		build_dir   "obj/$CONFIG/$ENGINE_PLATFORM/$FULL_GAME_NAME/$TYPE"
 		
 		include_directories
 		{
@@ -45,6 +40,7 @@ configuration
 			"shared/hl2"
 			"shared/hl2mp"
 			
+			"shared/weapons"
 			"shared/weapons/hl2mp"
 			"shared/base_classes"
 			
@@ -56,6 +52,8 @@ configuration
 			"$TYPE/base_classes"
 			
 			"$ENGINE_SRC/game/$TYPE"
+			
+			"$TYPE/$CONFIG"
 		}
 	}
 
@@ -63,6 +61,8 @@ configuration
 	{
 		preprocessor_definitions
 		{
+			"DEMEZ_HL2=1"
+			
 			"HL2MP"
 			"HL2_EPISODIC"
 			
@@ -73,6 +73,7 @@ configuration
 			"ENGINE_2013=$ENGINE_2013"
 			"ENGINE_ASW=$ENGINE_ASW"
 			"ENGINE_CSGO=$ENGINE_CSGO"
+			"ENGINE_TF2=0" // maybe?
 		}
 	}
 	
@@ -101,6 +102,10 @@ files
 {
 	- "$ENGINE_SRC_DIR/game/shared/activitylist.cpp"
 	
+	// overridden by vr
+	- "$ENGINE_SRC_DIR/game/shared/usercmd.cpp"
+	- "$ENGINE_SRC_DIR/game/shared/usercmd.h"
+	
 	"$ENGINE_SHARED/predicted_viewmodel.cpp"
 	"$ENGINE_SHARED/predicted_viewmodel.h"
 	
@@ -120,10 +125,15 @@ files
 	{
 	//	"shared/base_classes/demez_ammodef.cpp"
 	//	"shared/base_classes/demez_ammodef.h"
+	//	"shared/base_classes/d_respawnable_item.cpp"
+	//	"shared/base_classes/d_respawnable_item.h"
 	}
 	
 	folder "Game Base"
 	{
+		"shared/player_pickup.cpp"
+		"shared/player_pickup.h"
+		
 		"shared/hl2mp/hl2mp_gamerules.cpp"
 		"shared/hl2mp/hl2mp_gamerules.h"
 		
@@ -183,6 +193,10 @@ files
 			"shared/weapons/hl2mp/weapon_frag.cpp"
 			// "shared/weapons/hl2mp/weapon_physcannon.cpp"
 			// "shared/weapons/hl2mp/weapon_physcannon.h"
+			
+			"shared/weapons/weapon_physcannon_shared.cpp"
+			"shared/weapons/weapon_physcannon_shared.h"
+			
 			"shared/weapons/hl2mp/weapon_pistol.cpp"
 			"shared/weapons/hl2mp/weapon_rpg.cpp"
 			"shared/weapons/hl2mp/weapon_rpg.h"

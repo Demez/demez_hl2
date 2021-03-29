@@ -6,6 +6,8 @@
 
 #include "basecombatweapon_shared.h"
 #include "hl2mp_weapon_parse.h"
+#include "hl2_shareddefs.h"
+
 #ifdef CLIENT_DLL
 #include "c_hl2mp_player.h"
 #else
@@ -92,6 +94,11 @@ public:
 
 	virtual void FireBullets(const FireBulletsInfo_t& info);
 	virtual void FallInit(void);
+
+	bool IsWeaponZoomed()
+	{
+		return false;
+	}
 
 	#ifdef GAME_DLL
 	// void			SendReloadSoundEvent(void);

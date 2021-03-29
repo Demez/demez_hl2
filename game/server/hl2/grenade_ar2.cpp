@@ -96,7 +96,7 @@ void CGrenadeAR2::Spawn( void )
 	// -------------
 	// Smoke trail.
 	// -------------
-	if( g_CV_SmokeTrail.GetInt() && !IsXbox() )
+	if( g_CV_SmokeTrail.GetInt() )
 	{
 		m_hSmokeTrail = SmokeTrail::CreateSmokeTrail();
 		
@@ -208,7 +208,11 @@ void CGrenadeAR2::Detonate(void)
 	CPASFilter filter( GetAbsOrigin() );
 
 	te->Explosion( filter, 0.0,
+#if ENGINE_CSGO
+		GetAbsOrigin(), 
+#else
 		&GetAbsOrigin(), 
+#endif
 		g_sModelIndexFireball,
 		2.0, 
 		15,

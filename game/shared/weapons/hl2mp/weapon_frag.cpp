@@ -131,7 +131,7 @@ BEGIN_PREDICTION_DATA( CWeaponFrag )
 END_PREDICTION_DATA()
 #endif
 
-LINK_ENTITY_TO_CLASS( weapon_frag, CWeaponFrag );
+LINK_ENTITY_TO_CLASS_DUMB( weapon_frag, CWeaponFrag );
 PRECACHE_WEAPON_REGISTER(weapon_frag);
 
 CWeaponFrag::CWeaponFrag( void ) :

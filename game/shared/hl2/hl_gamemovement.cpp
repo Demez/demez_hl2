@@ -17,11 +17,13 @@ static ConVar sv_ladderautomountdot( "sv_ladderautomountdot", "0.4", FCVAR_REPLI
 
 static ConVar sv_ladder_useonly( "sv_ladder_useonly", "0", FCVAR_REPLICATED, "If set, ladders can only be mounted by pressing +USE" );
 
-ConVar demez_bhop_mode("dmz_sv_bhop_mode", "1", FCVAR_ARCHIVE | FCVAR_REPLICATED, "0 - hl1, 1 - hl2 release, 2 - abh");
-ConVar demez_auto_bhop("dmz_sv_auto_bhop", "1", FCVAR_ARCHIVE | FCVAR_REPLICATED);
+ConVar demez_bhop_mode("d_sv_bhop_mode", "1", FCVAR_ARCHIVE | FCVAR_REPLICATED, "0 - hl1, 1 - hl2 release, 2 - abh");
+ConVar demez_auto_bhop("d_sv_auto_bhop", "1", FCVAR_ARCHIVE | FCVAR_REPLICATED);
 
-ConVar dmz_bhop_other_mult("dmz_sv_bhop_other", "0.1", FCVAR_ARCHIVE | FCVAR_REPLICATED, "Multiplier to use for bhop mode 1 when sprint jumping");
-ConVar dmz_bhop_mult("dmz_sv_bhop", "0.5", FCVAR_ARCHIVE | FCVAR_REPLICATED, "Multiplier to use for bhop mode 1 for normal jumping when moving");
+ConVar dmz_bhop_other_mult("d_sv_bhop_mult_sprint", "0.1", FCVAR_ARCHIVE | FCVAR_REPLICATED, "Multiplier to use for bhop mode 1 when sprint jumping");
+ConVar dmz_bhop_mult("d_sv_bhop_mult", "0.5", FCVAR_ARCHIVE | FCVAR_REPLICATED, "Multiplier to use for bhop mode 1 for normal jumping when moving");
+
+ConVar demez_airaccel("d_sv_airaccel", "1", FCVAR_ARCHIVE | FCVAR_REPLICATED);
 
 extern ConVar sv_gravity;
 
@@ -782,6 +784,7 @@ void CHL2GameMovement::CheckFalling()
 	player->m_Local.m_flFallVelocity = 0;
 }
 
+// d_sv_airaccel
 void CHL2GameMovement::AirAccelerate(Vector& wishdir, float wishspeed, float accel)
 {
 	int i;

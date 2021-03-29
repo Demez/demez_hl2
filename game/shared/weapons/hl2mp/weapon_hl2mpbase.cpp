@@ -78,7 +78,7 @@ END_NETWORK_TABLE()
 BEGIN_PREDICTION_DATA( CWeaponHL2MPBase ) 
 END_PREDICTION_DATA()
 
-LINK_ENTITY_TO_CLASS( weapon_hl2mp_base, CWeaponHL2MPBase );
+LINK_ENTITY_TO_CLASS_DUMB( weapon_hl2mp_base, CWeaponHL2MPBase );
 
 
 #ifdef GAME_DLL

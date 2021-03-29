@@ -1,0 +1,32 @@
+macro PROJECT_NAME  "Client - Demez CSGO"
+macro ENGINE_CSGO    "1"
+
+include "base_scripts/demez_client.qpc"
+include "base_scripts/demez_gameui.qpc"
+// include "$DEMEZ_SRC_DIR/$ENGINE_FOLDER/game/client/client_portal2_gameui.qpc"
+
+include "demez_shared_csgo.qpc"
+
+configuration
+{
+	compiler
+	{
+		preprocessor_definitions
+		{
+			"GAMEUI_EMBEDDED"
+			"GAMEUI_EXPORTS"
+		}
+	}
+}
+
+files
+{
+	folder "CSGO Branch Only"
+	{
+		"$ENGINE_SRC_DIR/game/client/history_resource.h"
+		"$ENGINE_SRC_DIR/game/client/history_resource.cpp"
+		"$ENGINE_SRC_DIR/game/client/steamworks_gamestats_client.h"
+		"$ENGINE_SRC_DIR/game/client/steamworks_gamestats_client.cpp"
+	}
+}
+

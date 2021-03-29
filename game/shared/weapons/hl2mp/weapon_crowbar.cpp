@@ -27,8 +27,8 @@
 #include "tier0/memdbgon.h"
 
 
-static ConVar demez_wpn_crowbar_firerate("demez_wpn_crowbar_firerate", "0.4", FCVAR_CHEAT);
-static ConVar demez_wpn_crowbar_range("demez_wpn_crowbar_range", "75", FCVAR_CHEAT);
+static ConVar demez_wpn_crowbar_firerate("d_wpn_crowbar_firerate", "0.4", FCVAR_CHEAT);
+static ConVar demez_wpn_crowbar_range("d_wpn_crowbar_range", "75", FCVAR_CHEAT);
 
 
 //-----------------------------------------------------------------------------
@@ -43,7 +43,7 @@ END_NETWORK_TABLE()
 BEGIN_PREDICTION_DATA( CWeaponCrowbar )
 END_PREDICTION_DATA()
 
-LINK_ENTITY_TO_CLASS( weapon_crowbar, CWeaponCrowbar );
+LINK_ENTITY_TO_CLASS_DUMB( weapon_crowbar, CWeaponCrowbar );
 PRECACHE_WEAPON_REGISTER( weapon_crowbar );
 
 #ifndef CLIENT_DLL

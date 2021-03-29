@@ -75,9 +75,9 @@ extern int gEvilImpulse101;
 
 ConVar sv_autojump( "sv_autojump", "0" );
 
-ConVar hl2_walkspeed( "demez_sv_walkspeed", "150" );
-ConVar hl2_normspeed( "demez_sv_normspeed", "190" );
-ConVar hl2_sprintspeed( "demez_sv_sprintspeed", "320" );
+ConVar hl2_walkspeed( "d_sv_walkspeed", "150" );
+ConVar hl2_normspeed( "d_sv_normspeed", "190" );
+ConVar hl2_sprintspeed( "d_sv_sprintspeed", "320" );
 
 ConVar hl2_darkness_flashlight_factor ( "hl2_darkness_flashlight_factor", "1" );
 
@@ -87,12 +87,12 @@ ConVar player_showpredictedposition_timestep( "player_showpredictedposition_time
 ConVar player_squad_transient_commands( "player_squad_transient_commands", "1", FCVAR_REPLICATED );
 ConVar player_squad_double_tap_time( "player_squad_double_tap_time", "0.25" );
 
-ConVar demez_sv_infinite_aux_power("demez_sv_infinite_aux_power", "1");
-ConVar demez_sv_infinite_flashlight("demez_sv_infinite_flashlight", "1", FCVAR_ARCHIVE);
+ConVar demez_sv_infinite_aux_power("d_sv_infinite_aux_power", "1");
+ConVar demez_sv_infinite_flashlight("d_sv_infinite_flashlight", "1", FCVAR_ARCHIVE);
 
 ConVar autoaim_unlock_target( "autoaim_unlock_target", "0.8666" );
 
-ConVar sv_stickysprint("sv_stickysprint", "0", FCVAR_ARCHIVE | FCVAR_ARCHIVE_XBOX);
+ConVar sv_stickysprint("sv_stickysprint", "0", FCVAR_ARCHIVE);
 
 #define	FLASH_DRAIN_TIME	 1.1111	// 100 units / 90 secs
 #define	FLASH_CHARGE_TIME	 50.0f	// 100 units / 2 secs
@@ -850,30 +850,19 @@ void CHL2_Player::PreThink(void)
 	UpdateWeaponPosture();
 
 	// Disallow shooting while zooming
-	if ( IsX360() )
+	if ( m_nButtons & IN_ZOOM )
 	{
-		if ( IsZooming() )
-		{
-			if( GetActiveWeapon() && !GetActiveWeapon()->IsWeaponZoomed() )
-			{
-				// If not zoomed because of the weapon itself, do not attack.
-				m_nButtons &= ~(IN_ATTACK|IN_ATTACK2);
-			}
-		}
+		//FIXME: Held weapons like the grenade get sad when this happens
+#ifdef HL2_EPISODIC
+		// Episodic allows players to zoom while using a func_tank
+		CBaseCombatWeapon* pWep = GetActiveWeapon();
+		if ( !m_hUseEntity || ( pWep && pWep->IsWeaponVisible() ) )
+#endif
+		m_nButtons &= ~(IN_ATTACK|IN_ATTACK2);
 	}
-	else
-	{
-		if ( m_nButtons & IN_ZOOM )
-		{
-			//FIXME: Held weapons like the grenade get sad when this happens
-	#ifdef HL2_EPISODIC
-			// Episodic allows players to zoom while using a func_tank
-			CBaseCombatWeapon* pWep = GetActiveWeapon();
-			if ( !m_hUseEntity || ( pWep && pWep->IsWeaponVisible() ) )
-	#endif
-			m_nButtons &= ~(IN_ATTACK|IN_ATTACK2);
-		}
-	}
+
+	// not originally here
+	BaseClass::PreThink();
 }
 
 void CHL2_Player::PostThink( void )
@@ -1108,7 +1097,8 @@ void CHL2_Player::Spawn(void)
 	if ( !IsSuitEquipped() )
 		 StartWalking();
 
-	SuitPower_SetCharge( 100 );
+	SuitPower_Initialize();
+	// SuitPower_SetCharge( 100 );
 
 	m_Local.m_iHideHUD |= HIDEHUD_CHAT;
 
@@ -1974,10 +1964,15 @@ bool CHL2_Player::ApplyBattery( float powerMultiplier )
 		CSingleUserRecipientFilter user( this );
 		user.MakeReliable();
 
+#if ENGINE_CSGO
+		CCSUsrMsg_ItemPickup msg;
+		msg.set_item("item_battery");
+		SendUserMessage( user, CS_UM_ItemPickup, msg );
+#else
 		UserMessageBegin( user, "ItemPickup" );
-			WRITE_STRING( "item_battery" );
+		WRITE_STRING( "item_battery" );
 		MessageEnd();
-
+#endif
 		
 		// Suit reports new power level
 		// For some reason this wasn't working in release build -- round it.
@@ -2228,8 +2223,14 @@ void CHL2_Player::OnSquadMemberKilled( inputdata_t &data )
 	// send a message to the client, to notify the hud of the loss
 	CSingleUserRecipientFilter user( this );
 	user.MakeReliable();
+
+#if ENGINE_CSGO
+	CCSUsrMsg_SquadMemberDied msg;
+	SendUserMessage( user, CS_UM_SquadMemberDied, msg );
+#else
 	UserMessageBegin( user, "SquadMemberDied" );
 	MessageEnd();
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -2565,7 +2566,7 @@ bool CHL2_Player::ShouldKeepLockedAutoaimTarget( EHANDLE hLockedTarget )
 //			bSuppressSound - 
 // Output : int
 //-----------------------------------------------------------------------------
-int CHL2_Player::GiveAmmo( int nCount, int nAmmoIndex, bool bSuppressSound)
+/*int CHL2_Player::GiveAmmo( int nCount, int nAmmoIndex, bool bSuppressSound)
 {
 	// Don't try to give the player invalid ammo indices.
 	if (nAmmoIndex < 0)
@@ -2604,7 +2605,7 @@ int CHL2_Player::GiveAmmo( int nCount, int nAmmoIndex, bool bSuppressSound)
 	}
 
 	return nAdd;
-}
+}*/
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
@@ -2769,6 +2770,12 @@ bool CHL2_Player::ClientCommand( const CCommand &args )
 //-----------------------------------------------------------------------------
 void CHL2_Player::PlayerUse ( void )
 {
+	if ( m_bInVR )
+	{
+		BaseClass::PlayerUse();
+		return;
+	}
+
 	// Was use pressed or released?
 	if ( ! ((m_nButtons | m_afButtonPressed | m_afButtonReleased) & IN_USE) )
 		return;
@@ -3099,6 +3106,12 @@ bool CHL2_Player::Weapon_CanSwitchTo( CBaseCombatWeapon *pWeapon )
 
 void CHL2_Player::PickupObject( CBaseEntity *pObject, bool bLimitMassAndSize )
 {
+	if ( m_bInVR )
+	{
+		BaseClass::PickupObject( pObject, bLimitMassAndSize );
+		return;
+	}
+
 	// can't pick up what you're standing on
 	if ( GetGroundEntity() == pObject )
 		return;
@@ -3206,6 +3219,17 @@ void CHL2_Player::UpdateClientData( void )
 
 		CSingleUserRecipientFilter user( this );
 		user.MakeReliable();
+		
+#if ENGINE_CSGO
+		CCSUsrMsg_Damage msg;
+		msg.set_amount( m_DmgTake );
+		CMsgVector* msgDamageOrigin = new CMsgVector;
+		msgDamageOrigin->set_x( damageOrigin.x );
+		msgDamageOrigin->set_y( damageOrigin.y );
+		msgDamageOrigin->set_z( damageOrigin.z );
+		msg.set_allocated_inflictor_world_pos( msgDamageOrigin );
+		SendUserMessage( user, CS_UM_Damage, msg );
+#else
 		UserMessageBegin( user, "Damage" );
 			WRITE_BYTE( m_DmgSave );
 			WRITE_BYTE( m_DmgTake );
@@ -3214,6 +3238,7 @@ void CHL2_Player::UpdateClientData( void )
 			WRITE_FLOAT( damageOrigin.y );	//BUG: However, the HUD does _not_ implement bitfield messages (yet)
 			WRITE_FLOAT( damageOrigin.z );	//BUG: We use WRITE_VEC3COORD for everything else
 		MessageEnd();
+#endif
 	
 		m_DmgTake = 0;
 		m_DmgSave = 0;
@@ -3490,7 +3515,7 @@ bool CHL2_Player::TestHitboxes( const Ray_t &ray, unsigned int fContentsMask, tr
 				return false;
 
 			mstudiobbox_t *pbox = set->pHitbox( tr.hitbox );
-			mstudiobone_t *pBone = pStudioHdr->pBone(pbox->bone);
+			const mstudiobone_t *pBone = pStudioHdr->pBone(pbox->bone);
 			tr.surface.name = "**studio**";
 			tr.surface.flags = SURF_HITBOX;
 			tr.surface.surfaceProps = physprops->GetSurfaceIndex( pBone->pszSurfaceProp() );

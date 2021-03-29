@@ -6,12 +6,18 @@
 #pragma once
 #endif
 
-// full smile, again...
+// just use the functions ffs
 #define private public
 #include "items.h"
 #undef private
 
+#include "props.h"
 #include "engine_defines.h"
+
+#if ENGINE_CSGO
+#include "cstrike15_usermessages.pb.h"
+#include "hl2_usermessages.pb.h"
+#endif
 
 class CDemezItem: public CItem
 {
@@ -23,11 +29,15 @@ public:
 	
 	DECLARE_DATADESC()
 	
-	void    Spawn( void );
-	void    FallThink( void );
+	void		Spawn( void );
+	void		FallThink( void );
 
-	float   m_flNextResetCheckTime;
+	bool		CanRespawn( void );
+
+	float		m_flNextResetCheckTime;
+	bool		m_bCanRespawn;
 };
+
 
 
 #endif // DEMEZ_ITEMS_H

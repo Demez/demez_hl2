@@ -758,8 +758,9 @@ void MuzzleFlash_Strider( ClientEntityHandle_t hEntity, int attachmentIndex )
 	VPROF_BUDGET( "MuzzleFlash_Strider", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
 
 	// If the client hasn't seen this entity yet, bail.
-	matrix3x4_t	matAttachment;
-	if ( !FX_GetAttachmentTransform( hEntity, attachmentIndex, matAttachment ) )
+	// matrix3x4_t	matAttachment;
+	VMatrix	matAttachment;
+	if ( !FX_GetAttachmentTransform( hEntity, attachmentIndex, matAttachment.As3x4() ) )
 		return;
 
 	CSmartPtr<CLocalSpaceEmitter> pSimple = CLocalSpaceEmitter::Create( "MuzzleFlash_Strider", hEntity, attachmentIndex );

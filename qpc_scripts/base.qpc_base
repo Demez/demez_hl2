@@ -5,42 +5,45 @@ configurations
 	"Release"
 }
 
+group "demez_gamedlls"
+{
+	folder "Demez - Quiver" [$DEMEZ && $BASE_QUIVER]
+	{
+		"game/demez_client_quiver.qpc"
+		"game/demez_server_quiver.qpc"
+	}
+	
+	folder "Demez - 2013" [$DEMEZ && $BASE_2013]
+	{
+		"game/demez_client_2013.qpc"
+		"game/demez_server_2013.qpc"
+	}
+	
+	folder "Demez - ASW" [$DEMEZ && $BASE_ASW]
+	{
+		"game/demez_client_asw.qpc"
+		// "game/demez_client_asw_vr.qpc"
+		"game/demez_server_asw.qpc"
+	}
+	
+	folder "Demez - CSGO" [$DEMEZ && $BASE_CSGO]
+	{
+		"game/demez_client_csgo.qpc"
+		"game/demez_server_csgo.qpc"
+	}
+	
+	folder "Other"
+	{
+		"client"
+		"server"
+	}
+}
+
 group "demez_game"
 {
 	folder "Game Binaries"
 	{
-		folder "Demez - Quiver" [$DEMEZ && $BASE_QUIVER]
-		{
-			"game/demez_client_quiver.qpc"
-			"game/demez_server_quiver.qpc"
-		}
-		
-		folder "Demez - 2013" [$DEMEZ && $BASE_2013]
-		{
-			"game/demez_client_2013.qpc"
-			"game/demez_server_2013.qpc"
-		}
-		
-		folder "Demez - ASW" [$DEMEZ && $BASE_ASW]
-		{
-			"game/demez_client_asw.qpc"
-			// "game/demez_client_asw_vr.qpc"
-			"game/demez_server_asw.qpc"
-		}
-		
-		/*
-		folder "Demez - CSGO" [$DEMEZ && $BASE_CSGO]
-		{
-			"game/demez_client_csgo.qpc"
-			"game/demez_server_csgo.qpc"
-		}
-		*/
-		
-		folder "Other"
-		{
-			"client"
-			"server"
-		}
+		contains "demez_gamedlls"
 	}
 }
 
@@ -54,13 +57,13 @@ group "game"
 
 
 // if at least 2 of these macros are defined
-macro BASE_MULTIPLE_ENGINES "1" [$BASE_QUIVER && ($BASE_2013 || $BASE_ASW || $BASE_CSGO)]
-macro BASE_MULTIPLE_ENGINES "1" [$BASE_2013 && ($BASE_QUIVER || $BASE_ASW || $BASE_CSGO)]
-macro BASE_MULTIPLE_ENGINES "1" [$BASE_ASW && ($BASE_QUIVER || $BASE_2013 || $BASE_CSGO)]
-macro BASE_MULTIPLE_ENGINES "1" [$BASE_CSGO && ($BASE_QUIVER || $BASE_ASW || $BASE_2013)]
+// macro BASE_MULTIPLE_ENGINES "1" [$BASE_QUIVER && ($BASE_2013 || $BASE_ASW || $BASE_CSGO)]
+// macro BASE_MULTIPLE_ENGINES "1" [$BASE_2013 && ($BASE_QUIVER || $BASE_ASW || $BASE_CSGO)]
+// macro BASE_MULTIPLE_ENGINES "1" [$BASE_ASW && ($BASE_QUIVER || $BASE_2013 || $BASE_CSGO)]
+// macro BASE_MULTIPLE_ENGINES "1" [$BASE_CSGO && ($BASE_QUIVER || $BASE_ASW || $BASE_2013)]
 
-include "_qpc_scripts/_default.qpc_base" "branches/quiver/src"      [$BASE_QUIVER && !$BASE_MULTIPLE_ENGINES]
-include "_qpc_scripts/_default.qpc_base" "branches/2013/src"        [$BASE_2013 && !$BASE_MULTIPLE_ENGINES]
-include "_qpc_scripts/_default.qpc_base" "branches/asw"             [$BASE_ASW && !$BASE_MULTIPLE_ENGINES]
-// include "_qpc_scripts/_default.qpc_base" "branches/csgo"            [$BASE_CSGO && !$BASE_MULTIPLE_ENGINES]
+include "_qpc_scripts/_default.qpc_base" "branches/quiver/src"              [$BASE_QUIVER && !$BASE_MULTIPLE_ENGINES]
+include "_qpc_scripts/_default.qpc_base" "branches/2013/src"                [$BASE_2013 && !$BASE_MULTIPLE_ENGINES]
+include "_qpc_scripts/_default.qpc_base" "branches/cstrike15/cstrike15"     [$BASE_CSGO && !$BASE_MULTIPLE_ENGINES]
+include "_qpc_scripts/_default.qpc_base" "branches/asw"                     [$BASE_ASW && !$BASE_MULTIPLE_ENGINES]
 

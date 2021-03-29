@@ -918,9 +918,15 @@ bool CGrubNugget::MyTouch( CBasePlayer *pPlayer )
 	CSingleUserRecipientFilter user( pPlayer );
 	user.MakeReliable();
 
+#if ENGINE_CSGO
+	CCSUsrMsg_ItemPickup msg;
+	msg.set_item( GetClassname() );
+	SendUserMessage( user, CS_UM_ItemPickup, msg );
+#else
 	UserMessageBegin( user, "ItemPickup" );
 	WRITE_STRING( GetClassname() );
 	MessageEnd();
+#endif
 
 	CPASAttenuationFilter filter( pPlayer, "GrubNugget.Touch" );
 	EmitSound( filter, pPlayer->entindex(), "GrubNugget.Touch" );

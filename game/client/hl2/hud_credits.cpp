@@ -20,6 +20,10 @@
 #include "filesystem.h"
 #include "engine_defines.h"
 
+#if ENGINE_CSGO
+#include "hl2_usermessages.pb.h"
+#endif
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -68,8 +72,17 @@ public:
 
 	int GetStringPixelWidth ( wchar_t *pString, vgui::HFont hFont );
 
+#if ENGINE_CSGO
+	bool MsgFunc_CreditsMsg( const CCSUsrMsg_CreditsMsg &msg );
+	bool MsgFunc_LogoTimeMsg( const CCSUsrMsg_LogoTimeMsg &msg );
+	CUserMessageBinder m_UMCMsgCreditsMsg;
+	CUserMessageBinder m_UMCMsgLogoTimeMsg;
+#else
 	void MsgFunc_CreditsMsg( bf_read &msg );
 	void MsgFunc_LogoTimeMsg( bf_read &msg );
+#endif
+
+	void HandleCreditsMsg();
 
 	virtual bool	ShouldDraw( void ) 
 	{ 
@@ -311,7 +324,7 @@ void CHudCredits::DrawOutroCreditsName( void )
 					m_bLastOneInPlace = true;
 					
 					// 360 certification requires that we not hold a static image too long.
-					m_flFadeTime = gpGlobals->curtime + ( IsConsole() ? 2.0f : 10.0f );
+					m_flFadeTime = gpGlobals->curtime + 10.0f;
 				}
 			}
 			else
@@ -420,11 +433,7 @@ void CHudCredits::DrawLogo( void )
 
 	char szLogoFont[64];
 
-	if ( IsXbox() )
-	{
-		Q_snprintf( szLogoFont, sizeof( szLogoFont ), "WeaponIcons_Small" );
-	}
-	else if ( hl2_episodic.GetBool() )
+	if ( hl2_episodic.GetBool() )
 	{
 		Q_snprintf( szLogoFont, sizeof( szLogoFont ), "ClientTitleFont" );
 	}
@@ -704,10 +713,9 @@ void CHudCredits::PrepareIntroCredits( void )
 	SetActive( true );
 }
 
-void CHudCredits::MsgFunc_CreditsMsg( bf_read &msg )
-{
-	m_iCreditsType = msg.ReadByte();
 
+void CHudCredits::HandleCreditsMsg()
+{
 	switch ( m_iCreditsType )
 	{
 		case CREDITS_LOGO:
@@ -728,10 +736,35 @@ void CHudCredits::MsgFunc_CreditsMsg( bf_read &msg )
 	}
 }
 
+
+#if ENGINE_CSGO
+bool CHudCredits::MsgFunc_CreditsMsg( const CCSUsrMsg_CreditsMsg &msg )
+{
+	m_iCreditsType = msg.type();
+	HandleCreditsMsg();
+	return true;
+}
+#else
+void CHudCredits::MsgFunc_CreditsMsg( bf_read &msg )
+{
+	m_iCreditsType = msg.ReadByte();
+	HandleCreditsMsg();
+}
+#endif
+
+#if ENGINE_CSGO
+bool CHudCredits::MsgFunc_LogoTimeMsg( const CCSUsrMsg_LogoTimeMsg &msg )
+{
+	m_iCreditsType = CREDITS_LOGO;
+	PrepareLogo( msg.time() );
+	return true;
+}
+#else
 void CHudCredits::MsgFunc_LogoTimeMsg( bf_read &msg )
 {
 	m_iCreditsType = CREDITS_LOGO;
 	PrepareLogo( msg.ReadFloat() );
 }
+#endif
 
 

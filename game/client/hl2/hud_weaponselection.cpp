@@ -68,6 +68,20 @@ public:
 
 	virtual void LevelInit();
 
+#if ENGINE_CSGO
+	virtual void UserCmd_GamePadSlot1( void ) {};
+	virtual void UserCmd_GamePadSlot2( void ) {};
+	virtual void UserCmd_GamePadSlot3( void ) {};
+	virtual void UserCmd_GamePadSlot4( void ) {};
+	virtual void UserCmd_GamePadSlot5( void ) {};
+	virtual void UserCmd_GamePadSlot6( void ) {};
+
+	// amazing
+	virtual void CycleToNextGrenadeOrBomb( void ) {};
+	virtual void CycleToNextGrenadeBombOrMelee( void ) {};
+	virtual void CycleToNextNonGrenadeOrBomb( void ) {};
+#endif
+
 protected:
 	virtual void OnThink();
 	virtual void Paint();

@@ -514,7 +514,7 @@ bool CHL2MPClientScoreBoardDialog::GetPlayerScoreInfo(int playerIndex, KeyValues
 	kv->SetInt("team", g_PR->GetTeam( playerIndex ) );
 	kv->SetString("name", g_PR->GetPlayerName(playerIndex) );
 	kv->SetInt("deaths", g_PR->GetDeaths( playerIndex ));
-	kv->SetInt("frags", g_PR->GetPlayerScore( playerIndex ));
+	// kv->SetInt("frags", g_PR->GetPlayerScore( playerIndex ));
 	kv->SetString("class", "");
 	
 	if (g_PR->GetPing( playerIndex ) < 1)

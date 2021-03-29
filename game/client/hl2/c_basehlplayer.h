@@ -18,6 +18,8 @@
 #include "c_hl2_playerlocaldata.h"
 #include "engine_defines.h"
 
+extern ConVar fuck;
+
 class C_BaseHLPlayer : public C_VRBasePlayer
 {
 public:
@@ -51,7 +53,7 @@ public:
 	bool				IsSprinting() const { return m_fIsSprinting; }
 
 	// NOTE: you NEED this in ASW, otherwise the player is stuck at the origin point
-	virtual bool        ShouldRegenerateOriginFromCellBits() const { return true; }
+	virtual bool        ShouldRegenerateOriginFromCellBits() const { return fuck.GetBool(); }
 
 	// Input handling
 	virtual bool	CreateMove( float flInputSampleTime, CUserCmd *pCmd );

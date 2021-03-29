@@ -40,7 +40,7 @@ BEGIN_NETWORK_TABLE_NOBASE( CHalfLife2, DT_HL2GameRules )
 END_NETWORK_TABLE()
 
 
-LINK_ENTITY_TO_CLASS( hl2_gamerules, CHalfLife2Proxy );
+LINK_ENTITY_TO_CLASS_DUMB( hl2_gamerules, CHalfLife2Proxy );
 IMPLEMENT_NETWORKCLASS_ALIASED( HalfLife2Proxy, DT_HalfLife2Proxy )
 
 
@@ -88,7 +88,7 @@ ConVar	sk_dmg_take_scale2( "sk_dmg_take_scale2", "1.00", FCVAR_REPLICATED );
 	ConVar	sk_dmg_take_scale3( "sk_dmg_take_scale3", "1.50", FCVAR_REPLICATED );
 #endif//HL2_EPISODIC
 
-ConVar	sk_allow_autoaim( "sk_allow_autoaim", "1", FCVAR_REPLICATED | FCVAR_ARCHIVE_XBOX );
+ConVar	sk_allow_autoaim( "sk_allow_autoaim", "1", FCVAR_REPLICATED );
 
 // Autoaim scale
 ConVar	sk_autoaim_scale1( "sk_autoaim_scale1", "1.0", FCVAR_REPLICATED );
@@ -1815,22 +1815,22 @@ CAmmoDef *GetAmmoDef()
 		def.AddAmmoType("XBowBolt",			DMG_BULLET,					TRACER_LINE,			"sk_plr_dmg_crossbow",		"sk_npc_dmg_crossbow",		"sk_max_crossbow",		BULLET_IMPULSE(800, 8000),	0 );
 		def.AddAmmoType("FlareRound",		DMG_BURN,					TRACER_LINE,			"sk_plr_dmg_flare_round","sk_npc_dmg_flare_round",		"sk_max_flare_round",	BULLET_IMPULSE(1500, 600),	0 );
 		def.AddAmmoType("Buckshot",			DMG_BULLET | DMG_BUCKSHOT,	TRACER_LINE,			"sk_plr_dmg_buckshot",		"sk_npc_dmg_buckshot",		"sk_max_buckshot",		BULLET_IMPULSE(400, 1200),	0 );
-		def.AddAmmoType("RPG_Round",		DMG_BURN,					TRACER_NONE,			"sk_plr_dmg_rpg_round",		"sk_npc_dmg_rpg_round",		"sk_max_rpg_round",		0,							0 );
-		def.AddAmmoType("SMG1_Grenade",		DMG_BURN,					TRACER_NONE,			"sk_plr_dmg_smg1_grenade",	"sk_npc_dmg_smg1_grenade",	"sk_max_smg1_grenade",	0,							0 );
-		def.AddAmmoType("AR2_Grenade",		DMG_BURN,					TRACER_NONE,			"sk_plr_dmg_ar2_grenade",	"sk_npc_dmg_ar2_grenade",	"sk_max_ar2_grenade",	0,							0 );
-		def.AddAmmoType("ML_Grenade",		DMG_BURN,					TRACER_NONE,			"sk_plr_dmg_ml_grenade",	"sk_npc_dmg_ml_grenade",	"sk_max_ml_grenade",	0,							0 );
-		def.AddAmmoType("AR2AltFire",		DMG_DISSOLVE,				TRACER_NONE,			0,							0,							"sk_max_ar2_altfire",	0,							0 );
+		def.AddAmmoType("RPG_Round",		DMG_BURN,					TRACER_NONE,			"sk_plr_dmg_rpg_round",		"sk_npc_dmg_rpg_round",		"sk_max_rpg_round",		0.0,						0 );
+		def.AddAmmoType("SMG1_Grenade",		DMG_BURN,					TRACER_NONE,			"sk_plr_dmg_smg1_grenade",	"sk_npc_dmg_smg1_grenade",	"sk_max_smg1_grenade",	0.0,						0 );
+		def.AddAmmoType("AR2_Grenade",		DMG_BURN,					TRACER_NONE,			"sk_plr_dmg_ar2_grenade",	"sk_npc_dmg_ar2_grenade",	"sk_max_ar2_grenade",	0.0,						0 );
+		def.AddAmmoType("ML_Grenade",		DMG_BURN,					TRACER_NONE,			"sk_plr_dmg_ml_grenade",	"sk_npc_dmg_ml_grenade",	"sk_max_ml_grenade",	0.0,						0 );
+		def.AddAmmoType("AR2AltFire",		DMG_DISSOLVE,				TRACER_NONE,			0,							0,							"sk_max_ar2_altfire",	0.0,						0 );
 		def.AddAmmoType("SniperRound",		DMG_BULLET | DMG_SNIPER,	TRACER_NONE,			"sk_plr_dmg_sniper_round",	"sk_npc_dmg_sniper_round",	"sk_max_sniper_round",	BULLET_IMPULSE(650, 6000),	0 );
 		def.AddAmmoType("SniperPenetratedRound",DMG_BULLET | DMG_SNIPER,TRACER_NONE,			"sk_dmg_sniper_penetrate_plr","sk_dmg_sniper_penetrate_npc","sk_max_sniper_round",BULLET_IMPULSE(150, 6000),0 );
-		def.AddAmmoType("Slam",				DMG_BURN,					TRACER_NONE,			NULL,						NULL,						"sk_max_slam",			0,							0 );
-		def.AddAmmoType("Tripwire",			DMG_BURN,					TRACER_NONE,			NULL,						NULL,						"sk_max_tripwire",		0,							0 );
+		def.AddAmmoType("Slam",				DMG_BURN,					TRACER_NONE,			NULL,						NULL,						"sk_max_slam",			0.0,						0 );
+		def.AddAmmoType("Tripwire",			DMG_BURN,					TRACER_NONE,			NULL,						NULL,						"sk_max_tripwire",		0.0,						0 );
 		def.AddAmmoType("SmallRound",		DMG_BULLET,					TRACER_LINE,			"sk_plr_dmg_small_round",	"sk_npc_dmg_small_round",	"sk_max_small_round",	BULLET_IMPULSE(125, 1325),	0 );
 		def.AddAmmoType("MediumRound",		DMG_BULLET,					TRACER_LINE,			"sk_plr_dmg_medium_round",	"sk_npc_dmg_medium_round",	"sk_max_medium_round",	BULLET_IMPULSE(200, 1225),	0 );
 		def.AddAmmoType("LargeRound",		DMG_BULLET,					TRACER_LINE,			"sk_plr_dmg_large_round",	"sk_npc_dmg_large_round",	"sk_max_large_round",	BULLET_IMPULSE(250, 1180),	0 );
-		def.AddAmmoType("Molotov",			DMG_BURN,					TRACER_NONE,			"sk_plr_dmg_molotov",		"sk_npc_dmg_molotov",		"sk_max_molotov", 		0,							0 );
-		def.AddAmmoType("Grenade",			DMG_BURN,					TRACER_NONE,			"sk_plr_dmg_grenade",		"sk_npc_dmg_grenade",		"sk_max_grenade",		0,							0 );
-		def.AddAmmoType("Brickbat",			DMG_CLUB,					TRACER_NONE,			"sk_plr_dmg_brickbat",		"sk_npc_dmg_brickbat",		"sk_max_brickbat",		0,							0 );
-		def.AddAmmoType("Rock",				DMG_CLUB,					TRACER_NONE,			"sk_plr_dmg_brickbat",		"sk_npc_dmg_brickbat",		"sk_max_brickbat",		0,							0 );
+		def.AddAmmoType("Molotov",			DMG_BURN,					TRACER_NONE,			"sk_plr_dmg_molotov",		"sk_npc_dmg_molotov",		"sk_max_molotov", 		0.0,						0 );
+		def.AddAmmoType("Grenade",			DMG_BURN,					TRACER_NONE,			"sk_plr_dmg_grenade",		"sk_npc_dmg_grenade",		"sk_max_grenade",		0.0,						0 );
+		def.AddAmmoType("Brickbat",			DMG_CLUB,					TRACER_NONE,			"sk_plr_dmg_brickbat",		"sk_npc_dmg_brickbat",		"sk_max_brickbat",		0.0,						0 );
+		def.AddAmmoType("Rock",				DMG_CLUB,					TRACER_NONE,			"sk_plr_dmg_brickbat",		"sk_npc_dmg_brickbat",		"sk_max_brickbat",		0.0,						0 );
 		def.AddAmmoType("Thumper",			DMG_SONIC,					TRACER_NONE,			10, 10, 2, 0, 0 );
 		def.AddAmmoType("Gravity",			DMG_CLUB,					TRACER_NONE,			0,	0, 8, 0, 0 );
 		def.AddAmmoType("Extinguisher",		DMG_BURN,					TRACER_NONE,			0,	0, 100, 0, 0 );
@@ -1842,7 +1842,7 @@ CAmmoDef *GetAmmoDef()
 
 #ifdef HL2_EPISODIC
 		//def.AddAmmoType("Hopwire",			DMG_BLAST,					TRACER_NONE, 1,	1, 5, 0, 0 );
-		def.AddAmmoType("Hopwire",			DMG_BLAST,					TRACER_NONE,			"sk_plr_dmg_grenade",		"sk_npc_dmg_grenade",		"sk_max_hopwire",		0, 0);
+		def.AddAmmoType("Hopwire",			DMG_BLAST,					TRACER_NONE,			"sk_plr_dmg_grenade",		"sk_npc_dmg_grenade",		"sk_max_hopwire",		0.0, 0);
 		def.AddAmmoType("CombineHeavyCannon",	DMG_BULLET,				TRACER_LINE,			40,	40, NULL, 10 * 750 * 12, AMMO_FORCE_DROP_IF_CARRIED ); // hit like a 10 kg weight at 750 ft/s
 		def.AddAmmoType("ammo_proto1",			DMG_BULLET,				TRACER_LINE,			0, 0, 10, 0, 0 );
 #endif // HL2_EPISODIC

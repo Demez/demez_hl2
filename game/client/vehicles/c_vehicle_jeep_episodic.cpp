@@ -15,6 +15,11 @@
 #include "hl2_vehicle_radar.h"
 #include "usermessages.h"
 #include "hud_radar.h"
+#include "hud_macros.h"
+
+#if ENGINE_CSGO
+#include "hl2_usermessages.pb.h"
+#endif
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -35,6 +40,23 @@ public:
 	C_PropJeepEpisodic();
 
 	void OnEnteredVehicle( C_BasePlayer *pPlayer );
+
+	void HandleUpdateJalopyRadar();
+
+#if ENGINE_CSGO
+	CUserMessageBinder m_UMCMsgUpdateJalopyRadar;
+	bool MsgFunc_UpdateJalopyRadar(const CCSUsrMsg_UpdateJalopyRadar &msg) 
+	{
+		HandleUpdateJalopyRadar();
+		return true;
+	}
+#else
+	void MsgFunc_UpdateJalopyRadar(bf_read &msg) 
+	{
+		HandleUpdateJalopyRadar();
+	}
+#endif
+
 #if ENGINE_NEW
 	bool Simulate( void );
 #else
@@ -60,11 +82,15 @@ IMPLEMENT_CLIENTCLASS_DT( C_PropJeepEpisodic, DT_CPropJeepEpisodic, CPropJeepEpi
 
 END_RECV_TABLE()
 
+DECLARE_HUD_MESSAGE( C_PropJeepEpisodic, UpdateJalopyRadar );
+
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void __MsgFunc_UpdateJalopyRadar(bf_read &msg) 
+void C_PropJeepEpisodic::HandleUpdateJalopyRadar() 
 {
+	// TODO: how do you handle multiple jalopys for coop?
+
 	// Radar code here!
 	if( !GetHudRadar() )
 		return;
@@ -73,9 +99,9 @@ void __MsgFunc_UpdateJalopyRadar(bf_read &msg)
 	// Usually we do not, so default to false.
 	GetHudRadar()->m_bUseFastUpdate = false;
 
-	for( int i = 0 ; i < g_pJalopy->m_iNumRadarContacts ; i++ )
+	for( int i = 0 ; i < m_iNumRadarContacts ; i++ )
 	{
-		if( g_pJalopy->m_iRadarContactType[i] == RADAR_CONTACT_DOG )
+		if( m_iRadarContactType[i] == RADAR_CONTACT_DOG )
 		{
 			GetHudRadar()->m_bUseFastUpdate = true;
 			break;
@@ -93,11 +119,12 @@ void __MsgFunc_UpdateJalopyRadar(bf_read &msg)
 		flContactTimeToLive = RADAR_UPDATE_FREQUENCY;
 	}
 
-	for( int i = 0 ; i < g_pJalopy->m_iNumRadarContacts ; i++ )
+	for( int i = 0 ; i < m_iNumRadarContacts ; i++ )
 	{
-		GetHudRadar()->AddRadarContact( g_pJalopy->m_vecRadarContactPos[i], g_pJalopy->m_iRadarContactType[i], flContactTimeToLive );	
+		GetHudRadar()->AddRadarContact( m_vecRadarContactPos[i], m_iRadarContactType[i], flContactTimeToLive );	
 	}
 }
+
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
@@ -105,7 +132,11 @@ C_PropJeepEpisodic::C_PropJeepEpisodic()
 {
 	if( g_pJalopy == NULL )
 	{
+/*#if ENGINE_CSGO
+
+#else
 		usermessages->HookMessage( "UpdateJalopyRadar", __MsgFunc_UpdateJalopyRadar );
+#endif*/
 	}
 
 	g_pJalopy = this;

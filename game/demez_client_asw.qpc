@@ -12,6 +12,7 @@ configuration
 		{
 			"GAMEUI_EMBEDDED"
 			"GAMEUI_EXPORTS"
+			"ALLOW_DEVELOPMENT_CVARS"
 		}
 	}
 }

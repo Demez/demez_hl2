@@ -431,7 +431,13 @@ void CPropAPC::Event_Killed( const CTakeDamageInfo &info )
 	for (int i = 0; i < 5; i++)
 	{
 		CollisionProp()->RandomPointInBounds( vecNormalizedMins, vecNormalizedMaxs, &vecAbsPoint );
-		te->Explosion( filter, random->RandomFloat( 0.0, 1.0 ),	&vecAbsPoint, 
+		te->Explosion( filter, random->RandomFloat( 0.0, 1.0 ),
+#if ENGINE_CSGO
+					  vecAbsPoint, 
+#else
+					  &vecAbsPoint, 
+#endif
+
 			g_sModelIndexFireball, random->RandomInt( 4, 10 ), 
 			random->RandomInt( 8, 15 ), 
 #if ENGINE_NEW

@@ -10,6 +10,7 @@
 #include "player.h"
 #include "items.h"
 #include "in_buttons.h"
+#include "demez_items.h"
 #include "engine/IEngineSound.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -22,10 +23,10 @@ ConVar	sk_healthcharger( "sk_healthcharger","0" );
 //-----------------------------------------------------------------------------
 // Small health kit. Heals the player when picked up.
 //-----------------------------------------------------------------------------
-class CHealthKit : public CItem
+class CHealthKit : public CDemezItem
 {
 public:
-	DECLARE_CLASS( CHealthKit, CItem );
+	DECLARE_CLASS( CHealthKit, CDemezItem );
 
 	void Spawn( void );
 	void Precache( void );
@@ -71,9 +72,15 @@ bool CHealthKit::MyTouch( CBasePlayer *pPlayer )
 		CSingleUserRecipientFilter user( pPlayer );
 		user.MakeReliable();
 
+#if ENGINE_CSGO
+		CCSUsrMsg_ItemPickup msg;
+		msg.set_item( GetClassname() );
+		SendUserMessage( user, CS_UM_ItemPickup, msg );
+#else
 		UserMessageBegin( user, "ItemPickup" );
 			WRITE_STRING( GetClassname() );
 		MessageEnd();
+#endif
 
 		CPASAttenuationFilter filter( pPlayer, "HealthKit.Touch" );
 		EmitSound( filter, pPlayer->entindex(), "HealthKit.Touch" );
@@ -97,10 +104,10 @@ bool CHealthKit::MyTouch( CBasePlayer *pPlayer )
 // Small dynamically dropped health kit
 //-----------------------------------------------------------------------------
 
-class CHealthVial : public CItem
+class CHealthVial : public CDemezItem
 {
 public:
-	DECLARE_CLASS( CHealthVial, CItem );
+	DECLARE_CLASS( CHealthVial, CDemezItem );
 
 	void Spawn( void )
 	{
@@ -123,10 +130,16 @@ public:
 		{
 			CSingleUserRecipientFilter user( pPlayer );
 			user.MakeReliable();
-
+			
+#if ENGINE_CSGO
+			CCSUsrMsg_ItemPickup msg;
+			msg.set_item( GetClassname() );
+			SendUserMessage( user, CS_UM_ItemPickup, msg );
+#else
 			UserMessageBegin( user, "ItemPickup" );
 				WRITE_STRING( GetClassname() );
 			MessageEnd();
+#endif
 
 			CPASAttenuationFilter filter( pPlayer, "HealthVial.Touch" );
 			EmitSound( filter, pPlayer->entindex(), "HealthVial.Touch" );

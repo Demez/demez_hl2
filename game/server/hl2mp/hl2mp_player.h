@@ -51,6 +51,7 @@ public:
 
 	DECLARE_SERVERCLASS();
 	DECLARE_DATADESC();
+	DECLARE_ENT_SCRIPTDESC();
 
 	virtual void Precache( void );
 	virtual void Spawn( void );
@@ -140,6 +141,7 @@ public:
 
 	bool	JoinedFromChangeLevel() { return m_bChangedLevel; }
 
+	bool m_bInTransition;
 
 	Vector m_vecTotalBulletForce;	//Accumulator for bullet force in a single frame
 
@@ -148,6 +150,9 @@ public:
 
 	virtual bool	CanHearAndReadChatFrom( CBasePlayer *pPlayer );
 
+	virtual void RunOnPostSpawnScripts();
+	virtual int ScriptGiveAmmo( int iCount, const char *szName, bool bSuppressSound );
+	virtual bool ScriptGiveNamedItem( const char *szName );
 		
 private:
 

@@ -955,9 +955,15 @@ void CPropJeepEpisodic::UpdateRadar( bool forceUpdate )
 
 	CBasePlayer* pPlayer = UTIL_GetNearestPlayer(GetAbsOrigin());
 	CSingleUserRecipientFilter filter(pPlayer);
+
+#if ENGINE_CSGO
+	CCSUsrMsg_UpdateJalopyRadar msg;
+	SendUserMessage( filter, CS_UM_UpdateJalopyRadar, msg );
+#else
 	UserMessageBegin( filter, "UpdateJalopyRadar" );
 	WRITE_BYTE( 0 ); // end marker
 	MessageEnd();	// send message
+#endif
 }
 
 ConVar jalopy_cargo_anim_time( "jalopy_cargo_anim_time", "1.0" );

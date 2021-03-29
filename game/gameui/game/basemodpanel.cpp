@@ -65,6 +65,8 @@
 #include "smartptr.h"
 #include "nb_header_footer.h"
 
+#include "vr.h"
+
 // UI defines. Include if you want to implement some of them [str]
 #include "ui_defines.h"
 
@@ -206,6 +208,20 @@ CBaseModPanel* CBaseModPanel::GetSingletonPtr()
 {
 	return m_CFactoryBasePanel;
 }
+
+//=============================================================================
+// Disable Mouse Locking if in VR
+//=============================================================================
+bool CBaseModPanel::IsMouseInputEnabled()
+{
+	if ( g_VR.active )
+	{
+		return true;
+	}
+
+	return BaseClass::IsMouseInputEnabled();
+}
+
 
 //=============================================================================
 void CBaseModPanel::ReloadScheme()

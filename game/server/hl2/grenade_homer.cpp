@@ -386,7 +386,11 @@ void CGrenadeHomer::Detonate(void)
 	CPASFilter filter( GetAbsOrigin() );
 
 	te->Explosion( filter, 0.0,
+#if ENGINE_CSGO
+		GetAbsOrigin(), 
+#else
 		&GetAbsOrigin(), 
+#endif
 		g_sModelIndexFireball,
 		2.0, 
 		15,

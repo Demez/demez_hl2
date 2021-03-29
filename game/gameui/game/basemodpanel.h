@@ -114,6 +114,8 @@ namespace BaseModUI
 		static CBaseModPanel& GetSingleton();
 		static CBaseModPanel* GetSingletonPtr();
 
+		virtual bool IsMouseInputEnabled();
+
 		void ReloadScheme();
 
 		CBaseModFrame* OpenWindow( const WINDOW_TYPE& wt, CBaseModFrame * caller, bool hidePrevious = true, KeyValues *pParameters = NULL );

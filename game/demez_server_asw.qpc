@@ -3,6 +3,17 @@ macro ENGINE_ASW "1"
 
 include "base_scripts/demez_server.qpc"
 
+configuration
+{
+	compiler
+	{
+		preprocessor_definitions
+		{
+			"ALLOW_DEVELOPMENT_CVARS"
+		}
+	}
+}
+
 files
 {
 	- "$ENGINE_SRC_DIR/game/server/logic_playerproxy.cpp"

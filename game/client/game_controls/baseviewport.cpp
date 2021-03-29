@@ -40,6 +40,7 @@
 #include "mapoverview.h"
 #include "hud.h"
 #include "NavProgress.h"
+#include "commentary_modelviewer.h"
 
 // our definition
 #include "baseviewport.h"
@@ -47,11 +48,26 @@
 #include <convar.h>
 #include "ienginevgui.h"
 #include "iclientmode.h"
+#include "vgui_int.h"
+
+
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-IViewPort *gViewPortInterface = NULL;
+static IViewPort *s_pFullscreenViewportInterface;
+static IViewPort *s_pViewportInterfaces[ MAX_SPLITSCREEN_PLAYERS ];
+
+IViewPort *GetViewPortInterface()
+{
+	ASSERT_LOCAL_PLAYER_RESOLVABLE();
+	return s_pViewportInterfaces[ GET_ACTIVE_SPLITSCREEN_SLOT() ];
+}
+
+IViewPort *GetFullscreenViewPortInterface()
+{
+	return s_pFullscreenViewportInterface;
+}
 
 vgui::Panel *g_lastPanel = NULL; // used for mouseover buttons, keeps track of the last active panel
 vgui::Button *g_lastButton = NULL; // used for mouseover buttons, keeps track of the last active button
@@ -63,43 +79,43 @@ static ConVar cl_leveloverviewmarker( "cl_leveloverviewmarker", "0", FCVAR_CHEAT
 
 CON_COMMAND( showpanel, "Shows a viewport panel <name>" )
 {
-	if ( !gViewPortInterface )
+	if ( !GetViewPortInterface() )
 		return;
-	
+
 	if ( args.ArgC() != 2 )
 		return;
-		
-	 gViewPortInterface->ShowPanel( args[ 1 ], true );
+
+	GetViewPortInterface()->ShowPanel( args[ 1 ], true );
 }
 
 CON_COMMAND( hidepanel, "Hides a viewport panel <name>" )
 {
-	if ( !gViewPortInterface )
+	if ( !GetViewPortInterface() )
 		return;
-	
+
 	if ( args.ArgC() != 2 )
 		return;
-		
-	 gViewPortInterface->ShowPanel( args[ 1 ], false );
+
+	GetViewPortInterface()->ShowPanel( args[ 1 ], false );
 }
 
 /* global helper functions
 
 bool Helper_LoadFile( IBaseFileSystem *pFileSystem, const char *pFilename, CUtlVector<char> &buf )
 {
-	FileHandle_t hFile = pFileSystem->Open( pFilename, "rt" );
-	if ( hFile == FILESYSTEM_INVALID_HANDLE )
-	{
-		Warning( "Helper_LoadFile: missing %s\n", pFilename );
-		return false;
-	}
+FileHandle_t hFile = pFileSystem->Open( pFilename, "rt" );
+if ( hFile == FILESYSTEM_INVALID_HANDLE )
+{
+Warning( "Helper_LoadFile: missing %s\n", pFilename );
+return false;
+}
 
-	unsigned long len = pFileSystem->Size( hFile );
-	buf.SetSize( len );
-	pFileSystem->Read( buf.Base(), buf.Count(), hFile );
-	pFileSystem->Close( hFile );
+unsigned long len = pFileSystem->Size( hFile );
+buf.SetSize( len );
+pFileSystem->Read( buf.Base(), buf.Count(), hFile );
+pFileSystem->Close( hFile );
 
-	return true;
+return true;
 } */
 
 //-----------------------------------------------------------------------------
@@ -139,10 +155,10 @@ bool CBaseViewport::LoadHudAnimations( void )
 }
 
 //================================================================
-CBaseViewport::CBaseViewport() : vgui::EditablePanel( NULL, "CBaseViewport")
-{
-	gViewPortInterface = this;
+CBaseViewport::CBaseViewport() : vgui::EditablePanel( NULL, "CBaseViewport" )
+{	
 	m_bInitialized = false;
+	m_bFullscreenViewport = false;
 
 	m_GameuiFuncs = NULL;
 	m_GameEventManager = NULL;
@@ -156,26 +172,15 @@ CBaseViewport::CBaseViewport() : vgui::EditablePanel( NULL, "CBaseViewport")
 	m_pActivePanel = NULL;
 	m_pLastActivePanel = NULL;
 
-	vgui::HScheme scheme = vgui::scheme()->LoadSchemeFromFileEx( enginevgui->GetPanel( PANEL_CLIENTDLL ), "resource/ClientScheme.res", "ClientScheme");
-	SetScheme(scheme);
-	SetProportional( true );
-
-	m_pAnimController = new vgui::AnimationController(this);
-	// create our animation controller
-	m_pAnimController->SetScheme(scheme);
-	m_pAnimController->SetProportional(true);
-	
-	// Attempt to load all hud animations
-	if ( LoadHudAnimations() == false )
-	{
-		// Fall back to just the main
-		if ( m_pAnimController->SetScriptFile( GetVPanel(), "scripts/HudAnimations.txt", true ) == false )
-		{
-			Assert(0);
-		}
-	}
-
 	m_OldSize[ 0 ] = m_OldSize[ 1 ] = -1;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+vgui::VPANEL CBaseViewport::GetSchemeSizingVPanel( void )
+{
+	return VGui_GetFullscreenRootVPANEL();
 }
 
 //-----------------------------------------------------------------------------
@@ -184,6 +189,9 @@ CBaseViewport::CBaseViewport() : vgui::EditablePanel( NULL, "CBaseViewport")
 void CBaseViewport::OnScreenSizeChanged(int iOldWide, int iOldTall)
 {
 	BaseClass::OnScreenSizeChanged(iOldWide, iOldTall);
+
+	IViewPortPanel* pSpecGuiPanel = FindPanelByName(PANEL_SPECGUI);
+	bool bSpecGuiWasVisible = pSpecGuiPanel && pSpecGuiPanel->IsVisible();
 
 	// reload the script file, so the screen positions in it are correct for the new resolution
 	ReloadScheme( NULL );
@@ -195,7 +203,12 @@ void CBaseViewport::OnScreenSizeChanged(int iOldWide, int iOldTall)
 	m_pBackGround->SetZPos( -20 ); // send it to the back 
 	m_pBackGround->SetVisible( false );
 #endif
-	CreateDefaultPanels();
+
+	if ( !IsFullscreenViewport() )
+	{
+		CreateDefaultPanels();
+	}
+
 #ifndef _XBOX
 	vgui::ipanel()->MoveToBack( m_pBackGround->GetVPanel() ); // really send it to the back 
 #endif
@@ -203,7 +216,8 @@ void CBaseViewport::OnScreenSizeChanged(int iOldWide, int iOldTall)
 	// hide all panels when reconnecting 
 	ShowPanel( PANEL_ALL, false );
 
-	if ( engine->IsHLTV() )
+	// re-enable the spectator gui if it was previously visible
+	if ( bSpecGuiWasVisible )
 	{
 		ShowPanel( PANEL_SPECGUI, true );
 	}
@@ -211,25 +225,23 @@ void CBaseViewport::OnScreenSizeChanged(int iOldWide, int iOldTall)
 
 void CBaseViewport::CreateDefaultPanels( void )
 {
-#ifndef _XBOX
+
+
 	AddNewPanel( CreatePanelByName( PANEL_SCOREBOARD ), "PANEL_SCOREBOARD" );
 	AddNewPanel( CreatePanelByName( PANEL_INFO ), "PANEL_INFO" );
 	AddNewPanel( CreatePanelByName( PANEL_SPECGUI ), "PANEL_SPECGUI" );
 	AddNewPanel( CreatePanelByName( PANEL_SPECMENU ), "PANEL_SPECMENU" );
 	AddNewPanel( CreatePanelByName( PANEL_NAV_PROGRESS ), "PANEL_NAV_PROGRESS" );
-	// AddNewPanel( CreatePanelByName( PANEL_TEAM ), "PANEL_TEAM" );
-	// AddNewPanel( CreatePanelByName( PANEL_CLASS ), "PANEL_CLASS" );
-	// AddNewPanel( CreatePanelByName( PANEL_BUY ), "PANEL_BUY" );
-#endif
 }
 
 void CBaseViewport::UpdateAllPanels( void )
 {
-	int count = m_Panels.Count();
+	int nSlot = vgui::ipanel()->GetMessageContextId( GetVPanel() );
+	ACTIVE_SPLITSCREEN_PLAYER_GUARD_VGUI( nSlot );
 
-	for (int i=0; i< count; i++ )
+	for ( int i = 0; i < m_UnorderedPanels.Count(); ++i )
 	{
-		IViewPortPanel *p = m_Panels[i];
+		IViewPortPanel *p = m_UnorderedPanels[i];
 
 		if ( p->IsVisible() )
 		{
@@ -251,9 +263,9 @@ IViewPortPanel* CBaseViewport::CreatePanelByName(const char *szPanelName)
 	{
 		newpanel = new CTextWindow( this );
 	}
-/*	else if ( Q_strcmp(PANEL_OVERVIEW, szPanelName) == 0 )
+	/*	else if ( Q_strcmp(PANEL_OVERVIEW, szPanelName) == 0 )
 	{
-		newpanel = new CMapOverview( this );
+	newpanel = new CMapOverview( this );
 	}
 	*/
 	else if ( Q_strcmp(PANEL_TEAM, szPanelName) == 0 )
@@ -272,8 +284,15 @@ IViewPortPanel* CBaseViewport::CreatePanelByName(const char *szPanelName)
 	{
 		newpanel = new CNavProgress( this );
 	}
-#endif
-	
+
+
+#endif // !XBOX
+
+	if ( Q_strcmp(PANEL_COMMENTARY_MODELVIEWER, szPanelName) == 0 )
+	{
+		newpanel = new CCommentaryModelViewer( this );
+	}
+
 	return newpanel; 
 }
 
@@ -282,7 +301,6 @@ bool CBaseViewport::AddNewPanel( IViewPortPanel* pPanel, char const *pchDebugNam
 {
 	if ( !pPanel )
 	{
-		DevMsg("CBaseViewport::AddNewPanel(%s): NULL panel.\n", pchDebugName );
 		return false;
 	}
 
@@ -293,23 +311,20 @@ bool CBaseViewport::AddNewPanel( IViewPortPanel* pPanel, char const *pchDebugNam
 		return false;
 	}
 
-	m_Panels.AddToTail( pPanel );
+	m_Panels.Insert( pPanel->GetName(), pPanel );
 	pPanel->SetParent( GetVPanel() );
-	
+	m_UnorderedPanels.AddToTail( pPanel );
+
 	return true;
 }
 
 IViewPortPanel* CBaseViewport::FindPanelByName(const char *szPanelName)
 {
-	int count = m_Panels.Count();
+	int idx = m_Panels.Find( szPanelName );
+	if ( idx == m_Panels.InvalidIndex() )
+		return NULL;
 
-	for (int i=0; i< count; i++ )
-	{
-		if ( Q_strcmp(m_Panels[i]->GetName(), szPanelName) == 0 )
-			return m_Panels[i];
-	}
-
-	return NULL;
+	return m_Panels[ idx ];
 }
 
 void CBaseViewport::PostMessageToPanel( IViewPortPanel* pPanel, KeyValues *pKeyValues )
@@ -321,9 +336,10 @@ void CBaseViewport::PostMessageToPanel( const char *pName, KeyValues *pKeyValues
 {
 	if ( Q_strcmp( pName, PANEL_ALL ) == 0 )
 	{
-		for (int i=0; i< m_Panels.Count(); i++ )
+		for ( int i = 0; i < m_UnorderedPanels.Count(); ++i )
 		{
-			PostMessageToPanel( m_Panels[i], pKeyValues );
+			IViewPortPanel *p = m_UnorderedPanels[i];
+			PostMessageToPanel( p, pKeyValues );
 		}
 
 		return;
@@ -347,13 +363,50 @@ void CBaseViewport::PostMessageToPanel( const char *pName, KeyValues *pKeyValues
 }
 
 
+void CBaseViewport::ShowPanel( const char *pName, bool state, KeyValues *data, bool autoDeleteData )
+{
+	if ( !data )
+	{
+		ShowPanel( pName, state );
+		return;
+	}
+
+	// Also try to show the panel in the full screen viewport
+	if ( this != s_pFullscreenViewportInterface )
+	{
+		GetFullscreenViewPortInterface()->ShowPanel( pName, state, data, false );
+	}
+
+	IViewPortPanel *panel = FindPanelByName( pName );
+	if ( panel )
+	{
+		panel->SetData( data );
+		GetViewPortInterface()->ShowPanel( panel, state );
+	}
+
+	if ( autoDeleteData )
+	{
+		data->deleteThis();
+	}
+}
+
+
 void CBaseViewport::ShowPanel( const char *pName, bool state )
 {
+	// Also try to show the panel in the full screen viewport
+	if ( this != s_pFullscreenViewportInterface )
+	{
+		GetFullscreenViewPortInterface()->ShowPanel( pName, state );
+	}
+
+	ASSERT_LOCAL_PLAYER_RESOLVABLE();
+
 	if ( Q_strcmp( pName, PANEL_ALL ) == 0 )
 	{
-		for (int i=0; i< m_Panels.Count(); i++ )
+		for ( int i = 0; i < m_UnorderedPanels.Count(); ++i )
 		{
-			ShowPanel( m_Panels[i], state );
+			IViewPortPanel *p = m_UnorderedPanels[i];
+			ShowPanel( p, state );
 		}
 
 		return;
@@ -369,7 +422,7 @@ void CBaseViewport::ShowPanel( const char *pName, bool state )
 	{
 		panel = FindPanelByName( pName );
 	}
-	
+
 	if ( !panel	)
 		return;
 
@@ -378,23 +431,39 @@ void CBaseViewport::ShowPanel( const char *pName, bool state )
 
 void CBaseViewport::ShowPanel( IViewPortPanel* pPanel, bool state )
 {
+	// Extra guard to get layout stuff correct
+	ACTIVE_SPLITSCREEN_PLAYER_GUARD_VGUI( GET_ACTIVE_SPLITSCREEN_SLOT() );
+
 	if ( state )
 	{
 		// if this is an 'active' panel, deactivate old active panel
 		if ( pPanel->HasInputElements() )
 		{
 			// don't show input panels during normal demo playback
-			if ( engine->IsPlayingDemo() && !engine->IsHLTV() )
+#if defined( REPLAY_ENABLED )
+			if ( engine->IsPlayingDemo() && !g_bEngineIsHLTV && !engine->IsReplay() )
 				return;
+#else
+			if ( engine->IsPlayingDemo() && !g_bEngineIsHLTV )
+				return;
+#endif
 
 			if ( (m_pActivePanel != NULL) && (m_pActivePanel != pPanel) && (m_pActivePanel->IsVisible()) )
 			{
 				// store a pointer to the currently active panel
 				// so we can restore it later
-				m_pLastActivePanel = m_pActivePanel;
-				m_pActivePanel->ShowPanel( false );
+				if ( pPanel->CanReplace( m_pActivePanel->GetName() ) )
+				{
+					m_pLastActivePanel = m_pActivePanel;
+					m_pActivePanel->ShowPanel( false );
+				}
+				else
+				{
+					m_pLastActivePanel = pPanel;
+					return;
+				}
 			}
-		
+
 			m_pActivePanel = pPanel;
 		}
 	}
@@ -428,11 +497,45 @@ IViewPortPanel* CBaseViewport::GetActivePanel( void )
 	return m_pActivePanel;
 }
 
+void CBaseViewport::RecreatePanel( const char *szPanelName )
+{
+	IViewPortPanel *panel = FindPanelByName( szPanelName );
+	if ( panel )
+	{
+		m_Panels.Remove( szPanelName );
+		for ( int i = m_UnorderedPanels.Count() - 1; i >= 0; --i )
+		{
+			if ( m_UnorderedPanels[ i ] == panel )
+			{
+				m_UnorderedPanels.Remove( i );
+				break;
+			}
+		}
+
+		vgui::VPANEL vPanel = panel->GetVPanel();
+		vgui::ipanel()->DeletePanel( vPanel );
+
+		if ( m_pActivePanel == panel )
+		{
+			m_pActivePanel = NULL;
+		}
+
+		if ( m_pLastActivePanel == panel )
+		{
+			m_pLastActivePanel = NULL;
+		}
+
+		AddNewPanel( CreatePanelByName( szPanelName ), szPanelName );
+	}
+}
+
+
 void CBaseViewport::RemoveAllPanels( void)
 {
-	for ( int i=0; i < m_Panels.Count(); i++ )
+	for ( int i = 0; i < m_UnorderedPanels.Count(); ++i )
 	{
-		vgui::VPANEL vPanel = m_Panels[i]->GetVPanel();
+		IViewPortPanel *p = m_UnorderedPanels[i];
+		vgui::VPANEL vPanel = p->GetVPanel();
 		vgui::ipanel()->DeletePanel( vPanel );
 	}
 #ifndef _XBOX
@@ -442,7 +545,8 @@ void CBaseViewport::RemoveAllPanels( void)
 		m_pBackGround = NULL;
 	}
 #endif
-	m_Panels.Purge();
+	m_Panels.RemoveAll();
+	m_UnorderedPanels.RemoveAll();
 	m_pActivePanel = NULL;
 	m_pLastActivePanel = NULL;
 }
@@ -459,10 +563,13 @@ CBaseViewport::~CBaseViewport()
 	m_pBackGround = NULL;
 #endif
 	RemoveAllPanels();
-
-	gameeventmanager->RemoveListener( this );
 }
 
+void CBaseViewport::InitViewportSingletons( void )
+{
+	ASSERT_LOCAL_PLAYER_RESOLVABLE();
+	s_pViewportInterfaces[ GET_ACTIVE_SPLITSCREEN_SLOT() ] = this;
+}
 
 //-----------------------------------------------------------------------------
 // Purpose: called when the VGUI subsystem starts up
@@ -470,6 +577,8 @@ CBaseViewport::~CBaseViewport()
 //-----------------------------------------------------------------------------
 void CBaseViewport::Start( IGameUIFuncs *pGameUIFuncs, IGameEventManager2 * pGameEventManager )
 {
+	InitViewportSingletons();
+
 	m_GameuiFuncs = pGameUIFuncs;
 	m_GameEventManager = pGameEventManager;
 #ifndef _XBOX
@@ -477,10 +586,32 @@ void CBaseViewport::Start( IGameUIFuncs *pGameUIFuncs, IGameEventManager2 * pGam
 	m_pBackGround->SetZPos( -20 ); // send it to the back 
 	m_pBackGround->SetVisible( false );
 #endif
-	CreateDefaultPanels();
 
-	m_GameEventManager->AddListener( this, "game_newmap", false );
-	
+	ListenForGameEvent( "game_newmap" );
+
+	SetScheme( "ClientScheme" );
+	SetProportional( true );
+
+	if ( !IsFullscreenViewport() )
+	{
+		CreateDefaultPanels();
+	}
+
+	m_pAnimController = new vgui::AnimationController(this);
+	// create our animation controller
+	m_pAnimController->SetScheme( GetScheme() );
+	m_pAnimController->SetProportional(true);
+
+	// Attempt to load all hud animations
+	if ( LoadHudAnimations() == false )
+	{
+		// Fall back to just the main
+		if ( m_pAnimController->SetScriptFile( GetVPanel(), "scripts/HudAnimations.txt", true ) == false )
+		{
+			Assert(0);
+		}
+	}
+
 	m_bInitialized = true;
 }
 
@@ -491,34 +622,34 @@ void CBaseViewport::Start( IGameUIFuncs *pGameUIFuncs, IGameEventManager2 * pGam
 /*-----------------------------------------------------------------------------
 void CBaseViewport::UpdateSpectatorPanel()
 {
-	char bottomText[128];
-	int player = -1;
-	const char *name;
-	Q_snprintf(bottomText,sizeof( bottomText ), "#Spec_Mode%d", m_pClientDllInterface->SpectatorMode() );
+char bottomText[128];
+int player = -1;
+const char *name;
+Q_snprintf(bottomText,sizeof( bottomText ), "#Spec_Mode%d", m_pClientDllInterface->SpectatorMode() );
 
-	m_pClientDllInterface->CheckSettings();
-	// check if we're locked onto a target, show the player's name
-	if ( (m_pClientDllInterface->SpectatorTarget() > 0) && (m_pClientDllInterface->SpectatorTarget() <= m_pClientDllInterface->GetMaxPlayers()) && (m_pClientDllInterface->SpectatorMode() != OBS_ROAMING) )
-	{
-		player = m_pClientDllInterface->SpectatorTarget();
-	}
+m_pClientDllInterface->CheckSettings();
+// check if we're locked onto a target, show the player's name
+if ( (m_pClientDllInterface->SpectatorTarget() > 0) && (m_pClientDllInterface->SpectatorTarget() <= m_pClientDllInterface->GetMaxPlayers()) && (m_pClientDllInterface->SpectatorMode() != OBS_ROAMING) )
+{
+player = m_pClientDllInterface->SpectatorTarget();
+}
 
-		// special case in free map and inset off, don't show names
-	if ( ((m_pClientDllInterface->SpectatorMode() == OBS_MAP_FREE) && !m_pClientDllInterface->PipInsetOff()) || player == -1 )
-		name = NULL;
-	else
-		name = m_pClientDllInterface->GetPlayerInfo(player).name;
+// special case in free map and inset off, don't show names
+if ( ((m_pClientDllInterface->SpectatorMode() == OBS_MAP_FREE) && !m_pClientDllInterface->PipInsetOff()) || player == -1 )
+name = NULL;
+else
+name = m_pClientDllInterface->GetPlayerInfo(player).name;
 
-	// create player & health string
-	if ( player && name )
-	{
-		Q_strncpy( bottomText, name, sizeof( bottomText ) );
-	}
-	char szMapName[64];
-	Q_FileBase( const_cast<char *>(m_pClientDllInterface->GetLevelName()), szMapName );
+// create player & health string
+if ( player && name )
+{
+Q_strncpy( bottomText, name, sizeof( bottomText ) );
+}
+char szMapName[64];
+Q_FileBase( const_cast<char *>(m_pClientDllInterface->GetLevelName()), szMapName );
 
-	m_pSpectatorGUI->Update(bottomText, player, m_pClientDllInterface->SpectatorMode(), m_pClientDllInterface->IsSpectateOnly(), m_pClientDllInterface->SpectatorNumber(), szMapName );
-	m_pSpectatorGUI->UpdateSpectatorPlayerList();
+m_pSpectatorGUI->Update(bottomText, player, m_pClientDllInterface->SpectatorMode(), m_pClientDllInterface->IsSpectateOnly(), m_pClientDllInterface->SpectatorNumber(), szMapName );
+m_pSpectatorGUI->UpdateSpectatorPlayerList();
 }  */
 
 // Return TRUE if the HUD's allowed to print text messages
@@ -527,7 +658,7 @@ bool CBaseViewport::AllowedToPrintText( void )
 
 	/* int iId = GetCurrentMenuID();
 	if ( iId == MENU_TEAM || iId == MENU_CLASS || iId == MENU_INTRO || iId == MENU_CLASSHELP )
-		return false; */
+	return false; */
 	// TODO ask every aktive elemet if it allows to draw text while visible
 
 	return ( m_pActivePanel == NULL);
@@ -535,6 +666,8 @@ bool CBaseViewport::AllowedToPrintText( void )
 
 void CBaseViewport::OnThink()
 {
+	ABS_QUERY_GUARD( true );
+
 	// Clear our active panel pointer if the panel has made
 	// itself invisible. Need this so we don't bring up dead panels
 	// if they are stored as the last active panel
@@ -542,38 +675,48 @@ void CBaseViewport::OnThink()
 	{
 		if( m_pLastActivePanel )
 		{
-			m_pActivePanel = m_pLastActivePanel;
-			ShowPanel( m_pActivePanel, true );
+			if ( m_pLastActivePanel->CanBeReopened() )
+			{
+				m_pActivePanel = m_pLastActivePanel;
+				ShowPanel( m_pActivePanel, true );
+			}
+			else
+			{
+				m_pActivePanel = NULL;
+			}
 			m_pLastActivePanel = NULL;
 		}
 		else
 			m_pActivePanel = NULL;
 	}
-	
+
 	m_pAnimController->UpdateAnimations( gpGlobals->curtime );
 
 	// check the auto-reload cvar
 	m_pAnimController->SetAutoReloadScript(hud_autoreloadscript.GetBool());
 
-	int count = m_Panels.Count();
+	int nSlot = vgui::ipanel()->GetMessageContextId( GetVPanel() );
+	ACTIVE_SPLITSCREEN_PLAYER_GUARD_VGUI( nSlot );
 
-	for (int i=0; i< count; i++ )
+	for ( int i = 0; i < m_UnorderedPanels.Count(); ++i )
 	{
-		IViewPortPanel *panel = m_Panels[i];
-		if ( panel->NeedsUpdate() && panel->IsVisible() )
+		IViewPortPanel *p = m_UnorderedPanels[i];
+		if ( p && p->NeedsUpdate() && p->IsVisible() )
 		{
-			panel->Update();
+			p->Update();
 		}
 	}
 
 	int w, h;
-	vgui::ipanel()->GetSize( enginevgui->GetPanel( PANEL_CLIENTDLL ), w, h );
+	vgui::ipanel()->GetSize( VGui_GetClientDLLRootPanel(), w, h );
 
 	if ( m_OldSize[ 0 ] != w || m_OldSize[ 1 ] != h )
 	{
 		m_OldSize[ 0 ] = w;
 		m_OldSize[ 1 ] = h;
-		g_pClientMode->Layout();
+
+		ASSERT_LOCAL_PLAYER_RESOLVABLE();
+		GetClientMode()->Layout();
 	}
 
 	BaseClass::OnThink();
@@ -589,7 +732,7 @@ void CBaseViewport::SetParent(vgui::VPANEL parent)
 	// parent happened to be non-proportional (such as the vgui root panel), we got
 	// slammed to be nonproportional
 	EditablePanel::SetProportional( true );
-	
+
 #ifndef _XBOX
 	m_pBackGround->SetParent( (vgui::VPANEL)parent );
 #endif
@@ -626,10 +769,16 @@ void CBaseViewport::FireGameEvent( IGameEvent * event)
 		// hide all panels when reconnecting 
 		ShowPanel( PANEL_ALL, false );
 
-		if ( engine->IsHLTV() )
+		if ( g_bEngineIsHLTV )
 		{
 			ShowPanel( PANEL_SPECGUI, true );
 		}
+#ifdef REPLAY_ENABLED
+		else if ( engine->IsReplay() )
+		{
+			ShowPanel( PANEL_SPECGUI, true );
+		}
+#endif
 	}
 }
 
@@ -639,11 +788,12 @@ void CBaseViewport::FireGameEvent( IGameEvent * event)
 void CBaseViewport::ReloadScheme(const char *fromFile)
 {
 	// See if scheme should change
-	
+
 	if ( fromFile != NULL )
 	{
 		// "resource/ClientScheme.res"
-		vgui::HScheme scheme = vgui::scheme()->LoadSchemeFromFileEx( enginevgui->GetPanel( PANEL_CLIENTDLL ), fromFile, "HudScheme" );
+
+		vgui::HScheme scheme = vgui::scheme()->LoadSchemeFromFileEx( GetSchemeSizingVPanel(), fromFile, "HudScheme" );
 
 		SetScheme(scheme);
 		SetProportional( true );
@@ -661,16 +811,88 @@ void CBaseViewport::ReloadScheme(const char *fromFile)
 	}
 
 	SetProportional( true );
-	
-	// reload the .res file from disk
-	LoadControlSettings( "scripts/HudLayout.res" );
 
-	gHUD.RefreshHudTextures();
+	LoadHudLayout();
+
+	if ( GET_ACTIVE_SPLITSCREEN_SLOT() == 0 )
+	{
+		HudIcons().RefreshHudTextures();
+	}
 
 	InvalidateLayout( true, true );
 
+	for ( int i = 0; i < m_UnorderedPanels.Count(); ++i )
+	{
+		IViewPortPanel *p = m_UnorderedPanels[i];
+		p->ReloadScheme();
+	}
+
 	// reset the hud
-	gHUD.ResetHUD();
+	GetHud().ResetHUD();
+}
+
+extern ConVar ss_verticalsplit;
+
+void AddSubKeyNamed( KeyValues *pKeys, const char *pszName )
+{
+	KeyValues *pNewKey = new KeyValues( pszName );
+	if ( pNewKey )
+	{
+		pKeys->AddSubKey( pNewKey );
+	}	
+}
+
+void CBaseViewport::LoadHudLayout( void )
+{
+	VGUI_ABSPOS_SPLITSCREEN_GUARD( GET_ACTIVE_SPLITSCREEN_SLOT() );
+
+	// reload the .res file from disk
+	KeyValues *pConditions = NULL;
+	
+	if ( engine->IsSplitScreenActive() )
+	{
+		pConditions = new KeyValues( "conditions" );
+		if ( pConditions )
+		{
+			AddSubKeyNamed( pConditions, "if_split_screen_active" );
+
+			ConVarRef ss_verticalsplit( "ss_verticalsplit" );
+			
+			if ( ss_verticalsplit.IsValid() && ss_verticalsplit.GetBool() )
+			{
+				AddSubKeyNamed( pConditions, "if_split_screen_vertical" );
+
+				if ( GET_ACTIVE_SPLITSCREEN_SLOT() == 0 )
+				{
+					AddSubKeyNamed( pConditions, "if_split_screen_left" );
+				}
+				else
+				{
+					AddSubKeyNamed( pConditions, "if_split_screen_right" );
+				}
+			}
+			else
+			{
+				AddSubKeyNamed( pConditions, "if_split_screen_horizontal" );
+
+				if ( GET_ACTIVE_SPLITSCREEN_SLOT() == 0 )
+				{
+					AddSubKeyNamed( pConditions, "if_split_screen_top" );
+				}
+				else
+				{
+					AddSubKeyNamed( pConditions, "if_split_screen_bottom" );
+				}
+			}
+		}	
+	}
+
+	LoadControlSettings( "scripts/HudLayout.res", NULL, NULL, pConditions );
+
+	if ( pConditions )
+	{
+		pConditions->deleteThis();
+	}
 }
 
 int CBaseViewport::GetDeathMessageStartHeight( void )
@@ -688,4 +910,29 @@ void CBaseViewport::Paint()
 		vgui::surface()->DrawLine( size, 0, size, size );
 		vgui::surface()->DrawLine( 0, size, size, size );
 	}
+}
+
+void CBaseViewport::SetAsFullscreenViewportInterface( void )
+{
+	s_pFullscreenViewportInterface = this;
+	m_bFullscreenViewport = true;
+}
+
+bool CBaseViewport::IsFullscreenViewport() const
+{
+	return m_bFullscreenViewport;
+}
+
+void CBaseViewport::LevelInit( void )
+{
+#if ENGINE_CSGO
+	for ( int i = 0; i < m_UnorderedPanels.Count(); ++i )
+	{
+		IViewPortPanel *p = m_UnorderedPanels[i];
+		if ( p )
+		{
+			p->LevelInit();
+		}
+	}
+#endif
 }

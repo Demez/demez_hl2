@@ -151,3 +151,4 @@ output/hl2mp
 GameConfig.txt
 game/bin/win32/hlmv.rf
 *.bak
+/output/left4dead2

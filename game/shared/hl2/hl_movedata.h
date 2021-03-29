@@ -13,10 +13,11 @@
 
 
 #include "igamemovement.h"
+#include "vr_gamemovement.h"
 
 
 // This class contains HL2-specific prediction data.
-class CHLMoveData : public CMoveData
+class CHLMoveData : public CVRMoveData
 {
 public:
 	bool		m_bIsSprinting;

@@ -45,6 +45,7 @@ public:
 	vgui::VPANEL GetVPanel( void ) { return BaseClass::GetVPanel(); }
   	virtual bool IsVisible() { return BaseClass::IsVisible(); }
 	virtual void SetParent( vgui::VPANEL parent ) { BaseClass::SetParent( parent ); }
+	virtual bool WantsBackgroundBlurred( void ) { return false; }
 
 public:
 	virtual void OnClose();

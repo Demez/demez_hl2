@@ -426,6 +426,11 @@ void GameSettings::DoCustomMatch(char const *szGameState)
 	Navigate();
 }
 
+
+#if ENGINE_ASW
+#define V_isupper isupper
+#endif
+
 //=============================================================================
 void GameSettings::OnCommand(const char *command)
 {
@@ -730,7 +735,7 @@ void GameSettings::OnCommand(const char *command)
 		Q_snprintf(chBuffer, sizeof(chBuffer), "%s", szServerTypeValue);
 		for (char *pszUpper = chBuffer; *pszUpper; ++pszUpper)
 		{
-			if (isupper(*pszUpper))
+			if (V_isupper(*pszUpper))
 				*pszUpper = tolower(*pszUpper);
 		}
 
