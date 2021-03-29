@@ -64,6 +64,6 @@ group "game"
 
 include "_qpc_scripts/_default.qpc_base" "branches/quiver/src"              [$BASE_QUIVER && !$BASE_MULTIPLE_ENGINES]
 include "_qpc_scripts/_default.qpc_base" "branches/2013/src"                [$BASE_2013 && !$BASE_MULTIPLE_ENGINES]
-include "_qpc_scripts/_default.qpc_base" "branches/cstrike15/cstrike15"     [$BASE_CSGO && !$BASE_MULTIPLE_ENGINES]
+include "_qpc_scripts/_default.qpc_base" "branches/csgo/src"                [$BASE_CSGO && !$BASE_MULTIPLE_ENGINES]
 include "_qpc_scripts/_default.qpc_base" "branches/asw"                     [$BASE_ASW && !$BASE_MULTIPLE_ENGINES]
 
