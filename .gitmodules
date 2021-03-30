@@ -11,3 +11,6 @@
 [submodule "branches/asw"]
 	path = branches/asw
 	url = https://github.com/Demez/demez_asw_base
+[submodule "branches/csgo"]
+	path = branches/csgo
+	url = https://gitlab.com/demez/hl2_vr_csgo
