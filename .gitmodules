@@ -14,3 +14,6 @@
 [submodule "branches/csgo"]
 	path = branches/csgo
 	url = https://gitlab.com/demez/hl2_vr_csgo
+[submodule "game/vr_base"]
+	path = game/vr_base
+	url = https://github.com/Demez/SourceEngineVR
