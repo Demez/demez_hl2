@@ -1,0 +1,44 @@
+// ---------------------------------------------------------------
+// cstrike15_usermessages_include.qpc
+// ---------------------------------------------------------------
+macro PROTOBUF_BUILDER_INCLUDED [!$PROTOBUF_BUILDER_INCLUDED]
+
+configuration
+{
+	general
+	{
+		include_directories
+		{
+			"$TYPE/protobuf_build"
+			
+			// blech
+			"$ENGINE_SRC/game/$TYPE/generated_proto"
+		}
+	}
+
+	pre_build
+	{
+		"run_protobuf_compiler" "hl2_usermessages" ".proto" "$ROOT_DIR_ABS/game/shared/protobuf"
+		// "run_protobuf_compiler" "steammessages" ".proto" "$ENGINE_SRC/game/$TYPE/protobuf"
+	}
+}
+
+files
+{
+	folder "Protobuf Files"
+	{
+		"shared/protobuf/hl2_usermessages.proto"
+		// "$GENERATED_PROTO_DIR/steammessages.pb.h"
+
+		folder "Generated Files"
+		{
+			"$GENERATED_PROTO_DIR/hl2_usermessages.pb.h"
+			// "$GENERATED_PROTO_DIR/steammessages.pb.h"
+			
+			"$GENERATED_PROTO_DIR/hl2_usermessages.pb.cc"
+			{
+				precompiled_header "none" [$WINDOWS]
+			}
+		}
+	}
+}
