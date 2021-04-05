@@ -375,7 +375,11 @@ void CItem_ItemCrate::Break( CBaseEntity *pBreaker, const CTakeDamageInfo &info 
 		}
 	}
 
+#if ENGINE_NEW
 	IGameEvent * event = gameeventmanager->CreateEvent( "break_prop", false, &g_BreakPropEvent );
+#else
+	IGameEvent * event = gameeventmanager->CreateEvent( "break_prop", false );
+#endif
 
 	if ( event )
 	{
@@ -447,6 +451,7 @@ void CItem_ItemCrate::Break( CBaseEntity *pBreaker, const CTakeDamageInfo &info 
 							0.0f, this );
 			EmitSound("PropaneTank.Burst");
 		}
+#if ENGINE_NEW
 		else if( HasInteraction( PROPINTER_PHYSGUN_BREAK_EXPLODE_ICE ) )
 		{
 			ExplosionCreate( WorldSpaceCenter(), angles, pAttacker, m_explodeDamage, m_explodeRadius, 
@@ -454,6 +459,7 @@ void CItem_ItemCrate::Break( CBaseEntity *pBreaker, const CTakeDamageInfo &info 
 							0.0f, this );
 			EmitSound("PropaneTank.Burst");
 		}
+#endif
 		else
 		{
 
@@ -550,6 +556,7 @@ void CItem_ItemCrate::Break( CBaseEntity *pBreaker, const CTakeDamageInfo &info 
 		}
 	}
 
+#if ENGINE_NEW
 	if( HasInteraction( PROPINTER_PHYSGUN_BREAK_EXPLODE_ICE ) )
 	{
 		if ( bExploded == false )
@@ -576,4 +583,5 @@ void CItem_ItemCrate::Break( CBaseEntity *pBreaker, const CTakeDamageInfo &info 
 			}
 		}
 	}
+#endif
 }

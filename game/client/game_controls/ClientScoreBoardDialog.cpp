@@ -550,7 +550,7 @@ bool CClientScoreBoardDialog::GetPlayerScoreInfo(int playerIndex, KeyValues *kv)
 //-----------------------------------------------------------------------------
 void CClientScoreBoardDialog::UpdatePlayerAvatar( int playerIndex, KeyValues *kv )
 {
-#ifndef NO_STEAM
+#if 0 // ndef NO_STEAM
 	// Update their avatar
 	if ( kv && ShowAvatars() && steamapicontext->SteamFriends() && steamapicontext->SteamUtils() )
 	{
@@ -647,8 +647,8 @@ void CClientScoreBoardDialog::MoveLabelToFront(const char *textEntryName)
 //-----------------------------------------------------------------------------
 void CClientScoreBoardDialog::PositionScoreboard()
 {
-	ASSERT_LOCAL_PLAYER_RESOLVABLE();
-	ACTIVE_SPLITSCREEN_PLAYER_GUARD_VGUI( GET_ACTIVE_SPLITSCREEN_SLOT() );
+	// ASSERT_LOCAL_PLAYER_RESOLVABLE();
+	// ACTIVE_SPLITSCREEN_PLAYER_GUARD_VGUI( GET_ACTIVE_SPLITSCREEN_SLOT() );
 	int wide, tall;
 	GetSize( wide, tall );
 	int hudWide, hudTall;

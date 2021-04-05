@@ -67,6 +67,7 @@ BEGIN_DATADESC( CHL2MP_Player )
 END_DATADESC()
 
 
+#if ENGINE_NEW
 BEGIN_ENT_SCRIPTDESC( CHL2MP_Player, CBaseEntity, "HL2MP Player" )
 
 	// DEFINE_SCRIPTFUNC_NAMED( ScriptGetAttachmentOrigin, "GetAttachmentOrigin", "Get the attachement id's origin vector"  )
@@ -78,6 +79,7 @@ BEGIN_ENT_SCRIPTDESC( CHL2MP_Player, CBaseEntity, "HL2MP Player" )
 	DEFINE_SCRIPTFUNC_NAMED( ScriptGiveAmmo, "GiveAmmo", "Give ammo to the player"  )
 
 END_SCRIPTDESC();
+#endif
 
 
 // make this a convar later maybe idk
@@ -141,12 +143,24 @@ CHL2MP_Player::CHL2MP_Player() : m_PlayerAnimState( this )
 	
 	// UseClientSideAnimation();
 
+#if ENGINE_NEW
 	m_iszVScripts = MAKE_STRING("player.nut");
+#endif
 }
 
 CHL2MP_Player::~CHL2MP_Player( void )
 {
 
+}
+
+
+QAngle CHL2MP_Player::GetPunchAngle()
+{
+#if ENGINE_CSGO
+	return m_Local.m_aimPunchAngle;
+#else
+	return m_Local.m_vecPunchAngle;
+#endif
 }
 
 
@@ -164,6 +178,7 @@ int CHL2MP_Player::ScriptGiveAmmo( int iCount, const char *szName, bool bSuppres
 
 void CHL2MP_Player::RunOnPostSpawnScripts( void )
 {
+#if ENGINE_NEW
 	/*if( m_iszVScripts == NULL_STRING )
 	{
 		return;
@@ -185,6 +200,7 @@ void CHL2MP_Player::RunOnPostSpawnScripts( void )
 		m_ScriptScope.ReleaseFunction( hFuncDisp );
 
 	}
+#endif
 }
 
 
@@ -395,10 +411,12 @@ void CHL2MP_Player::Spawn(void)
 
 	PickDefaultSpawnTeam();
 
+#if ENGINE_NEW
 	m_iszVScripts = MAKE_STRING("player.nut");
 
 	RunVScripts();
 	RunPrecacheScripts();
+#endif
 
 	BaseClass::Spawn();
 

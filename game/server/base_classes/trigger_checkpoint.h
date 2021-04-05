@@ -7,6 +7,7 @@
 #include "baseentity.h"
 #include "triggers.h"
 #include "props.h"
+#include "engine_defines.h"
 
 
 
@@ -66,8 +67,10 @@ public:
 
 	void TeleportPlayer( CBasePlayer *pPlayer );
 	void TeleportAllPlayers();
-
+	
+#if ENGINE_NEW
 	HSCRIPT ScriptGetTrigger();
+#endif
 
 	void SetIndex( int index );
 	void SetTeleport( bool teleport );

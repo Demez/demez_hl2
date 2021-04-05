@@ -69,6 +69,17 @@ C_HL2MP_Player::~C_HL2MP_Player( void )
 	ReleaseFlashlight();
 }
 
+
+const QAngle& C_HL2MP_Player::GetPunchAngle()
+{
+#if ENGINE_CSGO
+	return m_Local.m_aimPunchAngle;
+#else
+	return m_Local.m_vecPunchAngle;
+#endif
+}
+
+
 int C_HL2MP_Player::GetIDTarget() const
 {
 	return m_iIDEntIndex;

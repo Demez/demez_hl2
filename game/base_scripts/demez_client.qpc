@@ -152,7 +152,7 @@ files
 			"client/hl2mp/hud_deathnotice.cpp"
 		}
 		
-		folder "Game Controls"
+		folder "Game Controls" [$ENGINE_ASW || $ENGINE_CSGO]
 		{
 			"client/game_controls/baseviewport.cpp"
 			"client/game_controls/basemodel_panel.cpp"

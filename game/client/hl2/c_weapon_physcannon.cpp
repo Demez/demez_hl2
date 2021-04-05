@@ -13,6 +13,7 @@
 #include "particles_attractor.h"
 #include "weapon_physcannon_shared.h"
 #include "hl2_shareddefs.h"
+#include "vcollide_parse.h"
 #include "engine_defines.h"
 
 

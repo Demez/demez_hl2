@@ -193,7 +193,11 @@ void CHLMachineGun::DoMachineGunKick( CBasePlayer *pPlayer, float dampEasy, floa
 	}
 
 	//Clip this to our desired min/max
+#if ENGINE_NEW
 	UTIL_ClipPunchAngleOffset( vecScratch, pPlayer->GetAimPunchAngle(), QAngle( 24.0f, 3.0f, 1.0f ) );
+#else
+	UTIL_ClipPunchAngleOffset( vecScratch, pPlayer->GetPunchAngle(), QAngle( 24.0f, 3.0f, 1.0f ) );
+#endif
 
 	//Add it to the view punch
 	// NOTE: 0.5 is just tuned to match the old effect before the punch became simulated

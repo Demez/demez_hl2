@@ -138,7 +138,11 @@ CBaseEntity* FindEntity( edict_t *pEdict, char *classname)
 		CBasePlayer *pPlayer = static_cast<CBasePlayer*>(GetContainingEntity(pEdict));
 		if ( pPlayer )
 		{
+			#if ENGINE_NEW
 			return pPlayer->FindPickerEntityClass( classname );
+			#else
+			return FindPickerEntityClass( pPlayer, classname );
+			#endif
 		}
 	}
 	return NULL;

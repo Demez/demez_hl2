@@ -33,6 +33,7 @@
 	#endif
 
 #elif ENGINE_QUIVER || ENGINE_2013
+	// awful
 	#define RENDER_INSTANCE_INPUT
 	#define RENDER_INSTANCE
 
@@ -43,6 +44,8 @@
 
 	#define matrix3x4a_t matrix3x4_t
 	#define extern_g_sModelIndexFireball extern short g_sModelIndexFireball
+
+	#define DECLARE_ENT_SCRIPTDESC()
 
 	#define PRECACHE_REGISTER_BEGIN( _system, _className ) CLIENTEFFECT_REGISTER_BEGIN( _className )
 	#define PRECACHE( _type, _name ) CLIENTEFFECT_MATERIAL( _name )

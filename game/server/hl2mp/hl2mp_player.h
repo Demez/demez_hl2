@@ -53,6 +53,8 @@ public:
 	DECLARE_DATADESC();
 	DECLARE_ENT_SCRIPTDESC();
 
+	virtual QAngle GetPunchAngle();
+
 	virtual void Precache( void );
 	virtual void Spawn( void );
 	virtual void PostThink( void );

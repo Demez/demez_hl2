@@ -442,7 +442,8 @@ void CChangeLevel::ChangeLevelNow( CBaseEntity *pActivator, bool force )
 	// If we're debugging, don't actually change level
 	if ( g_debug_transitions.GetInt() == 0 )
 	{
-		g_pGameRules->OnBeginChangeLevel( st_szNextMap, NULL );
+		// DemezGameRules()->OnBeginChangeLevel( st_szNextMap, NULL );
+
 		if ( d_sv_use_changelevel2.GetBool() )
 		{
 			engine->ChangeLevel( st_szNextMap, st_szNextSpot );

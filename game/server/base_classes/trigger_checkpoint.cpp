@@ -101,12 +101,14 @@ void CBasePointTrigger::SetEndOrigin( const Vector& vec )
 }*/
 
 
+#if ENGINE_NEW
 BEGIN_ENT_SCRIPTDESC( CBasePointTrigger, CBaseTrigger, "Point Entity Trigger" )
 	// DEFINE_SCRIPTFUNC( SetMinSize, "" )
 	DEFINE_SCRIPTFUNC( SetSize, "" )
 	DEFINE_SCRIPTFUNC( SetEndOrigin, "" )
 	// DEFINE_SCRIPTFUNC( SetEndOriginAndHeight, "" )
 END_SCRIPTDESC();
+#endif
 
 
 // ===================================
@@ -255,11 +257,13 @@ void CCheckpoint::TeleportPlayer( CBasePlayer* pPlayer )
 }
 
 
+#if ENGINE_NEW
 HSCRIPT CCheckpoint::ScriptGetTrigger()
 {
 	CreateTrigger();
 	return ToHScript( m_pTrigger );
 }
+#endif
 
 
 void CCheckpoint::SetIndex( int index )
@@ -340,6 +344,7 @@ void CCheckpoint::InputSetActive( inputdata_t &data )
 }
 
 
+#if ENGINE_NEW
 BEGIN_ENT_SCRIPTDESC( CCheckpoint, CBaseAnimating, "Checkpoint for coop" )
 	DEFINE_SCRIPTFUNC( SetIndex, "Set checkpoint number" )
 	DEFINE_SCRIPTFUNC( CalcSpawn, "" )
@@ -351,6 +356,7 @@ BEGIN_ENT_SCRIPTDESC( CCheckpoint, CBaseAnimating, "Checkpoint for coop" )
 	DEFINE_SCRIPTFUNC_NAMED( ScriptGetTrigger, "GetTrigger", "" )
 	DEFINE_SCRIPTFUNC_NAMED( ScriptSetOriginOverride, "SetOrigin", "" )
 END_SCRIPTDESC();
+#endif
 
 
 BEGIN_DATADESC( CCheckpoint )

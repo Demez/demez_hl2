@@ -365,7 +365,7 @@ void CWeaponSMG1::AddViewKick( void )
 void CWeaponSMG1::SecondaryAttack( void )
 {
 	// Only the player fires this way so we can cast
-	CBasePlayer *pPlayer = ToBasePlayer( GetOwner() );
+	CHL2MP_Player *pPlayer = ToHL2MPPlayer( GetOwner() );
 	
 	if ( pPlayer == NULL )
 		return;
@@ -390,7 +390,7 @@ void CWeaponSMG1::SecondaryAttack( void )
 	Vector vecSrc = pPlayer->Weapon_ShootPosition();
 	Vector	vecThrow;
 	// Don't autoaim on grenade tosses
-	AngleVectors( pPlayer->EyeAngles() + pPlayer->GetAimPunchAngle(), &vecThrow );
+	AngleVectors( pPlayer->EyeAngles() + pPlayer->GetPunchAngle(), &vecThrow );
 	VectorScale( vecThrow, 1000.0f, vecThrow );
 	
 #ifndef CLIENT_DLL

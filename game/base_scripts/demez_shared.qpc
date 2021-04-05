@@ -106,6 +106,9 @@ files
 	- "$ENGINE_SRC_DIR/game/shared/usercmd.cpp"
 	- "$ENGINE_SRC_DIR/game/shared/usercmd.h"
 	
+	- "$ENGINE_SRC_DIR/game/shared/UserCmd.cpp" [$ENGINE_QUIVER]
+	- "$ENGINE_SRC_DIR/game/shared/UserCmd.h" [$ENGINE_QUIVER]
+	
 	"$ENGINE_SHARED/predicted_viewmodel.cpp"
 	"$ENGINE_SHARED/predicted_viewmodel.h"
 	

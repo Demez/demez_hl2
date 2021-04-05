@@ -40,6 +40,7 @@ public:
 	QAngle GetAnimEyeAngles( void ) { return m_angEyeAngles; }
 	Vector GetAttackSpread( CBaseCombatWeapon *pWeapon, CBaseEntity *pTarget = NULL );
 
+	virtual const QAngle& GetPunchAngle();
 
 	// Should this object cast shadows?
 	virtual ShadowType_t		ShadowCastType( void );

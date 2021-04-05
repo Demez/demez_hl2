@@ -284,6 +284,7 @@ CHL2MPRules::CHL2MPRules()
 
 	m_vecRespawnableEntities.RemoveAll();
 
+	m_bTransitionTimerOn = false;
 	m_pCheckpoint = NULL;
 	m_pProxy = NULL;
 
@@ -292,6 +293,7 @@ CHL2MPRules::CHL2MPRules()
 
 
 
+#if ENGINE_NEW
 #ifdef GAME_DLL
 //-----------------------------------------------------------------------------
 //
@@ -354,6 +356,7 @@ bool CHL2MPRules::ValidateScriptScope()
 	return true;
 }
 #endif
+#endif
 
 
 void CHL2MPRules::LevelInitPostEntity()
@@ -407,7 +410,10 @@ void CHL2MPRules::CreateStandardEntities( void )
 	m_pProxy = CreateEntityByName( "hl2mp_gamerules" );
 	m_pProxy->SetLocalOrigin( vec3_origin );
 	m_pProxy->SetLocalAngles( vec3_angle );
+
+#if ENGINE_NEW
 	m_pProxy->m_iszVScripts = MAKE_STRING("gamerules.nut");
+#endif
 
 	gEntList.NotifyCreateEntity( m_pProxy );
 
@@ -2124,6 +2130,7 @@ bool CHL2MPRules::SetCheckpoint( CCheckpoint* checkpoint )
 #endif  // not CLIENT_DLL
 
 
+#if ENGINE_NEW
 #ifdef CLIENT_DLL
 
 
@@ -2190,7 +2197,11 @@ void CHL2MPRules::RegisterScriptFunctions()
 	// static global func
 	// ScriptRegisterFunction( g_pScriptVM, GivePlayerItem, "Get the name of the map." );
 }
+#endif
 
+
+// blech
+#if ENGINE_NEW
 
 CBaseEntity* GetEntity( const char* arg )
 {
@@ -2586,7 +2597,7 @@ static CEntFireAutoCompletionFunctor g_EntFireAutoComplete(false);
 
 static ConCommand ent_fire("ent_fire", &g_EntFireAutoComplete, "Usage:\n   ent_fire <target> [action] [value] [delay]\n", FCVAR_CHEAT, &g_EntFireAutoComplete );
 
-
+#endif
 
 
 

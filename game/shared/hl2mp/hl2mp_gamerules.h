@@ -170,8 +170,10 @@ public:
 	void RestartGame();
 	
 #ifndef CLIENT_DLL
+#if ENGINE_NEW
 	HSCRIPT GetScriptInstance();
 	bool ValidateScriptScope();
+#endif
 
 	virtual Vector VecItemRespawnSpot( CItem *pItem );
 	virtual QAngle VecItemRespawnAngles( CItem *pItem );
@@ -261,9 +263,11 @@ private:
 	// CUtlVector< CRespawnableEntity* > m_vecRespawnableEntities;
 	CUtlVector<CEntityRespawnInfo*> m_vecRespawnableEntities;
 
+#if ENGINE_NEW
 	CScriptScope	m_ScriptScope;
 	HSCRIPT			m_hScriptInstance;
 	string_t		m_iszScriptId;
+#endif
 
 #if ENGINE_CSGO
 	float m_flIntermissionEndTime;
