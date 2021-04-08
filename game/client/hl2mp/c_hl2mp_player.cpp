@@ -58,7 +58,7 @@ C_HL2MP_Player::C_HL2MP_Player() : m_PlayerAnimState( this ), m_iv_angEyeAngles(
 
 	AddVar( &m_angEyeAngles, &m_iv_angEyeAngles, LATCH_SIMULATION_VAR );
 
-	m_EntClientFlags |= ENTCLIENTFLAG_DONTUSEIK;
+	// m_EntClientFlags |= ENTCLIENTFLAG_DONTUSEIK;
 	m_blinkTimer.Invalidate();
 
 	m_pFlashlightBeam = NULL;
@@ -577,7 +577,7 @@ Vector C_HL2MP_Player::GetAutoaimVector( float flDelta )
 {
 	// Never autoaim a predicted weapon (for now)
 	Vector	forward;
-	AngleVectors( EyeAngles() + GetAimPunchAngle(), &forward );
+	AngleVectors( EyeAngles() + GetPunchAngle(), &forward );
 	return	forward;
 }
 
