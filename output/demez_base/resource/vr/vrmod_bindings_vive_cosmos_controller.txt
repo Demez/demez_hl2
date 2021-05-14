@@ -1,4 +1,3 @@
-
 {
    "action_manifest_version" : 0,
    "alias_info" : {},

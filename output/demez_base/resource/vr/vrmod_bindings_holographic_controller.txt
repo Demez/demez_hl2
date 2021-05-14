@@ -232,10 +232,9 @@
       }
    },
    "category" : "steamvr_input",
-   "controller_type" : "vive_controller",
+   "controller_type" : "holographic_controller",
    "description" : "default vrmod bindings",
    "name" : "default vrmod bindings",
    "options" : {},
    "simulated_actions" : []
 }
-

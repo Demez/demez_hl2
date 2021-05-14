@@ -14,7 +14,7 @@
 			game        |gameinfo_path|.
 			game        |gameinfo_path|custom/*
 			
-			vr          |gameinfo_path|.
+			vr          |gameinfo_path|../demez_base
 			
 			// particles test
 			// Game		"D:\sourceengine\csgoass"

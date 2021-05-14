@@ -62,30 +62,12 @@
             },
             {
                "inputs" : {
-                  "position" : {
-                     "output" : "/actions/driving/in/vector2_steer"
-                  }
-               },
-               "mode" : "joystick",
-               "path" : "/user/hand/left/input/thumbstick"
-            },
-            {
-               "inputs" : {
                   "click" : {
                      "output" : "/actions/driving/in/boolean_turret"
                   }
                },
                "mode" : "button",
-               "path" : "/user/hand/right/input/b"
-            },
-            {
-               "inputs" : {
-                  "click" : {
-                     "output" : "/actions/driving/in/boolean_handbrake"
-                  }
-               },
-               "mode" : "button",
-               "path" : "/user/hand/right/input/a"
+               "path" : "/user/hand/right/input/trackpad"
             },
             {
                "inputs" : {
@@ -94,7 +76,19 @@
                   }
                },
                "mode" : "button",
-               "path" : "/user/hand/left/input/b"
+               "path" : "/user/hand/right/input/application_menu"
+            },
+            {
+               "inputs" : {
+                  "click" : {
+                     "output" : "/actions/driving/in/boolean_handbrake"
+                  },
+                  "position" : {
+                     "output" : "/actions/driving/in/vector2_steer"
+                  }
+               },
+               "mode" : "trackpad",
+               "path" : "/user/hand/left/input/trackpad"
             }
          ]
       },
@@ -103,32 +97,32 @@
             {
                "inputs" : {
                   "click" : {
-                     "output" : "/actions/main/in/boolean_primaryfire"
+                     "output" : "/actions/main/in/boolean_chat"
                   }
                },
                "mode" : "button",
-               "path" : "/user/hand/right/input/trigger"
-            },
-            {
-               "inputs" : {
-                  "pull" : {
-                     "output" : "/actions/main/in/vector1_primaryfire"
-                  }
-               },
-               "mode" : "trigger",
-               "path" : "/user/hand/right/input/trigger"
+               "path" : "/user/hand/left/input/application_menu"
             },
             {
                "inputs" : {
                   "click" : {
-                     "output" : "/actions/main/in/boolean_changeweapon"
+                     "output" : "/actions/main/in/boolean_jump"
+                  },
+                  "position" : {
+                     "output" : "/actions/main/in/vector2_walkdirection"
+                  },
+                  "touch" : {
+                     "output" : "/actions/main/in/boolean_walk"
                   }
                },
-               "mode" : "button",
-               "path" : "/user/hand/right/input/trackpad"
+               "mode" : "trackpad",
+               "path" : "/user/hand/left/input/trackpad"
             },
             {
                "inputs" : {
+                  "center" : {
+                     "output" : "/actions/main/in/boolean_changeweapon"
+                  },
                   "east" : {
                      "output" : "/actions/main/in/boolean_turnright"
                   },
@@ -144,11 +138,11 @@
                },
                "mode" : "dpad",
                "parameters" : {
-	       "deadzone_pct" : "90",
+                  "deadzone_pct" : "70",
                   "overlap_pct" : "0",
-                  "sub_mode" : "touch"
+                  "sub_mode" : "click"
                },
-               "path" : "/user/hand/right/input/thumbstick"
+               "path" : "/user/hand/right/input/trackpad"
             },
             {
                "inputs" : {
@@ -157,31 +151,7 @@
                   }
                },
                "mode" : "button",
-               "path" : "/user/hand/right/input/b"
-            },
-            {
-               "inputs" : {
-                  "click" : {
-                     "output" : "/actions/main/in/boolean_jump"
-                  }
-               },
-               "mode" : "button",
-               "path" : "/user/hand/right/input/a"
-            },
-            {
-               "inputs" : {
-                  "click" : {
-                     "output" : "/actions/main/in/boolean_right_pickup"
-                  }
-               },
-               "mode" : "button",
-               "parameters" : {
-                  "force_input" : "force",
-	       "click_activate_threshold": "0.55",
-	       "click_deactivate_threshold": "0.5",
-                  "haptic_amplitude" : "0"
-               },
-               "path" : "/user/hand/right/input/grip"
+               "path" : "/user/hand/right/input/application_menu"
             },
             {
                "inputs" : {
@@ -190,88 +160,7 @@
                   }
                },
                "mode" : "button",
-               "parameters" : {
-                  "force_input" : "force",
-	       "click_activate_threshold": "0.55",
-	       "click_deactivate_threshold": "0.5",
-                  "haptic_amplitude" : "0"
-               },
                "path" : "/user/hand/right/input/grip"
-            },
-            {
-               "inputs" : {
-                  "click" : {
-                     "output" : "/actions/main/in/boolean_chat"
-                  }
-               },
-               "mode" : "button",
-               "path" : "/user/hand/left/input/trackpad"
-            },
-            {
-               "inputs" : {
-                  "position" : {
-                     "output" : "/actions/main/in/vector2_walkdirection"
-                  }
-               },
-               "mode" : "joystick",
-               "parameters" : {
-                  "deadzone_pct" : "10"
-               },
-               "path" : "/user/hand/left/input/thumbstick"
-            },
-            {
-               "inputs" : {
-                  "click" : {
-                     "output" : "/actions/main/in/boolean_walk"
-                  }
-               },
-               "mode" : "button",
-               "parameters" : {
-                  "click_activate_threshold" : "0.1",
-                  "click_deactivate_threshold" : "0.05",
-                  "force_input" : "position",
-                  "haptic_amplitude" : "0"
-               },
-               "path" : "/user/hand/left/input/thumbstick"
-            },
-            {
-               "inputs" : {
-                  "click" : {
-                     "output" : "/actions/main/in/boolean_left_pickup"
-                  }
-               },
-               "mode" : "button",
-               "parameters" : {
-                  "force_input" : "force",
-	       "click_activate_threshold": "0.55",
-	       "click_deactivate_threshold": "0.5",
-                  "haptic_amplitude" : "0"
-               },
-               "path" : "/user/hand/left/input/grip"
-            },
-            {
-               "inputs" : {
-                  "click" : {
-                     "output" : "/actions/main/in/boolean_use"
-                  }
-               },
-               "mode" : "button",
-               "parameters" : {
-                  "force_input" : "force",
-	       "click_activate_threshold": "0.55",
-	       "click_deactivate_threshold": "0.5",
-                  "haptic_amplitude" : "0"
-               },
-               "path" : "/user/hand/left/input/grip"
-            },
-            {
-               "inputs" : {
-                  "click" : {
-                     "output" : "/actions/main/in/boolean_sprint"
-                  }
-               },
-               "mode" : "button",
-               "path" : "/user/hand/left/input/thumbstick"
             },
             {
                "inputs" : {
@@ -280,16 +169,52 @@
                   }
                },
                "mode" : "button",
-               "path" : "/user/hand/left/input/b"
+               "path" : "/user/hand/left/input/grip"
+            },
+            {
+               "inputs" : {
+                  "pull" : {
+                     "output" : "/actions/main/in/vector1_primaryfire"
+                  }
+               },
+               "mode" : "trigger",
+               "path" : "/user/hand/right/input/trigger"
             },
             {
                "inputs" : {
                   "click" : {
-                     "output" : "/actions/main/in/boolean_undo"
+                     "output" : "/actions/main/in/boolean_primaryfire"
                   }
                },
                "mode" : "button",
-               "path" : "/user/hand/left/input/a"
+               "path" : "/user/hand/right/input/trigger"
+            },
+            {
+               "inputs" : {
+                  "click" : {
+                     "output" : "/actions/main/in/boolean_left_pickup"
+                  }
+               },
+               "mode" : "button",
+               "path" : "/user/hand/left/input/trigger"
+            },
+            {
+               "inputs" : {
+                  "click" : {
+                     "output" : "/actions/main/in/boolean_sprint"
+                  }
+               },
+               "mode" : "button",
+               "path" : "/user/hand/left/input/grip"
+            },
+            {
+               "inputs" : {
+                  "click" : {
+                     "output" : "/actions/main/in/boolean_right_pickup"
+                  }
+               },
+               "mode" : "button",
+               "path" : "/user/hand/right/input/trigger"
             },
             {
                "inputs" : {
@@ -297,17 +222,17 @@
                      "output" : "/actions/main/in/vector2_smoothturn"
                   }
                },
-               "mode" : "joystick",
+               "mode" : "trackpad",
                "parameters" : {
-                  "deadzone_pct" : "10"
+                  "deadzone_pct" : "70"
                },
-               "path" : "/user/hand/right/input/thumbstick"
+               "path" : "/user/hand/right/input/trackpad"
             }
          ]
       }
    },
    "category" : "steamvr_input",
-   "controller_type" : "knuckles",
+   "controller_type" : "vive_controller",
    "description" : "default vrmod bindings",
    "name" : "default vrmod bindings",
    "options" : {},

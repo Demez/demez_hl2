@@ -19,6 +19,18 @@
 		{
 			"controller_type": "vive_cosmos_controller",
 			"binding_url": "vrmod_bindings_vive_cosmos_controller.txt"
+		},
+		{
+			"controller_type": "vive_tracker_left_foot",
+			"binding_url": "vrmod_bindings_vive_tracker_left_foot.txt"
+		},
+		{
+			"controller_type": "vive_tracker_right_foot",
+			"binding_url": "vrmod_bindings_vive_tracker_right_foot.txt"
+		},
+		{
+			"controller_type": "vive_tracker_waist",
+			"binding_url": "vrmod_bindings_vive_tracker_waist.txt"
 		}
 	], 
 	
@@ -30,6 +42,18 @@
 		},
 		{
 			"name": "/actions/base/in/pose_righthand",
+			"type": "pose"
+		},
+		{
+			"name": "/actions/base/in/pose_leftfoot",
+			"type": "pose"
+		},
+		{
+			"name": "/actions/base/in/pose_rightfoot",
+			"type": "pose"
+		},
+		{
+			"name": "/actions/base/in/pose_waist",
 			"type": "pose"
 		},
 		{
@@ -200,7 +224,7 @@
 			"/actions/main/in/boolean_turnleft" : "Snap Turn Left",
 			"/actions/main/in/boolean_turnright" : "Snap Turn Right",
 			"/actions/main/in/vector2_smoothturn" : "Smooth Turn",
-			"/actions/main/in/boolean_chat" : "Chat",
+			"/actions/main/in/boolean_chat" : "Teleport",
 			"/actions/main/in/boolean_reload" : "Reload",
 			"/actions/main/in/boolean_jump" : "Jump",
 			"/actions/main/in/boolean_left_pickup" : "Left Pickup",
