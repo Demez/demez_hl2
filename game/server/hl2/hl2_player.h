@@ -120,7 +120,7 @@ public:
 	virtual void		CommanderMode();
 
 	// NOTE: you NEED this in ASW, otherwise the player is stuck at the origin point
-	virtual bool        ShouldRegenerateOriginFromCellBits() const { return true; }
+	// virtual bool        ShouldRegenerateOriginFromCellBits() const { return true; }
 	virtual bool        ClientCommand( const CCommand &args );
 
 	// from cbasecombatcharacter
