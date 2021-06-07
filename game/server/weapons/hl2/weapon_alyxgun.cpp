@@ -10,6 +10,7 @@
 #include "npcevent.h"
 #include "ai_basenpc.h"
 #include "globalstate.h"
+#include "d_gamemanager.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -95,15 +96,15 @@ IMPLEMENT_ACTTABLE(CWeaponAlyxGun);
 //=========================================================
 CWeaponAlyxGun::CWeaponAlyxGun( )
 {
-	if ( HL2MPRules()->IsHL2() )
-	{
-		m_fMinRange1		= 1;
-		m_fMaxRange1		= 5000;
-	}
-	else
+	if ( DemezGameManager()->IsEpisodic() )
 	{
 		m_fMinRange1		= 60;
 		m_fMaxRange1		= 2048;
+	}
+	else
+	{
+		m_fMinRange1		= 1;
+		m_fMaxRange1		= 5000;
 	}
 
 	m_flTooCloseTimer	= TOOCLOSETIMER_OFF;

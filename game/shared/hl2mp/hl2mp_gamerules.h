@@ -19,6 +19,7 @@
 #include "teamplay_gamerules.h"
 #include "gamevars_shared.h"
 #include "hl2_shareddefs.h"
+#include "d_ammodef.h"
 #include "engine_defines.h"
 
 #ifndef CLIENT_DLL
@@ -42,6 +43,7 @@ extern ConVar	demez_gamemode;
 #define DEMEZ_GAMEMODE_DEATHMATCH 0
 #define DEMEZ_GAMEMODE_TEAMPLAY 1
 #define DEMEZ_GAMEMODE_COOP 2
+
 
 enum
 {
@@ -102,11 +104,11 @@ public:
 
 
 #ifdef GAME_DLL
-class CEntityRespawnInfo
+class CEntitySpawnInfo
 {
 public:
-	CEntityRespawnInfo( CBaseEntity *pEntity );
-	~CEntityRespawnInfo();
+	CEntitySpawnInfo( CBaseEntity *pEntity );
+	~CEntitySpawnInfo();
 
 	void SetNeedsRespawn( bool enabled );
 	CBaseEntity* CreateEntity();
@@ -141,6 +143,7 @@ public:
 	CHL2MPRules();
 	virtual ~CHL2MPRules();
 
+	virtual void LevelInitPreEntity();
 	virtual void LevelInitPostEntity();
 
 	virtual void Precache( void );
@@ -192,16 +195,12 @@ public:
 
 	virtual bool IsAlyxInDarknessMode();
 
-	bool	IsHL2();
-	bool	IsEP1();
-	bool	IsEP2();
-
 	void	SetAICriteria( AI_CriteriaSet& set );
 
 	void StartTransitionTimer( CChangeLevel* changeLevel );
 	void EndTransitionTimer();
 
-	CEntityRespawnInfo* GetEntityRespawnInfo( CBaseEntity* pEntity );
+	CEntitySpawnInfo* GetEntityRespawnInfo( CBaseEntity* pEntity );
 	void AddRespawnableEntity( CBaseEntity* pEntity );
 	void RemoveRespawnableEntity( CBaseEntity* pEntity );
 	void SetEntityNeedsRespawn( CBaseEntity* pEntity, bool needed = true );
@@ -260,8 +259,7 @@ private:
 	bool m_bTransitionTimerOn;
 	CChangeLevel* m_pChangeLevel;
 
-	// CUtlVector< CRespawnableEntity* > m_vecRespawnableEntities;
-	CUtlVector<CEntityRespawnInfo*> m_vecRespawnableEntities;
+	CUtlVector<CEntitySpawnInfo*> m_vecRespawnableEntities;
 
 #if ENGINE_NEW
 	CScriptScope	m_ScriptScope;

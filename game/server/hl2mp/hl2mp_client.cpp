@@ -25,6 +25,7 @@
 #include "engine/IEngineSound.h"
 #include "team.h"
 #include "viewport_panel_names.h"
+#include "d_gamemanager.h"
 
 #include "tier0/vprof.h"
 
@@ -222,6 +223,7 @@ void InstallGameRules()
 {
 	// i can have separate gamerules and pick which one here, interesting...
 	// could use for coop, deathmatch, and team deathmatch
+	DemezGameManager()->CreateGameRules();
 	CreateGameRulesObject( "CHL2MPRules" );
 }
 

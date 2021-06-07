@@ -80,6 +80,8 @@ public:
 	virtual void	OnDataChanged( DataUpdateType_t type );
 
 	virtual bool	OnFireEvent( C_BaseViewModel *pViewModel, const Vector& origin, const QAngle& angles, int event, const char *options );
+
+	virtual void	Redraw(void);
 #endif
 
 	Vector			GetOriginalSpawnOrigin(void) { return m_vOriginalSpawnOrigin; }

@@ -462,6 +462,18 @@ bool CBaseHLCombatWeapon::OnFireEvent(C_BaseViewModel* pViewModel, const Vector&
 	return BaseClass::OnFireEvent(pViewModel, origin, angles, event, options);
 }
 
+
+void CBaseHLCombatWeapon::Redraw()
+{
+	// really doesn't need to be done each frame, aaaa
+	if ( GetOwner() && GetOwner()->IsPlayer() )
+		ClientLeafSystem()->DisableFlashlightShadows( RenderHandle(), true );
+	else
+		ClientLeafSystem()->DisableFlashlightShadows( RenderHandle(), false );
+
+	BaseClass::Redraw();
+}
+
 #endif
 
 void CBaseHLCombatWeapon::WeaponSound(WeaponSound_t sound_type, float soundtime /* = 0.0f */)

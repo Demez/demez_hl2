@@ -42,7 +42,7 @@ configuration
 			
 			"shared/weapons"
 			"shared/weapons/hl2mp"
-			"shared/base_classes"
+			"shared/demez"
 			
 			"$TYPE"
 			"$TYPE/hl2"
@@ -126,10 +126,12 @@ files
 	
 	folder "Demez"
 	{
-	//	"shared/base_classes/demez_ammodef.cpp"
-	//	"shared/base_classes/demez_ammodef.h"
-	//	"shared/base_classes/d_respawnable_item.cpp"
-	//	"shared/base_classes/d_respawnable_item.h"
+		"shared/demez/d_ammodef.cpp"
+		"shared/demez/d_ammodef.h"
+		"shared/demez/d_gamemanager.cpp"
+		"shared/demez/d_gamemanager.h"
+	//	"shared/demez/d_respawnable_item.cpp"
+	//	"shared/demez/d_respawnable_item.h"
 	}
 	
 	folder "Game Base"

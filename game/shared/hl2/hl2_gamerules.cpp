@@ -9,7 +9,7 @@
 #include "hl2_gamerules.h"
 #include "ammodef.h"
 #include "hl2_shareddefs.h"
-// #include "demez_ammodef.h"
+#include "d_ammodef.h"
 
 #ifdef CLIENT_DLL
 
@@ -1787,112 +1787,4 @@ bool CHalfLife2::ShouldBurningPropsEmitLight()
 // Global functions.
 // ------------------------------------------------------------------------------------ //
 
-// shared ammo definition
-// JAY: Trying to make a more physical bullet response
-#define BULLET_MASS_GRAINS_TO_LB(grains)	(0.002285*(grains)/16.0f)
-#define BULLET_MASS_GRAINS_TO_KG(grains)	lbs2kg(BULLET_MASS_GRAINS_TO_LB(grains))
-
-// exaggerate all of the forces, but use real numbers to keep them consistent
-#define BULLET_IMPULSE_EXAGGERATION			3.5
-// convert a velocity in ft/sec and a mass in grains to an impulse in kg in/s
-#define BULLET_IMPULSE(grains, ftpersec)	((ftpersec)*12*BULLET_MASS_GRAINS_TO_KG(grains)*BULLET_IMPULSE_EXAGGERATION)
-
-
-CAmmoDef *GetAmmoDef()
-{
-	static CAmmoDef def;
-	static bool bInitted = false;
-	
-	if ( !bInitted )
-	{
-		bInitted = true;
-
-		def.AddAmmoType("AR2",				DMG_BULLET,					TRACER_LINE_AND_WHIZ,	"sk_plr_dmg_ar2",			"sk_npc_dmg_ar2",			"sk_max_ar2",			BULLET_IMPULSE(200, 1225),	0 );
-		def.AddAmmoType("AlyxGun",			DMG_BULLET,					TRACER_LINE,			"sk_plr_dmg_alyxgun",		"sk_npc_dmg_alyxgun",		"sk_max_alyxgun",		BULLET_IMPULSE(200, 1225),	0 );
-		def.AddAmmoType("Pistol",			DMG_BULLET,					TRACER_LINE_AND_WHIZ,	"sk_plr_dmg_pistol",		"sk_npc_dmg_pistol",		"sk_max_pistol",		BULLET_IMPULSE(200, 1225),	0 );
-		def.AddAmmoType("SMG1",				DMG_BULLET,					TRACER_LINE_AND_WHIZ,	"sk_plr_dmg_smg1",			"sk_npc_dmg_smg1",			"sk_max_smg1",			BULLET_IMPULSE(200, 1225),	0 );
-		def.AddAmmoType("357",				DMG_BULLET,					TRACER_LINE_AND_WHIZ,	"sk_plr_dmg_357",			"sk_npc_dmg_357",			"sk_max_357",			BULLET_IMPULSE(800, 5000),	0 );
-		def.AddAmmoType("XBowBolt",			DMG_BULLET,					TRACER_LINE,			"sk_plr_dmg_crossbow",		"sk_npc_dmg_crossbow",		"sk_max_crossbow",		BULLET_IMPULSE(800, 8000),	0 );
-		def.AddAmmoType("FlareRound",		DMG_BURN,					TRACER_LINE,			"sk_plr_dmg_flare_round","sk_npc_dmg_flare_round",		"sk_max_flare_round",	BULLET_IMPULSE(1500, 600),	0 );
-		def.AddAmmoType("Buckshot",			DMG_BULLET | DMG_BUCKSHOT,	TRACER_LINE,			"sk_plr_dmg_buckshot",		"sk_npc_dmg_buckshot",		"sk_max_buckshot",		BULLET_IMPULSE(400, 1200),	0 );
-		def.AddAmmoType("RPG_Round",		DMG_BURN,					TRACER_NONE,			"sk_plr_dmg_rpg_round",		"sk_npc_dmg_rpg_round",		"sk_max_rpg_round",		0.0,						0 );
-		def.AddAmmoType("SMG1_Grenade",		DMG_BURN,					TRACER_NONE,			"sk_plr_dmg_smg1_grenade",	"sk_npc_dmg_smg1_grenade",	"sk_max_smg1_grenade",	0.0,						0 );
-		def.AddAmmoType("AR2_Grenade",		DMG_BURN,					TRACER_NONE,			"sk_plr_dmg_ar2_grenade",	"sk_npc_dmg_ar2_grenade",	"sk_max_ar2_grenade",	0.0,						0 );
-		def.AddAmmoType("ML_Grenade",		DMG_BURN,					TRACER_NONE,			"sk_plr_dmg_ml_grenade",	"sk_npc_dmg_ml_grenade",	"sk_max_ml_grenade",	0.0,						0 );
-		def.AddAmmoType("AR2AltFire",		DMG_DISSOLVE,				TRACER_NONE,			0,							0,							"sk_max_ar2_altfire",	0.0,						0 );
-		def.AddAmmoType("SniperRound",		DMG_BULLET | DMG_SNIPER,	TRACER_NONE,			"sk_plr_dmg_sniper_round",	"sk_npc_dmg_sniper_round",	"sk_max_sniper_round",	BULLET_IMPULSE(650, 6000),	0 );
-		def.AddAmmoType("SniperPenetratedRound",DMG_BULLET | DMG_SNIPER,TRACER_NONE,			"sk_dmg_sniper_penetrate_plr","sk_dmg_sniper_penetrate_npc","sk_max_sniper_round",BULLET_IMPULSE(150, 6000),0 );
-		def.AddAmmoType("Slam",				DMG_BURN,					TRACER_NONE,			NULL,						NULL,						"sk_max_slam",			0.0,						0 );
-		def.AddAmmoType("Tripwire",			DMG_BURN,					TRACER_NONE,			NULL,						NULL,						"sk_max_tripwire",		0.0,						0 );
-		def.AddAmmoType("SmallRound",		DMG_BULLET,					TRACER_LINE,			"sk_plr_dmg_small_round",	"sk_npc_dmg_small_round",	"sk_max_small_round",	BULLET_IMPULSE(125, 1325),	0 );
-		def.AddAmmoType("MediumRound",		DMG_BULLET,					TRACER_LINE,			"sk_plr_dmg_medium_round",	"sk_npc_dmg_medium_round",	"sk_max_medium_round",	BULLET_IMPULSE(200, 1225),	0 );
-		def.AddAmmoType("LargeRound",		DMG_BULLET,					TRACER_LINE,			"sk_plr_dmg_large_round",	"sk_npc_dmg_large_round",	"sk_max_large_round",	BULLET_IMPULSE(250, 1180),	0 );
-		def.AddAmmoType("Molotov",			DMG_BURN,					TRACER_NONE,			"sk_plr_dmg_molotov",		"sk_npc_dmg_molotov",		"sk_max_molotov", 		0.0,						0 );
-		def.AddAmmoType("Grenade",			DMG_BURN,					TRACER_NONE,			"sk_plr_dmg_grenade",		"sk_npc_dmg_grenade",		"sk_max_grenade",		0.0,						0 );
-		def.AddAmmoType("Brickbat",			DMG_CLUB,					TRACER_NONE,			"sk_plr_dmg_brickbat",		"sk_npc_dmg_brickbat",		"sk_max_brickbat",		0.0,						0 );
-		def.AddAmmoType("Rock",				DMG_CLUB,					TRACER_NONE,			"sk_plr_dmg_brickbat",		"sk_npc_dmg_brickbat",		"sk_max_brickbat",		0.0,						0 );
-		def.AddAmmoType("Thumper",			DMG_SONIC,					TRACER_NONE,			10, 10, 2, 0, 0 );
-		def.AddAmmoType("Gravity",			DMG_CLUB,					TRACER_NONE,			0,	0, 8, 0, 0 );
-		def.AddAmmoType("Extinguisher",		DMG_BURN,					TRACER_NONE,			0,	0, 100, 0, 0 );
-		def.AddAmmoType("Battery",			DMG_CLUB,					TRACER_NONE,			NULL, NULL, NULL, 0, 0 );
-		def.AddAmmoType("GaussEnergy",		DMG_SHOCK,					TRACER_NONE,			"sk_jeep_gauss_damage",		"sk_jeep_gauss_damage", "sk_max_gauss_round", BULLET_IMPULSE(650, 8000), 0 ); // hit like a 10kg weight at 400 in/s
-		def.AddAmmoType("CombineCannon",	DMG_BULLET,					TRACER_LINE,			"sk_npc_dmg_gunship_to_plr", "sk_npc_dmg_gunship", NULL, 1.5 * 750 * 12, 0 ); // hit like a 1.5kg weight at 750 ft/s
-		def.AddAmmoType("AirboatGun",		DMG_AIRBOAT,				TRACER_LINE,			"sk_plr_dmg_airboat",		"sk_npc_dmg_airboat",		NULL,					BULLET_IMPULSE(10, 600), 0 );
-		def.AddAmmoType("HelicopterGun",	DMG_BULLET,					TRACER_LINE_AND_WHIZ,	"sk_npc_dmg_helicopter_to_plr", "sk_npc_dmg_helicopter",	"sk_max_smg1",	BULLET_IMPULSE(400, 1225), AMMO_FORCE_DROP_IF_CARRIED | AMMO_INTERPRET_PLRDAMAGE_AS_DAMAGE_TO_PLAYER );
-
-#ifdef HL2_EPISODIC
-		//def.AddAmmoType("Hopwire",			DMG_BLAST,					TRACER_NONE, 1,	1, 5, 0, 0 );
-		def.AddAmmoType("Hopwire",			DMG_BLAST,					TRACER_NONE,			"sk_plr_dmg_grenade",		"sk_npc_dmg_grenade",		"sk_max_hopwire",		0.0, 0);
-		def.AddAmmoType("CombineHeavyCannon",	DMG_BULLET,				TRACER_LINE,			40,	40, NULL, 10 * 750 * 12, AMMO_FORCE_DROP_IF_CARRIED ); // hit like a 10 kg weight at 750 ft/s
-		def.AddAmmoType("ammo_proto1",			DMG_BULLET,				TRACER_LINE,			0, 0, 10, 0, 0 );
-#endif // HL2_EPISODIC
-
-		def.AddAmmoType("StriderMinigunDirect",	DMG_BULLET,				TRACER_LINE,			2, 2, 15, 1.0 * 750 * 12, AMMO_FORCE_DROP_IF_CARRIED ); // hit like a 1.0kg weight at 750 ft/s
-
-		//=====================================================================
-		// STRIDER MINIGUN DAMAGE - Pull up a chair and I'll tell you a tale.
-		//
-		// When we shipped Half-Life 2 in 2004, we were unaware of a bug in
-		// CAmmoDef::NPCDamage() which was returning the MaxCarry field of
-		// an ammotype as the amount of damage that should be done to a NPC
-		// by that type of ammo. Thankfully, the bug only affected Ammo Types 
-		// that DO NOT use ConVars to specify their parameters. As you can see,
-		// all of the important ammotypes use ConVars, so the effect of the bug
-		// was limited. The Strider Minigun was affected, though.
-		//
-		// According to my perforce Archeology, we intended to ship the Strider
-		// Minigun ammo type to do 15 points of damage per shot, and we did. 
-		// To achieve this we, unaware of the bug, set the Strider Minigun ammo 
-		// type to have a maxcarry of 15, since our observation was that the 
-		// number that was there before (8) was indeed the amount of damage being
-		// done to NPC's at the time. So we changed the field that was incorrectly
-		// being used as the NPC Damage field.
-		//
-		// The bug was fixed during Episode 1's development. The result of the 
-		// bug fix was that the Strider was reduced to doing 5 points of damage
-		// to NPC's, since 5 is the value that was being assigned as NPC damage
-		// even though the code was returning 15 up to that point.
-		//
-		// Now as we go to ship Orange Box, we discover that the Striders in 
-		// Half-Life 2 are hugely ineffective against citizens, causing big
-		// problems in maps 12 and 13. 
-		//
-		// In order to restore balance to HL2 without upsetting the delicate 
-		// balance of ep2_outland_12, I have chosen to build Episodic binaries
-		// with 5 as the Strider->NPC damage, since that's the value that has
-		// been in place for all of Episode 2's development. Half-Life 2 will
-		// build with 15 as the Strider->NPC damage, which is how HL2 shipped
-		// originally, only this time the 15 is located in the correct field
-		// now that the AmmoDef code is behaving correctly.
-		//
-		//=====================================================================
-
-		if (hl2_episodic.GetBool())
-			def.AddAmmoType("StriderMinigun",	DMG_BULLET,					TRACER_LINE,			5, 5, 15, 1.0 * 750 * 12, AMMO_FORCE_DROP_IF_CARRIED ); // hit like a 1.0kg weight at 750 ft/s
-		else
-			def.AddAmmoType("StriderMinigun",	DMG_BULLET,					TRACER_LINE,			5, 15,15, 1.0 * 750 * 12, AMMO_FORCE_DROP_IF_CARRIED ); // hit like a 1.0kg weight at 750 ft/s
-	}
-
-	return &def;
-}
 

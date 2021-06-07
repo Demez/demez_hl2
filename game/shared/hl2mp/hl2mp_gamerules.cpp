@@ -12,10 +12,13 @@
 #include "ammodef.h"
 #include "hl2_shareddefs.h"
 #include "tier1/fmtstr.h"
+#include "d_ammodef.h"
+#include "d_gamemanager.h"
 
 #ifdef CLIENT_DLL
 	#include "c_hl2mp_player.h"
 	#include "cliententitylist.h"
+	#include "clientmode_hl2mpnormal.h"
 #else
 	#include "globalstate.h"
 	#include "eventqueue.h"
@@ -215,6 +218,7 @@ char *sTeamNames[] =
 	"Rebels",
 };
 
+
 // idk where to put this
 #if ENGINE_CSGO
 #include "achievementmgr.h"
@@ -359,6 +363,12 @@ bool CHL2MPRules::ValidateScriptScope()
 #endif
 
 
+void CHL2MPRules::LevelInitPreEntity()
+{
+	// UpdateAmmoDef();
+}
+
+
 void CHL2MPRules::LevelInitPostEntity()
 {
 #ifdef GAME_DLL
@@ -366,12 +376,15 @@ void CHL2MPRules::LevelInitPostEntity()
 	// m_hProxy->RunOnPostSpawnScripts();
 
 
-	/*HSCRIPT hLoadCheckpoints = g_pScriptVM->LookupFunction( "LoadCheckpoints" );
-	if ( hLoadCheckpoints )
+	HSCRIPT hLevelInitPostEntity = g_pScriptVM->LookupFunction( "LevelInitPostEntity" );
+	if ( hLevelInitPostEntity )
 	{
-		g_pScriptVM->Call( hLoadCheckpoints, NULL, true, NULL, (HSCRIPT)m_ScriptScope );
-		g_pScriptVM->ReleaseFunction( hLoadCheckpoints );
-	}*/
+		variant_t variant;
+		variant.SetString( MAKE_STRING("LevelInitPostEntity") );
+		g_EventQueue.AddEvent( m_pProxy, "CallScriptFunction", variant, 0, m_pProxy, m_pProxy );
+		m_ScriptScope.ReleaseFunction( hLevelInitPostEntity );
+	}
+
 #endif
 }
 
@@ -646,138 +659,20 @@ bool CHL2MPRules::CheckGameOver()
 }
 
 
-#ifndef CLIENT_DLL
-// Demez: TEMP, move to a keyvalues file
-static const char *s_hl2Maps[] =
-{
-	"background01",
-	"background02",
-	"background03",
-	"background04",
-	"background05",
-	"background06",
-	"background07",
-	"credits",
-	"d1_canals_01",
-	"d1_canals_01a",
-	"d1_canals_02",
-	"d1_canals_03",
-	"d1_canals_05",
-	"d1_canals_06",
-	"d1_canals_07",
-	"d1_canals_08",
-	"d1_canals_09",
-	"d1_canals_10",
-	"d1_canals_11",
-	"d1_canals_12",
-	"d1_canals_13",
-	"d1_eli_01",
-	"d1_eli_02",
-	"d1_town_01",
-	"d1_town_01a",
-	"d1_town_02",
-	"d1_town_02a",
-	"d1_town_03",
-	"d1_town_04",
-	"d1_town_05",
-	"d1_trainstation_01",
-	"d1_trainstation_02",
-	"d1_trainstation_03",
-	"d1_trainstation_04",
-	"d1_trainstation_05",
-	"d1_trainstation_06",
-	"d2_coast_01",
-	"d2_coast_02",
-	"d2_coast_03",
-	"d2_coast_04",
-	"d2_coast_05",
-	"d2_coast_07",
-	"d2_coast_08",
-	"d2_coast_09",
-	"d2_coast_10",
-	"d2_coast_11",
-	"d2_coast_12",
-	"d2_prison_01",
-	"d2_prison_02",
-	"d2_prison_03",
-	"d2_prison_04",
-	"d2_prison_05",
-	"d2_prison_06",
-	"d2_prison_07",
-	"d2_prison_08",
-	"d3_breen_01",
-	"d3_c17_01",
-	"d3_c17_02",
-	"d3_c17_02_camera",
-	"d3_c17_03",
-	"d3_c17_04",
-	"d3_c17_05",
-	"d3_c17_06a",
-	"d3_c17_06b",
-	"d3_c17_07",
-	"d3_c17_08",
-	"d3_c17_09",
-	"d3_c17_10a",
-	"d3_c17_10b",
-	"d3_c17_11",
-	"d3_c17_12",
-	"d3_c17_12b",
-	"d3_c17_13",
-	"d3_citadel_01",
-	"d3_citadel_02",
-	"d3_citadel_03",
-	"d3_citadel_04",
-	"d3_citadel_05",
-	"", // END Marker
-};
-
-
-static const char *s_ep1Maps[] =
-{
-	"", // END Marker
-};
-
-
-static const char *s_ep2Maps[] =
-{
-	"", // END Marker
-};
-
-
-bool CHL2MPRules::IsHL2()
-{
-	string_t mapName = gpGlobals->mapname;
-	return FindInList( s_hl2Maps, mapName.ToCStr() );
-}
-
-bool CHL2MPRules::IsEP1()
-{
-	string_t mapName = gpGlobals->mapname;
-	return FindInList( s_ep1Maps, mapName.ToCStr() );
-}
-
-bool CHL2MPRules::IsEP2()
-{
-	// funny lazy default
-	//string_t mapName = gpGlobals->mapname;
-	//return FindInList( s_ep2Maps, mapName.ToCStr() );
-	return true;
-}
-
-
+#ifdef GAME_DLL
 void CHL2MPRules::SetAICriteria( AI_CriteriaSet& set )
 {
 	// Demez: funny hl2 check
-	if ( IsHL2() )
+	if ( DemezGameManager()->IsHL2Map() )
 	{
 		set.AppendCriteria( "game_hl2", "1" );
 	}
-	else if ( IsEP1() )
+	else if ( DemezGameManager()->IsEP1Map() )
 	{
 		set.AppendCriteria( "game_episodic", "1" );
 		set.AppendCriteria( "game_ep1", "1" );
 	}
-	else if ( IsEP2() )
+	else if ( DemezGameManager()->IsEP2Map() )
 	{
 		set.AppendCriteria( "game_episodic", "1" );
 		set.AppendCriteria( "game_ep2", "1" );
@@ -1426,63 +1321,6 @@ bool CHL2MPRules::ClientCommand( CBaseEntity *pEdict, const CCommand &args )
 	return false;
 }
 
-// shared ammo definition
-// JAY: Trying to make a more physical bullet response
-/*#define BULLET_MASS_GRAINS_TO_LB(grains)	(0.002285*(grains)/16.0f)
-#define BULLET_MASS_GRAINS_TO_KG(grains)	lbs2kg(BULLET_MASS_GRAINS_TO_LB(grains))
-
-// exaggerate all of the forces, but use real numbers to keep them consistent
-#define BULLET_IMPULSE_EXAGGERATION			3.5
-// convert a velocity in ft/sec and a mass in grains to an impulse in kg in/s
-#define BULLET_IMPULSE(grains, ftpersec)	((ftpersec)*12*BULLET_MASS_GRAINS_TO_KG(grains)*BULLET_IMPULSE_EXAGGERATION)
-
-
-CAmmoDef *GetAmmoDef()
-{
-	static CAmmoDef def;
-	static bool bInitted = false;
-	
-	if ( !bInitted )
-	{
-		bInitted = true;
-
-		def.AddAmmoType("AR2",				DMG_BULLET,					TRACER_LINE_AND_WHIZ,	8,			3,			60,			BULLET_IMPULSE(200, 1225),	0 );
-		def.AddAmmoType("AR2AltFire",		DMG_DISSOLVE,				TRACER_NONE,			0,			0,			3,			0,							0 );
-		def.AddAmmoType("AlyxGun",			DMG_BULLET,					TRACER_LINE,			0,			0,			150,		BULLET_IMPULSE(200, 1225),	0 );
-		def.AddAmmoType("Pistol",			DMG_BULLET,					TRACER_LINE_AND_WHIZ,	0,			0,			150,		BULLET_IMPULSE(200, 1225),	0 );
-		def.AddAmmoType("SMG1",				DMG_BULLET,					TRACER_LINE_AND_WHIZ,	0,			0,			225,		BULLET_IMPULSE(200, 1225),	0 );
-		def.AddAmmoType("357",				DMG_BULLET,					TRACER_LINE_AND_WHIZ,	0,			0,			12,			BULLET_IMPULSE(800, 5000),	0 );
-		def.AddAmmoType("XBowBolt",			DMG_BULLET,					TRACER_LINE,			0,			0,			10,			BULLET_IMPULSE(800, 8000),	0 );
-		def.AddAmmoType("FlareRound",		DMG_BURN,					TRACER_LINE,			0,			0,			30,			BULLET_IMPULSE(1500, 600),	0 );
-		def.AddAmmoType("Buckshot",			DMG_BULLET | DMG_BUCKSHOT,	TRACER_LINE,			0,			0,			30,			BULLET_IMPULSE(400, 1200),	0 );
-		def.AddAmmoType("RPG_Round",		DMG_BURN,					TRACER_NONE,			0,			0,			3,			0,							0 );
-		def.AddAmmoType("SMG1_Grenade",		DMG_BURN,					TRACER_NONE,			0,			0,			3,			0,							0 );
-		def.AddAmmoType("ML_Grenade",		DMG_BURN,					TRACER_NONE,			0,			0,			3,			0,							0 );
-		def.AddAmmoType("AR2_Grenade",		DMG_BURN,					TRACER_NONE,			0,			0,			0,			0,							0 );
-		def.AddAmmoType("Grenade",			DMG_BURN,					TRACER_NONE,			0,			0,			5,			0,							0 );
-		def.AddAmmoType("slam",				DMG_BURN,					TRACER_NONE,			0,			0,			5,			0,							0 );
-		def.AddAmmoType("SmallRound",		DMG_BULLET,					TRACER_LINE,			5,			5,			150,		BULLET_IMPULSE(125, 1325),	0 );
-		def.AddAmmoType("MediumRound",		DMG_BULLET,					TRACER_LINE,			8,			7,			150,		BULLET_IMPULSE(200, 1225),	0 );
-		def.AddAmmoType("LargeRound",		DMG_BULLET,					TRACER_LINE,			15,			10,			60,			BULLET_IMPULSE(250, 1180),	0 );
-		def.AddAmmoType("Molotov",			DMG_BURN,					TRACER_NONE,			0,			0,			5,			0,							0 );
-		def.AddAmmoType("Brickbat",			DMG_CLUB,					TRACER_NONE,			0,			0,			8,			0,							0 );
-		def.AddAmmoType("Rock",				DMG_CLUB,					TRACER_NONE,			0,			0,			8,			0,							0 );
-		def.AddAmmoType("Tripwire",			DMG_BURN,					TRACER_NONE,			NULL,		NULL,		3,			0,							0 );
-		def.AddAmmoType("Thumper",			DMG_SONIC,					TRACER_NONE,			10,			10,			2,			0,							0 );
-		def.AddAmmoType("Gravity",			DMG_CLUB,					TRACER_NONE,			0,			0,			8,			0,							0 );
-		def.AddAmmoType("Extinguisher",		DMG_BURN,					TRACER_NONE,			0,			0,			100,		0,							0 );
-		def.AddAmmoType("Battery",			DMG_CLUB,					TRACER_NONE,			NULL,		NULL,		NULL,		0,							0 );
-		def.AddAmmoType("GaussEnergy",		DMG_SHOCK,					TRACER_NONE,			0,			0,			60,			BULLET_IMPULSE(650, 8000),	0 ); // hit like a 10kg weight at 400 in/s
-		def.AddAmmoType("CombineCannon",	DMG_BULLET,					TRACER_LINE,			3,			40,			NULL,		1.5 * 750 * 12,				0 ); // hit like a 1.5kg weight at 750 ft/s
-		def.AddAmmoType("HelicopterGun",	DMG_BULLET,					TRACER_LINE_AND_WHIZ,	3,			6,			225,		BULLET_IMPULSE(400, 1225),	AMMO_FORCE_DROP_IF_CARRIED | AMMO_INTERPRET_PLRDAMAGE_AS_DAMAGE_TO_PLAYER );
-		def.AddAmmoType("Hopwire",			DMG_BLAST,					TRACER_NONE,			1,			1,			5,			0,							0 );
-		def.AddAmmoType("StriderMinigun",	DMG_BULLET,					TRACER_LINE,			5,			15,			15,			1.0 * 750 * 12,				AMMO_FORCE_DROP_IF_CARRIED ); // hit like a 1.0kg weight at 750 ft/s
-		def.AddAmmoType("StriderMinigunDirect",	DMG_BULLET,				TRACER_LINE,			2,			2,			15,			1.0 * 750 * 12,				AMMO_FORCE_DROP_IF_CARRIED ); // hit like a 1.0kg weight at 750 ft/s
-
-		}
-
-	return &def;
-}*/
 
 #ifdef CLIENT_DLL
 
@@ -1539,15 +1377,17 @@ CAmmoDef *GetAmmoDef()
 
 #ifndef CLIENT_DLL
 
+ConVar d_restarthack("d_restarthack", "0", 0);
+
 void CHL2MPRules::RestartGame()
 {
-	// temp fix
-
-	char cmd[128];
-	V_snprintf(cmd, 128, "changelevel %s\n", gpGlobals->mapname);
-	engine->ServerCommand(cmd);
-
-	return;
+	if ( d_restarthack.GetBool() )
+	{
+		char cmd[128];
+		V_snprintf(cmd, 128, "changelevel %s\n", gpGlobals->mapname);
+		engine->ServerCommand(cmd);
+		return;
+	}
 
 	// bounds check
 	if ( mp_timelimit.GetInt() < 0 )
@@ -1615,6 +1455,9 @@ void CHL2MPRules::RestartGame()
 
 	m_pCheckpoint = NULL;
 	// m_vecCheckpoints.Purge();
+
+	// hmmm
+	LevelInitPostEntity();
 }
 
 void CHL2MPRules::CleanUpMap()
@@ -1792,6 +1635,9 @@ void CHL2MPRules::CheckAllPlayersReady( void )
 //-----------------------------------------------------------------------------
 const char *CHL2MPRules::GetChatFormat( bool bTeamOnly, CBasePlayer *pPlayer )
 {
+	// DEMEZ HACK: chat works if this returns NULL, could look into it more, but this is fine
+	return NULL;
+
 	if ( !pPlayer )  // dedicated server output
 	{
 		return NULL;
@@ -1937,11 +1783,11 @@ CON_COMMAND( d_sv_changelevel_cancel, "Stop the changelevel timer" )
 //=========================================================
 //GetEntityRespawnInfo
 //=========================================================
-CEntityRespawnInfo* CHL2MPRules::GetEntityRespawnInfo( CBaseEntity *pEntity )
+CEntitySpawnInfo* CHL2MPRules::GetEntityRespawnInfo( CBaseEntity *pEntity )
 {
 	for ( int i = 0; i < m_vecRespawnableEntities.Count(); i++ )
 	{
-		CEntityRespawnInfo* respawnInfo = m_vecRespawnableEntities[i];
+		CEntitySpawnInfo* respawnInfo = m_vecRespawnableEntities[i];
 
 		if ( respawnInfo->m_pEntity == pEntity )
 		{
@@ -1960,7 +1806,7 @@ void CHL2MPRules::AddRespawnableEntity( CBaseEntity *pEntity )
 {
 	if ( GetEntityRespawnInfo( pEntity ) == NULL )
 	{
-		m_vecRespawnableEntities.AddToTail( new CEntityRespawnInfo( pEntity ) );
+		m_vecRespawnableEntities.AddToTail( new CEntitySpawnInfo( pEntity ) );
 	}
 }
 
@@ -1969,7 +1815,7 @@ void CHL2MPRules::AddRespawnableEntity( CBaseEntity *pEntity )
 //=========================================================
 void CHL2MPRules::RemoveRespawnableEntity( CBaseEntity *pEntity )
 {
-	CEntityRespawnInfo* pInfo = GetEntityRespawnInfo( pEntity );
+	CEntitySpawnInfo* pInfo = new CEntitySpawnInfo( pEntity );
 
 	if ( pInfo && m_vecRespawnableEntities.Find( pInfo ) != -1 )
 	{
@@ -1984,7 +1830,7 @@ void CHL2MPRules::RemoveRespawnableEntity( CBaseEntity *pEntity )
 //=========================================================
 void CHL2MPRules::SetEntityNeedsRespawn( CBaseEntity *pEntity, bool needed )
 {
-	CEntityRespawnInfo* pInfo = GetEntityRespawnInfo( pEntity );
+	CEntitySpawnInfo* pInfo = GetEntityRespawnInfo( pEntity );
 
 	if ( pInfo )
 	{
@@ -2001,7 +1847,7 @@ void CHL2MPRules::RespawnEntities( void )
 	{
 		for ( int i = 0; i < iTotal; i++ )
 		{
-			CEntityRespawnInfo *pInfo = m_vecRespawnableEntities[i];
+			CEntitySpawnInfo *pInfo = m_vecRespawnableEntities[i];
 
 			if ( pInfo )
 			{
@@ -2035,7 +1881,7 @@ void CHL2MPRules::RespawnEntities( void )
 
 // ====================================================================
 
-CEntityRespawnInfo::CEntityRespawnInfo( CBaseEntity* pEntity )
+CEntitySpawnInfo::CEntitySpawnInfo( CBaseEntity* pEntity )
 {
 	m_bCanRespawn = true;
 	m_bNeedsRespawn = false;
@@ -2047,11 +1893,11 @@ CEntityRespawnInfo::CEntityRespawnInfo( CBaseEntity* pEntity )
 }
 
 
-CEntityRespawnInfo::~CEntityRespawnInfo()
+CEntitySpawnInfo::~CEntitySpawnInfo()
 {
 }
 
-void CEntityRespawnInfo::SetNeedsRespawn( bool enabled )
+void CEntitySpawnInfo::SetNeedsRespawn( bool enabled )
 {
 	m_bNeedsRespawn = enabled;
 
@@ -2066,7 +1912,7 @@ void CEntityRespawnInfo::SetNeedsRespawn( bool enabled )
 }
 
 // hmmm
-CBaseEntity* CEntityRespawnInfo::CreateEntity()
+CBaseEntity* CEntitySpawnInfo::CreateEntity()
 {
 	return m_pEntity;
 }
@@ -2177,6 +2023,32 @@ void ScriptDeleteEntity( const char* targetName )
 {
 }
 
+
+bool ScriptIsHL2Map()
+{
+	return DemezGameManager()->IsHL2Map();
+}
+
+bool ScriptIsEP1Map()
+{
+	return DemezGameManager()->IsEP1Map();
+}
+
+bool ScriptIsEP2Map()
+{
+	return DemezGameManager()->IsEP2Map();
+}
+
+bool ScriptIsHL2()
+{
+	return DemezGameManager()->IsHL2();
+}
+
+bool ScriptIsEpisodic()
+{
+	return DemezGameManager()->IsEpisodic();
+}
+
 #endif
 
 
@@ -2191,6 +2063,13 @@ void CHL2MPRules::RegisterScriptFunctions()
 #else
 
 	ScriptRegisterFunctionNamed( g_pScriptVM, ScriptCreateEntity, "CreateEntity", "Create an entity" );
+
+	ScriptRegisterFunctionNamed( g_pScriptVM, ScriptIsHL2Map,    "IsHL2Map",    "Is Half-Life 2 Map" );
+	ScriptRegisterFunctionNamed( g_pScriptVM, ScriptIsEP1Map,    "IsEP1Map",    "Is Episode 1 Map" );
+	ScriptRegisterFunctionNamed( g_pScriptVM, ScriptIsEP2Map,    "IsEP2Map",    "Is Episode 2 Map" );
+
+	ScriptRegisterFunctionNamed( g_pScriptVM, ScriptIsHL2,       "IsHL2",       "Is Half-Life 2" );
+	ScriptRegisterFunctionNamed( g_pScriptVM, ScriptIsEpisodic,  "IsEpisodic",  "Is Episodic" );
 
 #endif
 
@@ -2300,7 +2179,7 @@ CON_COMMAND_F( ent_getkv, "Get entity keyvalues\n", FCVAR_CHEAT )
 }*/
 
 
-CON_COMMAND( d_reent_count, "Get the current entity count and the entity limit" )
+CON_COMMAND( d_ent_count, "Get the current entity count and the entity limit" )
 {
 	CLIENT_MSG( "Number of Edicts:   %d / %d", gEntList.NumberOfEdicts(), MAX_EDICTS );
 	CLIENT_MSG( "Number of Entities: %d / %d", gEntList.NumberOfEntities(), NUM_ENT_ENTRIES );

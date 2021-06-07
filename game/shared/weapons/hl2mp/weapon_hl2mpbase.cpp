@@ -335,5 +335,16 @@ void UTIL_ClipPunchAngleOffset( QAngle &in, const QAngle &punch, const QAngle &c
 	}
 }
 
+void CWeaponHL2MPBase::Redraw()
+{
+	// really doesn't need to be done each frame, aaaa
+	if ( GetOwner() && GetOwner()->IsPlayer() )
+		ClientLeafSystem()->DisableFlashlightShadows( RenderHandle(), true );
+	else
+		ClientLeafSystem()->DisableFlashlightShadows( RenderHandle(), false );
+
+	BaseClass::Redraw();
+}
+
 #endif
 
