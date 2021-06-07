@@ -40,6 +40,8 @@ public:
 	virtual int         GetDeathMessageStartHeight( void );
 	virtual void        InitViewport();
 
+	virtual void        LevelInit( const char *newmap );
+
 #if ENGINE_NEW
 	virtual void        DoPostScreenSpaceEffects( const CViewSetup *pSetup ) {}
 	virtual void        FireGameEvent( IGameEvent *event );
@@ -49,6 +51,14 @@ public:
 	virtual void OnColorCorrectionWeightsReset() {}
 	virtual float GetColorCorrectionScale() const { return 0.0f; }
 #endif
+
+#if ENGINE_CSGO
+	inline const char* GetMapNameChar() { return mapName; }
+#else
+	inline const char* GetMapName() { return mapName; }
+#endif
+
+	const char* mapName;
 };
 
 extern IClientMode *GetClientModeNormal();

@@ -134,6 +134,15 @@ void ClientModeHL2MPNormal::Init()
 }
 
 
+void ClientModeHL2MPNormal::LevelInit( const char *newmap )
+{
+	BaseClass::LevelInit( newmap );
+
+	// V_memcpy( (void*)mapName, newmap, sizeof(newmap) );
+	mapName = newmap;
+}
+
+
 #if ENGINE_NEW
 // See interface.h/.cpp for specifics:  basically this ensures that we actually Sys_UnloadModule the dll and that we don't call Sys_LoadModule 
 //  over and over again.
