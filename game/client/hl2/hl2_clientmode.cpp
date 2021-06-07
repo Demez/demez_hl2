@@ -9,7 +9,6 @@
 #include "ivmodemanager.h"
 #include "clientmode_hl2mpnormal.h"
 #include "panelmetaclassmgr.h"
-#include "vr_clientmode.h"
 
 #if ENGINE_NEW
 #include "c_gameinstructor.h"
@@ -37,7 +36,7 @@ ConVar d_fov("d_fov", "90", FCVAR_ARCHIVE | FCVAR_USERINFO, "Sets the base field
 
 #define SCREEN_FILE		"scripts/vgui_screens.txt"
 
-class CHLModeManager : public CVRModeManager
+class CHLModeManager : public IVModeManager
 {
 public:
 				CHLModeManager( void );
