@@ -247,6 +247,9 @@ void C_HL2MP_Player::ClientThink( void )
 {
 	C_VRBasePlayer::ClientThink();
 
+	// DEMEZ TESTING: really should not be set every frame
+	ClientLeafSystem()->DisableFlashlightShadows( RenderHandle(), true );
+
 	bool bFoundViewTarget = false;
 	
 	Vector vForward;
