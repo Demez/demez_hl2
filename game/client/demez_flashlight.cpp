@@ -547,7 +547,7 @@ bool CFlashlightEffect::ComputeLightPosAndOrientation( const Vector &vecPos, con
 	// Not on ladder...trace a hull
 	if ( !bPlayerOnLadder ) 
 	{
-		Vector vecPlayerEyePos = pPlayer->GetRenderOrigin() + pPlayer->GetViewOffset();
+		/*Vector vecPlayerEyePos = pPlayer->GetRenderOrigin() + pPlayer->GetViewOffset();
 
 		trace_t pmOriginTrace;
 		UTIL_TraceHull( vecPlayerEyePos, vOrigin, Vector(-2, -2, -2), Vector(2, 2, 2), ( MASK_SOLID & ~(CONTENTS_HITBOX) ) | CONTENTS_WINDOW | CONTENTS_GRATE, &traceFilter, &pmOriginTrace );//1
@@ -575,7 +575,7 @@ bool CFlashlightEffect::ComputeLightPosAndOrientation( const Vector &vecPos, con
 			{
 				vOrigin = vecPos;
 			}
-		}
+		}*/
 	}
 	else // on ladder...skip the above hull trace
 	{
