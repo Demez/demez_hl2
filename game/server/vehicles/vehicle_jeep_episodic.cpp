@@ -476,6 +476,12 @@ void CPropJeepEpisodic::Activate()
 {
 	m_iNumRadarContacts = 0; // Force first contact tone
 	BaseClass::Activate();
+
+	// dumb
+	if ( V_strcmp( GetModelName().ToCStr(), "models/buggy.mdl" ) == 0 )
+	{
+		SetGunEnabled( true );
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -1331,7 +1337,8 @@ void CPropJeepEpisodic::DriveVehicle( float flFrameTime, CUserCmd *ucmd, int iBu
 	   and we haven't built any gameplay around it.
 
 	   Furthermore, I don't think I've ever seen a playtester turn it on.
-	
+	*/
+
 	if ( ucmd->impulse == 100 )
 	{
 		if (HeadlightIsOn())
@@ -1342,7 +1349,7 @@ void CPropJeepEpisodic::DriveVehicle( float flFrameTime, CUserCmd *ucmd, int iBu
 		{
 			HeadlightTurnOn();
 		}
-	}*/
+	}
 	
 	if ( ucmd->forwardmove != 0.0f )
 	{

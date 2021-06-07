@@ -37,6 +37,7 @@ public:
 
 	DECLARE_SERVERCLASS();
 	DECLARE_DATADESC();
+	DECLARE_ENT_SCRIPTDESC();
 
 	CPropJeep( void );
 
@@ -49,6 +50,8 @@ public:
 	virtual bool	AllowBlockedExit( CBasePlayer *pPlayer, int nRole ) { return false; }
 	virtual bool	CanExitVehicle( CBaseEntity *pEntity );
 	virtual bool	IsVehicleBodyInWater() { return m_WaterData.m_bBodyInWater; }
+
+	virtual void	SetGunEnabled( bool enabled );
 	
 	// Passengers do not directly receive damage from blasts or radiation damage
 	virtual bool PassengerShouldReceiveDamage( CTakeDamageInfo &info ) 

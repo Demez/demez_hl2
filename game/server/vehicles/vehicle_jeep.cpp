@@ -147,6 +147,14 @@ END_SEND_TABLE();
 LINK_ENTITY_TO_CLASS( prop_vehicle_jeep, CPropJeep );
 #endif
 
+
+#if ENGINE_NEW
+BEGIN_ENT_SCRIPTDESC( CPropJeep, CBaseAnimating, "Prop Jeep" )
+	DEFINE_SCRIPTFUNC( SetGunEnabled, "" )
+END_SCRIPTDESC();
+#endif
+
+
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -235,6 +243,34 @@ void CPropJeep::Spawn( void )
 	}
 
 	AddSolidFlags( FSOLID_NOT_STANDABLE );
+}
+
+
+void CPropJeep::SetGunEnabled( bool enabled )
+{
+	m_bHasGun = enabled;
+
+	if ( m_bHasGun )
+	{
+		m_nBulletType = GetAmmoDef()->Index("GaussEnergy");
+
+		CAmmoDef *pAmmoDef = GetAmmoDef();
+		m_nAmmoType = pAmmoDef->Index("GaussEnergy");
+
+		SetBodygroup( 1, true );
+
+		// Initialize pose parameters
+		SetPoseParameter( JEEP_GUN_YAW, 0 );
+		SetPoseParameter( JEEP_GUN_PITCH, 0 );
+		m_nSpinPos = 0;
+		SetPoseParameter( JEEP_GUN_SPIN, m_nSpinPos );
+		m_aimYaw = 0;
+		m_aimPitch = 0;
+	}
+	else
+	{
+		SetBodygroup( 1, false );
+	}
 }
 
 //-----------------------------------------------------------------------------
