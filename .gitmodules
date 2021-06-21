@@ -19,4 +19,4 @@
 	url = https://github.com/Demez/SourceEngineVR
 [submodule "output/vr_assets"]
 	path = output/vr_assets
-	url = https://github.com/Demez/SourceEngineVR
+	url = https://github.com/Demez/SourceEngineVRAssets
