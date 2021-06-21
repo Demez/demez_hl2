@@ -248,7 +248,9 @@ void C_HL2MP_Player::ClientThink( void )
 	C_VRBasePlayer::ClientThink();
 
 	// DEMEZ TESTING: really should not be set every frame
+#if ENGINE_ASW
 	ClientLeafSystem()->DisableFlashlightShadows( RenderHandle(), true );
+#endif
 
 	bool bFoundViewTarget = false;
 	
@@ -498,6 +500,9 @@ bool C_HL2MP_Player::ShouldDraw( void )
 	if ( !IsAlive() )
 		return false;
 
+	if ( g_VR.active )
+		return true;
+
 //	if( GetTeamNumber() == TEAM_SPECTATOR )
 //		return false;
 
@@ -578,10 +583,12 @@ float C_HL2MP_Player::GetFOV( void )
 //=========================================================
 Vector C_HL2MP_Player::GetAutoaimVector( float flDelta )
 {
+	return BaseClass::GetAutoaimVector( flDelta );
+
 	// Never autoaim a predicted weapon (for now)
-	Vector	forward;
-	AngleVectors( EyeAngles() + GetPunchAngle(), &forward );
-	return	forward;
+	// Vector	forward;
+	// AngleVectors( EyeAngles() + GetPunchAngle(), &forward );
+	// return	forward;
 }
 
 //-----------------------------------------------------------------------------

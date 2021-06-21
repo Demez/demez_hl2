@@ -243,7 +243,7 @@ void CBaseHLCombatWeapon::WeaponIdle( void )
 float	g_lateralBob;
 float	g_verticalBob;
 
-#if defined( CLIENT_DLL ) && ( !defined( HL2MP ) && !defined( PORTAL ) )
+#if defined( CLIENT_DLL ) // && ( !defined( HL2MP ) && !defined( PORTAL ) )
 
 #define	HL2_BOB_CYCLE_MIN	1.0f
 #define	HL2_BOB_CYCLE_MAX	0.45f
@@ -418,6 +418,12 @@ float CBaseHLCombatWeapon::GetSpreadBias( WeaponProficiency_t proficiency )
 	return (pProficiencyValues)[ proficiency ].bias;
 }
 
+const WeaponProficiencyInfo_t *CBaseHLCombatWeapon::GetProficiencyValues()
+{
+	return GetDefaultProficiencyValues();
+}
+#endif
+
 //-----------------------------------------------------------------------------
 CBasePlayer* CBaseHLCombatWeapon::GetPlayerOwner() const
 {
@@ -465,11 +471,13 @@ bool CBaseHLCombatWeapon::OnFireEvent(C_BaseViewModel* pViewModel, const Vector&
 
 void CBaseHLCombatWeapon::Redraw()
 {
+#if ENGINE_ASW
 	// really doesn't need to be done each frame, aaaa
 	if ( GetOwner() && GetOwner()->IsPlayer() )
 		ClientLeafSystem()->DisableFlashlightShadows( RenderHandle(), true );
 	else
 		ClientLeafSystem()->DisableFlashlightShadows( RenderHandle(), false );
+#endif
 
 	BaseClass::Redraw();
 }
@@ -628,10 +636,6 @@ void CBaseHLCombatWeapon::FireBullets(const FireBulletsInfo_t& info)
 }
 
 //-----------------------------------------------------------------------------
-const WeaponProficiencyInfo_t *CBaseHLCombatWeapon::GetProficiencyValues()
-{
-	return GetDefaultProficiencyValues();
-}
 
 //-----------------------------------------------------------------------------
 const WeaponProficiencyInfo_t *CBaseHLCombatWeapon::GetDefaultProficiencyValues()
@@ -651,4 +655,4 @@ const WeaponProficiencyInfo_t *CBaseHLCombatWeapon::GetDefaultProficiencyValues(
 	return g_BaseWeaponProficiencyTable;
 }
 
-#endif
+// #endif

@@ -127,7 +127,9 @@ bool UTIL_IsAnyPlayerLookingAtEntity( const Vector &vecSpot )
 
 bool UTIL_IsAnyPlayerVisible( CBaseEntity* pEntity )
 {
-	return UTIL_IsAnyPlayerLookingAtEntity( pEntity->WorldSpaceCenter() );
+	// maybe?
+	return UTIL_IsAnyPlayerVisible( pEntity->WorldSpaceCenter() );
+	// return UTIL_IsAnyPlayerLookingAtEntity( pEntity->WorldSpaceCenter() );
 }
 
 

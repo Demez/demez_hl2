@@ -369,12 +369,13 @@ void CHL2MPRules::LevelInitPreEntity()
 }
 
 
+#ifdef GAME_DLL
+extern void UpdatePhysEnvironment();
+#endif
+
 void CHL2MPRules::LevelInitPostEntity()
 {
 #ifdef GAME_DLL
-
-	// m_hProxy->RunOnPostSpawnScripts();
-
 
 	HSCRIPT hLevelInitPostEntity = g_pScriptVM->LookupFunction( "LevelInitPostEntity" );
 	if ( hLevelInitPostEntity )
@@ -384,6 +385,8 @@ void CHL2MPRules::LevelInitPostEntity()
 		g_EventQueue.AddEvent( m_pProxy, "CallScriptFunction", variant, 0, m_pProxy, m_pProxy );
 		m_ScriptScope.ReleaseFunction( hLevelInitPostEntity );
 	}
+
+	UpdatePhysEnvironment();
 
 #endif
 }

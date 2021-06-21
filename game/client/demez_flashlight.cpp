@@ -469,10 +469,12 @@ bool CFlashlightEffect::UpdateDefaultFlashlightState( FlashlightState_t& state, 
 	if ( m_bMuzzleFlashEnabled )
 	{
 		state.m_pSpotlightTexture = m_MuzzleFlashTexture;
+		// state.m_pSpotlightTexture = m_FlashlightTexture;
 		state.m_pProjectedMaterial = NULL;
 		state.m_Color[0] = m_flMuzzleFlashBrightness;
 		state.m_Color[1] = m_flMuzzleFlashBrightness;
 		state.m_Color[2] = m_flMuzzleFlashBrightness;
+		// state.m_NearZ = 1.0;
 	}
 	else
 	{
@@ -541,7 +543,11 @@ bool CFlashlightEffect::ComputeLightPosAndOrientation( const Vector &vecPos, con
 
 	//	Vector vOrigin = vecPos + r_flashlightoffsety.GetFloat() * vecUp;
 	Vector vecOffset;
-	pPlayer->GetFlashlightOffset( vecForward, vecRight, vecUp, &vecOffset );
+	vecOffset.Init();
+	if ( !m_bMuzzleFlashEnabled )
+	{
+		pPlayer->GetFlashlightOffset( vecForward, vecRight, vecUp, &vecOffset );
+	}
 	Vector vOrigin = vecPos + vecOffset;
 
 	// Not on ladder...trace a hull

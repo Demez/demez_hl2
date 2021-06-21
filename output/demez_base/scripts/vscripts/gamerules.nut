@@ -1,15 +1,25 @@
 //********************************************************************************************
-//MAPSPAWN.nut is called on newgame or transitions
+// gamerules.nut is called on newgame or transitions
 //********************************************************************************************
+
 printl( "==== calling gamerules.nut on map " + GetMapName() )
+
 
 
 function DispatchOnPostSpawn()
 {
 	printl( "called DispatchOnPostSpawn" )
 	
-	LoadCheckpoints()
+	// LoadCheckpoints()
 	ApplyMapFixes()
+}
+
+
+function LevelInitPostEntity()
+{
+	printl( "called LevelInitPostEntity" )
+	
+	LoadCheckpoints()
 }
 
 
@@ -515,7 +525,7 @@ function LoadCheckpoints()
 		local chk0 = CreateCheckpoint();
 		chk0.SetTriggerOrigin( Vector(2607, -982, 256) );
 		chk0.SetTriggerSize( Vector(160, 160, 96) );
-		chk0.SetAngles( Vector(0, -180, 0) );
+		chk0.SetAngles( 0, -180, 0 );
 		
 		local chk1 = CreateCheckpoint();
 		chk1.SetTriggerOrigin( Vector(3454, 878, 512) );

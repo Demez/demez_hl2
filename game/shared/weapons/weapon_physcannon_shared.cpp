@@ -382,7 +382,7 @@ float CGrabController::ComputeError()
 void CGrabController::ComputeMaxSpeed( CBaseEntity *pEntity, IPhysicsObject *pPhysics )
 {
 #ifndef CLIENT_DLL
-	m_shadow.maxSpeed = 1000;
+	m_shadow.maxSpeed = 10000;
 	m_shadow.maxAngular = DEFAULT_MAX_ANGULAR;
 
 	// Compute total mass...
@@ -453,7 +453,7 @@ void CGrabController::AttachEntity( CBasePlayer *pPlayer, CBaseEntity *pEntity, 
 	Pickup_GetPreferredCarryAngles( pEntity, pPlayer, pPlayer->EntityToWorldTransform(), angles );
 #endif
 
-//	ComputeMaxSpeed( pEntity, pPhys );
+	ComputeMaxSpeed( pEntity, pPhys );
 
 	// Carried entities can never block LOS
 	m_bCarriedEntityBlocksLOS = pEntity->BlocksLOS();
@@ -565,7 +565,8 @@ void CGrabController::DetachEntity( bool bClearVelocity )
 			else
 			{
 #ifndef CLIENT_DLL
-				ClampPhysicsVelocity( pPhys, hl2_normspeed.GetFloat() * 1.5f, 2.0f * 360.0f );
+				// ClampPhysicsVelocity( pPhys, hl2_normspeed.GetFloat() * 1.5f, 2.0f * 360.0f );
+				ClampPhysicsVelocity( pPhys, hl2_normspeed.GetFloat() * 4.0f, 4.0f * 360.0f );
 #endif
 			}
 

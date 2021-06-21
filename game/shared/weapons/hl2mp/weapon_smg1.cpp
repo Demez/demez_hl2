@@ -39,6 +39,7 @@
 #define SMG1_GRENADE_RADIUS 250.0f
 
 ConVar sdd_npc_smg1_grenade("d_npc_smg1_grenade", "0", FCVAR_NONE);
+ConVar d_funny_smg_grenade("d_funny_smg_grenade", "0", FCVAR_CHEAT);
 
 extern ConVar sk_npc_dmg_ar2_grenade;
 
@@ -390,7 +391,8 @@ void CWeaponSMG1::SecondaryAttack( void )
 	Vector vecSrc = pPlayer->Weapon_ShootPosition();
 	Vector	vecThrow;
 	// Don't autoaim on grenade tosses
-	AngleVectors( pPlayer->EyeAngles() + pPlayer->GetPunchAngle(), &vecThrow );
+	// AngleVectors( pPlayer->EyeAngles() + pPlayer->GetPunchAngle(), &vecThrow );
+	AngleVectors( pPlayer->GetWeaponShootAng() + pPlayer->GetPunchAngle(), &vecThrow );
 	VectorScale( vecThrow, 1000.0f, vecThrow );
 	
 #ifndef CLIENT_DLL
@@ -414,10 +416,17 @@ void CWeaponSMG1::SecondaryAttack( void )
 	pPlayer->RemoveAmmo( 1, m_iSecondaryAmmoType );
 
 	// Can shoot again immediately
-	m_flNextPrimaryAttack = gpGlobals->curtime + 0.5f;
+ 	m_flNextPrimaryAttack = gpGlobals->curtime + 0.5f;
 
 	// Can blow up after a short delay (so have time to release mouse button)
-	m_flNextSecondaryAttack = gpGlobals->curtime + 1.0f;
+	if ( d_funny_smg_grenade.GetFloat() < 0.001 )
+	{
+		m_flNextSecondaryAttack = gpGlobals->curtime + 1.0f;
+	}
+	else
+	{
+		m_flNextSecondaryAttack = gpGlobals->curtime + d_funny_smg_grenade.GetFloat();
+	}
 
 	// Register a muzzleflash for the AI.
 #ifdef GAME_DLL

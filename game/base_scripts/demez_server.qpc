@@ -98,6 +98,8 @@ files
 		"server/base_classes/d_util.cpp"
 		"server/base_classes/d_changelevel.cpp"
 		"server/base_classes/d_changelevel.h"
+		
+		"server/d_concommands.cpp"
 	}
 	
 	folder "Game Base"
