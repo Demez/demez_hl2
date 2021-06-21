@@ -17,3 +17,6 @@
 [submodule "game/vr_base"]
 	path = game/vr_base
 	url = https://github.com/Demez/SourceEngineVR
+[submodule "output/vr_assets"]
+	path = output/vr_assets
+	url = https://github.com/Demez/SourceEngineVR
