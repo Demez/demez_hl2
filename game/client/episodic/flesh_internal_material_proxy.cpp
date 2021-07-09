@@ -7,6 +7,7 @@
 #include "ProxyEntity.h"
 #include "materialsystem/IMaterial.h"
 #include "materialsystem/IMaterialVar.h"
+#include "imaterialproxydict.h"
 #include "debugoverlay_shared.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -222,4 +223,5 @@ IMaterial *CFleshInteriorMaterialProxy::GetMaterial()
 	return m_pMaterialParamFleshEffectCenterRadius1->GetOwningMaterial();
 }
 
-EXPOSE_INTERFACE( CFleshInteriorMaterialProxy, IMaterialProxy, "FleshInterior" IMATERIAL_PROXY_INTERFACE_VERSION );
+// EXPOSE_INTERFACE( CFleshInteriorMaterialProxy, IMaterialProxy, "FleshInterior" IMATERIAL_PROXY_INTERFACE_VERSION );
+EXPOSE_MATERIAL_PROXY( CFleshInteriorMaterialProxy, FleshInterior );

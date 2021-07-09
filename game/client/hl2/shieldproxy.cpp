@@ -9,6 +9,7 @@
 #include "materialsystem/IMaterial.h"
 #include "materialsystem/IMaterialVar.h"
 #include "materialsystem/IMaterialSystem.h"
+#include "imaterialproxydict.h"
 #include <KeyValues.h>
 #include "engine_defines.h"
 
@@ -108,4 +109,5 @@ IMaterial *CShieldProxy::GetMaterial()
 	return m_AlphaVar->GetOwningMaterial();
 }
 
-EXPOSE_INTERFACE( CShieldProxy, IMaterialProxy, "Shield" IMATERIAL_PROXY_INTERFACE_VERSION );
+// EXPOSE_INTERFACE( CShieldProxy, IMaterialProxy, "Shield" IMATERIAL_PROXY_INTERFACE_VERSION );
+EXPOSE_MATERIAL_PROXY( CShieldProxy, Shield );

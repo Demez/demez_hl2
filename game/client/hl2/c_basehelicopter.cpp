@@ -9,6 +9,7 @@
 #include "proxyentity.h"
 #include "materialsystem/imaterial.h"
 #include "materialsystem/imaterialvar.h"
+#include "imaterialproxydict.h"
 #include "KeyValues.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -87,5 +88,6 @@ IMaterial *CHeliBladeMaterialProxy::GetMaterial()
 	return m_AlphaVar->GetOwningMaterial();
 }
 
-EXPOSE_INTERFACE( CHeliBladeMaterialProxy, IMaterialProxy, "HeliBlade" IMATERIAL_PROXY_INTERFACE_VERSION );
+// EXPOSE_INTERFACE( CHeliBladeMaterialProxy, IMaterialProxy, "HeliBlade" IMATERIAL_PROXY_INTERFACE_VERSION );
+EXPOSE_MATERIAL_PROXY( CHeliBladeMaterialProxy, HeliBlade );
 

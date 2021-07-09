@@ -17,6 +17,7 @@
 #include "ProxyEntity.h"
 #include "materialsystem/IMaterial.h"
 #include "materialsystem/IMaterialVar.h"
+#include "imaterialproxydict.h"
 
 // idk
 #undef DECLARE_CLIENT_EFFECT
@@ -602,4 +603,5 @@ IMaterial *CVortEmissiveProxy::GetMaterial()
 		return NULL;
 }
 
-EXPOSE_INTERFACE( CVortEmissiveProxy, IMaterialProxy, "VortEmissive" IMATERIAL_PROXY_INTERFACE_VERSION );
+// EXPOSE_INTERFACE( CVortEmissiveProxy, IMaterialProxy, "VortEmissive" IMATERIAL_PROXY_INTERFACE_VERSION );
+EXPOSE_MATERIAL_PROXY( CVortEmissiveProxy, VortEmissive );
