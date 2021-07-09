@@ -375,6 +375,7 @@ extern void UpdatePhysEnvironment();
 
 void CHL2MPRules::LevelInitPostEntity()
 {
+#if ENGINE_NEW
 #ifdef GAME_DLL
 
 	HSCRIPT hLevelInitPostEntity = g_pScriptVM->LookupFunction( "LevelInitPostEntity" );
@@ -388,6 +389,7 @@ void CHL2MPRules::LevelInitPostEntity()
 
 	UpdatePhysEnvironment();
 
+#endif
 #endif
 }
 
@@ -1414,6 +1416,8 @@ void CHL2MPRules::RestartGame()
 		if ( !pPlayer )
 			continue;
 
+		engine->ClientCommand(pPlayer->edict(), "stopsound");
+
 		if ( pPlayer->GetActiveWeapon() )
 		{
 			pPlayer->GetActiveWeapon()->Holster();
@@ -1425,17 +1429,20 @@ void CHL2MPRules::RestartGame()
 
 	// Respawn entities (glass, doors, etc..)
 
-	CTeam *pRebels = GetGlobalTeam( TEAM_REBELS );
-	CTeam *pCombine = GetGlobalTeam( TEAM_COMBINE );
-
-	if ( pRebels )
+	if ( IsDeathmatch() )
 	{
-		pRebels->SetScore( 0 );
-	}
+		CTeam *pRebels = GetGlobalTeam( TEAM_REBELS );
+		CTeam *pCombine = GetGlobalTeam( TEAM_COMBINE );
 
-	if ( pCombine )
-	{
-		pCombine->SetScore( 0 );
+		if ( pRebels )
+		{
+			pRebels->SetScore( 0 );
+		}
+
+		if ( pCombine )
+		{
+			pCombine->SetScore( 0 );
+		}
 	}
 
 	m_flIntermissionEndTime = 0;

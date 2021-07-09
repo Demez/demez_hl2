@@ -7,6 +7,9 @@
 #endif
 
 
+extern ConVar hl2_episodic;
+
+
 // Demez: TEMP, move to a keyvalues file or a vscript
 static const char *s_hl2Maps[] =
 {
@@ -173,11 +176,13 @@ void CDemezGameManager::DetermineGame()
 	{
 		m_gameType = EDemezGame::HL2;
 		demez_game.SetValue( "hl2" );
+		hl2_episodic.SetValue(0);
 	}
 	else if ( IsEP1Map() || IsEP2Map() )
 	{
 		m_gameType = EDemezGame::EPISODIC;
 		demez_game.SetValue( "episodic" );
+		hl2_episodic.SetValue(1);
 	}
 	else
 	{
@@ -185,6 +190,7 @@ void CDemezGameManager::DetermineGame()
 		// Warning( "Invalid Game Type, defaulting to HL2 Episodic" );
 		m_gameType = EDemezGame::EPISODIC;
 		demez_game.SetValue( "episodic" );
+		hl2_episodic.SetValue(1);
 	}
 }
 

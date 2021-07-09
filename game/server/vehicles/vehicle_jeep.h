@@ -11,6 +11,7 @@
 #endif
 
 #include "vehicle_base.h"
+#include "engine_defines.h"
 
 #define JEEP_WHEEL_COUNT	4
 
