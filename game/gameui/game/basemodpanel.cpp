@@ -1421,6 +1421,9 @@ void CBaseModPanel::DrawCopyStats()
 #endif
 }
 
+
+ConVar bgmovie("bgmovie", "1", FCVAR_ARCHIVE);
+
 //=============================================================================
 void CBaseModPanel::PaintBackground()
 {
@@ -1445,7 +1448,7 @@ void CBaseModPanel::PaintBackground()
 			ActivateBackgroundEffects();
 
 #ifdef HL2_CLIENT_DLL
-			if ( HL2BackgroundMovie() )
+			if ( HL2BackgroundMovie() && bgmovie.GetBool() )
 			{
 				HL2BackgroundMovie()->Update();
 				if ( HL2BackgroundMovie()->SetTextureMaterial() != -1 )

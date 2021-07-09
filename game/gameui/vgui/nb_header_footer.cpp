@@ -24,7 +24,6 @@
 
 using namespace vgui;
 
-#ifdef HL2_CLIENT_DLL
 CHL2_Background_Movie *g_pBackgroundMovie = NULL;
 
 CHL2_Background_Movie* HL2BackgroundMovie()
@@ -39,22 +38,6 @@ CHL2_Background_Movie* HL2BackgroundMovie()
 
 CHL2_Background_Movie::CHL2_Background_Movie()
 {
-#elif GAMEUI_SHARED
-C_Background_Movie *g_pBackgroundMovie = NULL;
-
-C_Background_Movie* BackgroundMovie()
-{
-	if (!g_pBackgroundMovie)
-	{
-		g_pBackgroundMovie = new C_Background_Movie();
-	}
-	return g_pBackgroundMovie;
-}
-
-
-C_Background_Movie::C_Background_Movie()
-{
-#endif
 #ifdef ASW_BINK_MOVIES
 	m_nBIKMaterial = BIKMATERIAL_INVALID;
 #else
@@ -65,7 +48,6 @@ C_Background_Movie::C_Background_Movie()
 	m_nLastGameState = -1;
 }
 
-#ifdef HL2_CLIENT_DLL
 CHL2_Background_Movie::~CHL2_Background_Movie()
 {
 
@@ -73,21 +55,8 @@ CHL2_Background_Movie::~CHL2_Background_Movie()
 
 void CHL2_Background_Movie::SetCurrentMovie( const char *szFilename )
 {
-	return;
-
 	if ( Q_strcmp( m_szCurrentMovie, szFilename ) )
 	{
-#elif GAMEUI_SHARED
-C_Background_Movie::~C_Background_Movie()
-{
-
-}
-
-void C_Background_Movie::SetCurrentMovie(const char *szFilename)
-{
-	if (Q_strcmp(m_szCurrentMovie, szFilename))
-	{
-#endif
 #ifdef ASW_BINK_MOVIES
 		if ( m_nBIKMaterial != BIKMATERIAL_INVALID )
 		{
@@ -123,11 +92,8 @@ void C_Background_Movie::SetCurrentMovie(const char *szFilename)
 	}
 }
 
-#ifdef HL2_CLIENT_DLL
+
 void CHL2_Background_Movie::ClearCurrentMovie()
-#elif GAMEUI_SHARED
-void C_Background_Movie::ClearCurrentMovie()
-#endif
 {
 #ifdef ASW_BINK_MOVIES
 	if ( m_nBIKMaterial != BIKMATERIAL_INVALID )
@@ -148,11 +114,7 @@ void C_Background_Movie::ClearCurrentMovie()
 #endif
 }
 
-#ifdef HL2_CLIENT_DLL
 int CHL2_Background_Movie::SetTextureMaterial()
-#elif GAMEUI_SHARED
-int C_Background_Movie::SetTextureMaterial()
-#endif
 {
 #ifdef ASW_BINK_MOVIES
 	if ( m_nBIKMaterial == BIKMATERIAL_INVALID )
@@ -175,7 +137,6 @@ int C_Background_Movie::SetTextureMaterial()
 	return m_nTextureID;
 }
 
-#ifdef HL2_CLIENT_DLL
 void CHL2_Background_Movie::Update()
 {
 	if ( engine->IsConnected() && HL2GameRules() )
@@ -185,24 +146,6 @@ void CHL2_Background_Movie::Update()
 		if ( nGameState != m_nLastGameState )
 		{
 			// todo: whats this? [str]
-
-#elif GAMEUI_SHARED
-void C_Background_Movie::Update()
-{
-#ifdef DEATHMATCH_CLIENT_DLL
-	if (engine->IsConnected() && DMGameRules())
-#elif HL2_CLIENT_DLL
-	if (engine->IsConnected() && HL2GameRules())
-#endif
-	{
-		// Do something based on the gamerules...
-		int nGameState = 1;
-		if (nGameState != m_nLastGameState)
-		{
-			// todo: whats this? [str]
-
-#endif
-
 #ifdef ASW_BINK_MOVIES
 			SetCurrentMovie( "media/BGFX_01.bik" );
 #else
@@ -431,17 +374,11 @@ void CNB_Header_Footer::SetMovieEnabled( bool bMovieEnabled )
 void CNB_Header_Footer::PaintBackground()
 {
 	BaseClass::PaintBackground();
-#ifdef HL2_CLIENT_DLL
+
 	if ( m_bMovieEnabled && HL2BackgroundMovie() )
 	{
 		HL2BackgroundMovie()->Update();
 		if ( HL2BackgroundMovie()->SetTextureMaterial() != -1 )
-#elif GAMEUI_SHARED
-	if (m_bMovieEnabled && BackgroundMovie())
-	{
-		BackgroundMovie()->Update();
-		if (BackgroundMovie()->SetTextureMaterial() != -1)
-#endif
 		{
 			surface()->DrawSetColor( 255, 255, 255, 255 );
 
