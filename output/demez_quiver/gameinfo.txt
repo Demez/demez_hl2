@@ -15,7 +15,7 @@
             game		|gameinfo_path|../hl2mp/hl2mp_pak.vpk
 			
 			game		|gameinfo_path|custom/*
-			game		|gameinfo_path|../demez_base/custom/*
+			// game		|gameinfo_path|../demez_base/custom/*
 			game		|gameinfo_path|../ep2/custom/*
 			game		|gameinfo_path|../episodic/custom/*
 			game		|gameinfo_path|../hl2mp/custom/*
@@ -24,7 +24,8 @@
 			
 			game		|gameinfo_path|.
 			
-			vr			|gameinfo_path|../demez_base
+			vr			|gameinfo_path|../vr_assets
+			game		|gameinfo_path|../vr_assets
 			
             game		|gameinfo_path|../ep2/ep2_pak.vpk
 			game		|gameinfo_path|../episodic/ep1_pak.vpk
