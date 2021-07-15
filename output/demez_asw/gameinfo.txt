@@ -1,0 +1,72 @@
+"GameInfo"
+{
+	game 		"demez hl2 - asw"
+	title 		"demez hl2"
+	type		multiplayer_only
+	
+	SupportsXBox360 0
+	supportsdx8 0
+
+	FileSystem
+	{
+		SteamAppId		220	
+		
+		SearchPaths
+		{
+			game        |gameinfo_path|.
+			// game        |gameinfo_path|custom/*
+			
+			vr          |gameinfo_path|../vr_assets
+			game        |gameinfo_path|../vr_assets
+			
+			// game        |gameinfo_path|../vrc_mdl_test
+			
+			// particles test
+			// Game		"D:\sourceengine\csgoass"
+			
+			// game        |gameinfo_path|../demez_base/custom
+			// game        |gameinfo_path|../ep2/custom/*
+			// game        |gameinfo_path|../episodic/custom/*
+			// game        |gameinfo_path|../hl2mp/custom/*
+			// game        |gameinfo_path|../hl2/custom/*
+			
+			// game        "|gameinfo_path|../content_portal"
+			// game        "|gameinfo_path|../portal/portal_pak.vpk"
+			// game        "|gameinfo_path|../portal"
+			
+			Game		"|gameinfo_path|..\assets_hl2_asw\test"
+			Game		"|gameinfo_path|..\hl2_asw_assets"
+			game        "|gameinfo_path|../demez_base"
+			
+			// mount maps
+			game        |gameinfo_path|../hlmaps2
+			
+			game        |gameinfo_path|../hl2/hl2_textures.vpk
+			game        |gameinfo_path|../hl2/hl2_sound_misc.vpk
+			game        |gameinfo_path|../hl2/hl2_pak.vpk
+			game        |gameinfo_path|../hl2/hl2_misc.vpk
+			game        |gameinfo_path|../hl2
+			
+			// game        |gameinfo_path|../ep2
+			// game        |gameinfo_path|../episodic
+			// game        |gameinfo_path|../hl2  // this is needed, or else it will crash, idk what it is yet
+			// game        |gameinfo_path|../hl2mp
+			
+			game        swarm
+			game        swarm_base
+			// game        reactivedrop
+			
+			// new filesystem test
+			game        swarm/pak01.vpk
+			game        swarm_base/pak01.vpk
+			game        platform/pak01.vpk
+            
+			game        platform
+			
+			platform    |gameinfo_path|.
+			platform    platform/pak01.vpk
+			platform    platform
+		}
+	}
+}
+
