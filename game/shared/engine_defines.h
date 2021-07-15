@@ -25,6 +25,16 @@
 	#define TypeDesc_FieldOffset(dataDesc, offset) dataDesc->fieldOffset
 	#define AmmoMaxCarry(iAmmoType, pPlayer) MaxCarry(iAmmoType, pPlayer)
 
+	#define CLIENTEFFECT_REGISTER_BEGIN( _name ) PRECACHE_REGISTER_BEGIN( GLOBAL, _name )
+	#define PRECACHE_MATERIAL( _name ) PRECACHE( MATERIAL, _name )
+
+	#define SET_STENCIL_ENABLE( pRenderContext, value ) \
+					ShaderStencilState_t state; \
+					state.m_bEnable = value; \
+					pRenderContext->SetStencilState( state )
+
+	#define SS_SLOT_ARG() GET_ACTIVE_SPLITSCREEN_SLOT(),
+
 	#if CLIENT_DLL
 		// #define SteamUser() steamapicontext->SteamUser()
 	#elif GAME_DLL
@@ -41,6 +51,7 @@
 	#define RENDER_GROUP_OPAQUE RENDER_GROUP_OPAQUE_ENTITY
 
 	#define GET_ACTIVE_SPLITSCREEN_SLOT()
+	#define SS_SLOT_ARG()
 
 	#define matrix3x4a_t matrix3x4_t
 	#define extern_g_sModelIndexFireball extern short g_sModelIndexFireball
@@ -49,6 +60,7 @@
 
 	#define PRECACHE_REGISTER_BEGIN( _system, _className ) CLIENTEFFECT_REGISTER_BEGIN( _className )
 	#define PRECACHE( _type, _name ) CLIENTEFFECT_MATERIAL( _name )
+	#define PRECACHE_MATERIAL( _name ) CLIENTEFFECT_MATERIAL( _name )
 	#define PRECACHE_REGISTER_END() CLIENTEFFECT_REGISTER_END()
 
 	#define DECLARE_CLIENT_EFFECT( effectName, callbackFunction ) \
@@ -63,10 +75,19 @@
 	#define TypeDesc_FieldOffset(dataDesc, offset) dataDesc->fieldOffset[offset]
 	#define AmmoMaxCarry(iAmmoType, pPlayer) MaxCarry(iAmmoType)
 
+	#define EXPOSE_MATERIAL_PROXY( CLASS, NAME ) \
+		EXPOSE_INTERFACE( CLASS, IMaterialProxy, #NAME IMATERIAL_PROXY_INTERFACE_VERSION );
+
+	#define SET_STENCIL_ENABLE( pRenderContext, value ) \
+		pRenderContext->SetStencilEnable( value )
+
+	#define GetViewEffects() vieweffects
+
 	struct RenderableInstance_t {};
 
 	#if CLIENT_DLL
 		#define GetHud() gHUD
+		#define HudIcons() gHUD  // hmm
 		#define GetClientMode() g_pClientMode
 		#define GetMapOverView() g_pMapOverview
 		#define GetViewPortInterface() gViewPortInterface
