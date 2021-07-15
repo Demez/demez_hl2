@@ -7,12 +7,12 @@
 
 enum class EDemezGame
 {
-	// HL1,
-	// PORTAL, // maybe?
-	// SANDBOX, // maybe?
-	HL2 = 0,
-	EPISODIC,
-	MAX = EPISODIC
+	Invalid,
+	// HalfLife,  // will come later
+	HalfLife2,
+	Episodic,
+	Portal
+	// Sandbox // maybe?
 };
 
 
@@ -34,10 +34,19 @@ public:
 
 	// -------------------------------------------------------------
 
+	virtual bool            Init();
+
 	virtual void            LevelInit( const char* mapName );
 
+	// well, this is a mess
 	// void                    RegisterGame( CDemezGame* game );
-	void                    DetermineGame();
+	void                    LevelInitSetGame();
+	void                    DetermineGameFromMap();
+	void                    SetGame( const char* game, bool warn = false );
+	void                    SetGame( EDemezGame game );
+	const char*             GetGameName( EDemezGame game = EDemezGame::Invalid );
+
+	void                    ParseMapListFiles();
 
 	EDemezGame              GetGameType();
 	CDemezGameRules*        GetGameRules();
@@ -50,11 +59,13 @@ public:
 	bool                    IsHL2Map();
 	bool                    IsEP1Map();
 	bool                    IsEP2Map();
+	bool                    IsPortalMap();
 
 	bool                    IsHL2();
 	// bool                    IsEP1();
 	// bool                    IsEP2();
 	bool                    IsEpisodic();
+	bool                    IsPortal();
 	// bool                    IsSandbox();
 
 	// -------------------------------------------------------------
@@ -62,6 +73,13 @@ public:
 	EDemezGame              m_gameType;
 	CDemezGameRules*        m_gameRules;
 	const char*             m_mapName;
+
+	// -------------------------------------------------------------
+	// map lists - maybe actually make that CDemezGame class and have this be a part of it?
+	// though ep1 and ep2 maps would be grouped together, thoguh that's not too important
+	CUtlVector< const char* > m_mapsHalfLife2;
+	CUtlVector< const char* > m_mapsEpisodic;
+	CUtlVector< const char* > m_mapsPortal;
 };
 
 

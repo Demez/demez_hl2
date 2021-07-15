@@ -31,7 +31,7 @@
 #define	GUNSHIPFX_BIG_SHOT_TIME			3.0f
 
 PRECACHE_REGISTER_BEGIN( GLOBAL, PrecacheGunshipFX )
-PRECACHE( MATERIAL, "sprites/bluelaser1" )
+PRECACHE_MATERIAL( "sprites/bluelaser1" )
 PRECACHE_REGISTER_END()
 
 //-----------------------------------------------------------------------------

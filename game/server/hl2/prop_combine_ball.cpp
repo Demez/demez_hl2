@@ -1755,6 +1755,10 @@ void CFuncCombineBallSpawner::Precache()
 {
 	BaseClass::Precache();
 
+#if ENGINE_NEW
+	PrecacheEffect( "cball_bounce" );
+#endif
+
 	UTIL_PrecacheOther( "prop_combine_ball" );
 }
 

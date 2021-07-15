@@ -43,7 +43,9 @@ extern CBaseEntity				*g_pLastSpawn;
 
 void DropPrimedFragGrenade( CHL2MP_Player *pPlayer, CBaseCombatWeapon *pGrenade );
 
+#ifndef PORTAL_DLL
 LINK_ENTITY_TO_CLASS( player, CHL2MP_Player );
+#endif
 
 LINK_ENTITY_TO_CLASS( info_player_combine, CPointEntity );
 LINK_ENTITY_TO_CLASS( info_player_rebel, CPointEntity );
@@ -610,17 +612,24 @@ void CHL2MP_Player::SetPlayerModel( void )
 
 void CHL2MP_Player::SetupPlayerSoundsByModel( const char *pModelName )
 {
-	if ( Q_stristr( pModelName, "models/human") )
+	if ( g_pGameRules->IsCoOp() || !g_pGameRules->IsMultiplayer() )
 	{
 		m_iPlayerSoundType = (int)PLAYER_SOUNDS_CITIZEN;
 	}
-	else if ( Q_stristr(pModelName, "police" ) )
+	else
 	{
-		m_iPlayerSoundType = (int)PLAYER_SOUNDS_METROPOLICE;
-	}
-	else if ( Q_stristr(pModelName, "combine" ) )
-	{
-		m_iPlayerSoundType = (int)PLAYER_SOUNDS_COMBINESOLDIER;
+		if ( Q_stristr( pModelName, "models/human") )
+		{
+			m_iPlayerSoundType = (int)PLAYER_SOUNDS_CITIZEN;
+		}
+		else if ( Q_stristr(pModelName, "police" ) )
+		{
+			m_iPlayerSoundType = (int)PLAYER_SOUNDS_METROPOLICE;
+		}
+		else if ( Q_stristr(pModelName, "combine" ) )
+		{
+			m_iPlayerSoundType = (int)PLAYER_SOUNDS_COMBINESOLDIER;
+		}
 	}
 }
 

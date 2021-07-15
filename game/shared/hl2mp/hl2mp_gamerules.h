@@ -167,6 +167,11 @@ public:
 	virtual const CViewVectors*     GetViewVectors() const;
 	const HL2MPViewVectors*         GetHL2MPViewVectors() const;
 
+	virtual bool IsMultiplayer( void )
+	{
+		return (gpGlobals->maxClients > 1);
+	}
+
 	float GetMapRemainingTime();
 	void CleanUpMap();
 	void CheckRestartGame();

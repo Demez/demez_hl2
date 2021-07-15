@@ -180,19 +180,26 @@ void ClientGamePrecache( void )
 // called by ClientKill and DeadThink
 void respawn( CBaseEntity *pEdict, bool fCopyCorpse )
 {
-	CHL2MP_Player *pPlayer = ToHL2MPPlayer( pEdict );
-
-	if ( pPlayer )
+	if ( g_pGameRules->IsMultiplayer() )
 	{
-		if ( gpGlobals->curtime > pPlayer->GetDeathTime() + DEATH_ANIMATION_TIME )
-		{		
-			// respawn player
-			pPlayer->Spawn();			
-		}
-		else
+		CHL2MP_Player *pPlayer = ToHL2MPPlayer( pEdict );
+
+		if ( pPlayer )
 		{
-			pPlayer->SetNextThink( gpGlobals->curtime + 0.1f );
+			if ( gpGlobals->curtime > pPlayer->GetDeathTime() + DEATH_ANIMATION_TIME )
+			{		
+				// respawn player
+				pPlayer->Spawn();			
+			}
+			else
+			{
+				pPlayer->SetNextThink( gpGlobals->curtime + 0.1f );
+			}
 		}
+	}
+	else
+	{       // restart the entire server
+		engine->ServerCommand("reload\n");
 	}
 }
 
@@ -224,6 +231,5 @@ void InstallGameRules()
 	// i can have separate gamerules and pick which one here, interesting...
 	// could use for coop, deathmatch, and team deathmatch
 	DemezGameManager()->CreateGameRules();
-	CreateGameRulesObject( "CHL2MPRules" );
 }
 

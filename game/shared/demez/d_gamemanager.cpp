@@ -95,6 +95,42 @@ static const char *s_hl2Maps[] =
 };
 
 
+static const char *s_portalMaps[] =
+{
+	"background1",
+	"background2",
+
+	"testchmb_a_00",
+	"testchmb_a_01",
+	"testchmb_a_02",
+	"testchmb_a_03",
+	"testchmb_a_04",
+	"testchmb_a_05",
+	"testchmb_a_06",
+	"testchmb_a_07",
+	"testchmb_a_08",
+	"testchmb_a_09",
+	"testchmb_a_10",
+	"testchmb_a_11",
+	"testchmb_a_13",
+	"testchmb_a_14",
+	"testchmb_a_15",
+
+	"testchmb_a_08_advanced",
+	"testchmb_a_09_advanced",
+	"testchmb_a_10_advanced",
+	"testchmb_a_11_advanced",
+	"testchmb_a_13_advanced",
+	"testchmb_a_14_advanced",
+
+	"escape_00",
+	"escape_01",
+	"escape_02",
+
+	"", // END Marker
+};
+
+
 static const char *s_ep1Maps[] =
 {
 	"", // END Marker
@@ -107,11 +143,20 @@ static const char *s_ep2Maps[] =
 };
 
 
-ConVar demez_game("d_game", "hl2", FCVAR_GAMEDLL | FCVAR_ARCHIVE | FCVAR_REPLICATED | FCVAR_NOT_CONNECTED,
-				  "options: hl2, episodic" );
-
-
 CDemezGameManager g_demezGameMgr;
+
+
+CON_COMMAND_F( d_game, "set the game, leave blank for auto determining it", FCVAR_ARCHIVE | FCVAR_REPLICATED )
+// CON_COMMAND( d_game, "set the game, leave blank for auto determining it" )
+{
+	if ( args.ArgC() != 2 )
+	{
+		Msg("Current game is \"%s\", options: auto, hl2, episodic, portal\n", g_demezGameMgr.GetGameName());
+		return;
+	}
+
+	g_demezGameMgr.SetGame( args[1], true );
+}
 
 
 CDemezGameManager* DemezGameManager()
@@ -122,6 +167,8 @@ CDemezGameManager* DemezGameManager()
 
 CDemezGameManager::CDemezGameManager(): CAutoGameSystem()
 {
+	m_mapName = "";
+	m_gameType = EDemezGame::Invalid;
 }
 
 CDemezGameManager::~CDemezGameManager()
@@ -163,34 +210,144 @@ const char* CDemezGameManager::GetMapName()
 }
 
 
-void CDemezGameManager::LevelInit( const char* mapName )
+bool CDemezGameManager::Init()
 {
-	m_mapName = mapName;
-	DetermineGame();
+	ParseMapListFiles();
+
+	return true;
 }
 
 
-void CDemezGameManager::DetermineGame()
+void CDemezGameManager::LevelInit( const char* mapName )
 {
-	if ( IsHL2Map() )
+	m_mapName = mapName;
+	LevelInitSetGame();
+}
+
+
+void CDemezGameManager::ParseMapListFiles()
+{
+	// TODO: read the keyvalues file "resource/demez/maplist.res" in all search paths and add them to the vectors
+}
+
+
+void CDemezGameManager::LevelInitSetGame()
+{
+	/*if ( V_strcmp(demez_game.GetString(), "") == 0 )
 	{
-		m_gameType = EDemezGame::HL2;
-		demez_game.SetValue( "hl2" );
+		SetGame( demez_game.GetString(), true );
+	}
+	if ( V_strcmp(m_gameTypeStr, "") != 0 )
+	{
+		SetGame( m_gameTypeStr, false );
+	}
+	else*/
+
+	if ( m_gameType == EDemezGame::Invalid )
+	{
+		DetermineGameFromMap();
+	}
+}
+
+static bool s_warn = true;
+
+const char* CDemezGameManager::GetGameName( EDemezGame game )
+{
+	if (game == EDemezGame::Invalid)
+		game = m_gameType;
+
+	switch (game)
+	{
+		case EDemezGame::HalfLife2:		return "hl2";
+		case EDemezGame::Portal:		return "portal";
+		case EDemezGame::Episodic:		return "episodic";
+		default:						return "";
+	}
+}
+
+
+void CDemezGameManager::SetGame( const char* game, bool warn )
+{
+	if ( V_strcmp(game, "auto") == 0 || V_strcmp(game, "") == 0 )
+	{
+		Msg( "Game will be determined on map load\n" );
+		m_gameType = EDemezGame::Invalid;
+		return;
+	}
+
+	if ( V_strcmp(game, GetGameName()) == 0 )
+	{
+		return;
+	}
+
+	if ( V_strcmp(game, "hl2") == 0 )
+	{
+		m_gameType = EDemezGame::HalfLife2;
 		hl2_episodic.SetValue(0);
 	}
-	else if ( IsEP1Map() || IsEP2Map() )
+	else if ( V_strcmp(game, "portal") == 0 )
 	{
-		m_gameType = EDemezGame::EPISODIC;
-		demez_game.SetValue( "episodic" );
+		m_gameType = EDemezGame::Portal;
+		hl2_episodic.SetValue(1);
+	}
+	else if ( V_strcmp(game, "episodic") == 0 )
+	{
+		m_gameType = EDemezGame::Episodic;
 		hl2_episodic.SetValue(1);
 	}
 	else
 	{
-		// maybe?
-		// Warning( "Invalid Game Type, defaulting to HL2 Episodic" );
-		m_gameType = EDemezGame::EPISODIC;
-		demez_game.SetValue( "episodic" );
+		Warning( "Invalid Game Type, Game will be determined on map load\n" );
+		m_gameType = EDemezGame::Invalid;
+		DetermineGameFromMap();
+		return;
+	}
+	
+	Msg( "Game set to \"%s\"\n", game );
+}
+
+
+void CDemezGameManager::SetGame( EDemezGame game )
+{
+	// TODO: add a bounds check here
+	m_gameType = game;
+
+	if ( game == EDemezGame::HalfLife2 )
+	{
+		hl2_episodic.SetValue(0);
+	}
+	else
+	{
 		hl2_episodic.SetValue(1);
+	}
+}
+
+
+void CDemezGameManager::DetermineGameFromMap()
+{
+	// only need this if the game isn't set by the player
+	if ( m_gameType != EDemezGame::Invalid )
+		return;
+
+	if ( V_strcmp(GetMapName(), "") == 0 )
+		return;
+
+	if ( IsHL2Map() )
+	{
+		SetGame( EDemezGame::HalfLife2 );
+	}
+	else if ( IsPortalMap() )
+	{
+		SetGame( EDemezGame::Portal );
+	}
+	else if ( IsEP1Map() || IsEP2Map() )
+	{
+		SetGame( EDemezGame::Episodic );
+	}
+	else
+	{
+		Warning( "Unknown Game Type, Defaulting to HL2 Episodic" );
+		SetGame( EDemezGame::Episodic );
 	}
 }
 
@@ -212,8 +369,10 @@ bool CDemezGameManager::IsEP2Map()
 	return true;
 }
 
-
-extern ConVar demez_game;
+bool CDemezGameManager::IsPortalMap()
+{
+	return FindInList( s_portalMaps, GetMapName() );
+}
 
 
 EDemezGame CDemezGameManager::GetGameType()
@@ -232,34 +391,32 @@ CDemezGameRules* CDemezGameManager::GetGameRules()
 void CDemezGameManager::CreateGameRules()
 {
 	// TODO: clean up the CHL2MPRules class, make a base CDemezGameRules class, and then have each game have their own gamerules
-	CreateGameRulesObject( "CHL2MPRules" );
+
+	if ( m_gameType == EDemezGame::Portal )
+	{
+		CreateGameRulesObject( "CPortalGameRules" );
+	}
+	else
+	{
+		CreateGameRulesObject( "CHL2MPRules" );
+	}
 }
 #endif
 
 
 bool CDemezGameManager::IsHL2()
 {
-	// return ( V_strcmp( demez_game.GetString(), "hl2" ) == 0 );
-	// return IsHL2Map() || IsEP1() || IsEP2();
-	return ( m_gameType == EDemezGame::HL2 ) || IsEpisodic();
+	return ( m_gameType == EDemezGame::HalfLife2 ) || IsEpisodic();
 }
-
-/*bool CDemezGameManager::IsEP1()
-{
-	// return ( V_strcmp( demez_game.GetString(), "ep1" ) == 0 );
-	return IsEP1Map();
-}
-
-bool CDemezGameManager::IsEP2()
-{
-	// return ( V_strcmp( demez_game.GetString(), "ep2" ) == 0 );
-	return IsEP2Map();
-}*/
 
 bool CDemezGameManager::IsEpisodic()
 {
-	// return IsEP1() || IsEP2();
-	return ( m_gameType == EDemezGame::EPISODIC );
+	return ( m_gameType == EDemezGame::Episodic );
+}
+
+bool CDemezGameManager::IsPortal()
+{
+	return ( m_gameType == EDemezGame::Portal );
 }
 
 /*bool CDemezGameManager::IsSandbox()

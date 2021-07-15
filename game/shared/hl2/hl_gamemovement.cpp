@@ -12,16 +12,16 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-static ConVar sv_autoladderdismount( "sv_autoladderdismount", "1", FCVAR_REPLICATED, "Automatically dismount from ladders when you reach the end (don't have to +USE)." );
+static ConVar sv_autoladderdismount( "sv_autoladderdismount", "1", FCVAR_ARCHIVE | FCVAR_REPLICATED, "Automatically dismount from ladders when you reach the end (don't have to +USE)." );
 static ConVar sv_ladderautomountdot( "sv_ladderautomountdot", "0.4", FCVAR_REPLICATED, "When auto-mounting a ladder by looking up its axis, this is the tolerance for looking now directly along the ladder axis." );
 
-static ConVar sv_ladder_useonly( "sv_ladder_useonly", "0", FCVAR_REPLICATED, "If set, ladders can only be mounted by pressing +USE" );
+static ConVar sv_ladder_useonly( "sv_ladder_useonly", "0", FCVAR_ARCHIVE | FCVAR_REPLICATED, "If set, ladders can only be mounted by pressing +USE" );
 
 ConVar demez_bhop_mode("d_sv_bhop_mode", "1", FCVAR_ARCHIVE | FCVAR_REPLICATED, "0 - hl1, 1 - hl2 release, 2 - abh");
-ConVar demez_auto_bhop("d_sv_auto_bhop", "1", FCVAR_ARCHIVE | FCVAR_REPLICATED);
+ConVar demez_auto_bhop("d_sv_bhop_auto", "1", FCVAR_ARCHIVE | FCVAR_REPLICATED);
 
-ConVar dmz_bhop_other_mult("d_sv_bhop_mult_sprint", "0.1", FCVAR_ARCHIVE | FCVAR_REPLICATED, "Multiplier to use for bhop mode 1 when sprint jumping");
-ConVar dmz_bhop_mult("d_sv_bhop_mult", "0.5", FCVAR_ARCHIVE | FCVAR_REPLICATED, "Multiplier to use for bhop mode 1 for normal jumping when moving");
+ConVar dmz_bhop_other_mult("d_sv_bhop_mult_other", "0.1", FCVAR_CHEAT | FCVAR_REPLICATED, "Multiplier to use for bhop mode 1 when sprinting or crouching");
+ConVar dmz_bhop_mult("d_sv_bhop_mult", "0.5", FCVAR_CHEAT | FCVAR_REPLICATED, "Multiplier to use for bhop mode 1 for jumping when walking normally");
 
 ConVar demez_airaccel("d_sv_airaccel", "1", FCVAR_ARCHIVE | FCVAR_REPLICATED);
 
@@ -1451,7 +1451,7 @@ bool CHL2GameMovement::CanAccelerate()
 }
 
 
-#ifndef PORTAL	// Portal inherits from this but needs to declare it's own global interface
+#ifndef PORTAL_DLL	// Portal inherits from this but needs to declare it's own global interface
 	// Expose our interface.
 	static CHL2GameMovement g_GameMovement;
 	IGameMovement *g_pGameMovement = ( IGameMovement * )&g_GameMovement;

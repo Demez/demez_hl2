@@ -87,15 +87,15 @@ public:
 	void FlashlightTurnOff( void );
 	void FlashlightTurnOff( bool playSound = true );
 
-	void	PrecacheFootStepSounds( void );
-	bool	ValidatePlayerModel( const char *pModel );
+	virtual void	PrecacheFootStepSounds( void );
+	virtual bool	ValidatePlayerModel( const char *pModel );
 
 	QAngle GetAnimEyeAngles( void ) { return m_angEyeAngles.Get(); }
 
 	Vector GetAttackSpread( CBaseCombatWeapon *pWeapon, CBaseEntity *pTarget = NULL );
 
-	void CheatImpulseCommands( int iImpulse );
-	void CreateRagdollEntity( void );
+	virtual void CheatImpulseCommands( int iImpulse );
+	virtual void CreateRagdollEntity( void );
 	void GiveAllItems( void );
 	void GiveDefaultItems( void );
 	void GivePreviousWeapons( void );
@@ -106,8 +106,8 @@ public:
 	void NoteWeaponFired( void );
 
 	void ResetAnimation( void );
-	void SetPlayerModel( void );
-	void SetPlayerTeamModel( void );
+	virtual void SetPlayerModel( void );
+	virtual void SetPlayerTeamModel( void );
 	Activity TranslateTeamActivity( Activity ActToTranslate );
 	
 	float GetNextModelChangeTime( void ) { return m_flNextModelChangeTime; }

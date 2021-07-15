@@ -378,13 +378,17 @@ void CHL2MPRules::LevelInitPostEntity()
 #if ENGINE_NEW
 #ifdef GAME_DLL
 
-	HSCRIPT hLevelInitPostEntity = g_pScriptVM->LookupFunction( "LevelInitPostEntity" );
-	if ( hLevelInitPostEntity )
+	// DEMEZ: this breaks on save game loading in singleplayer
+	if ( IsMultiplayer() )
 	{
-		variant_t variant;
-		variant.SetString( MAKE_STRING("LevelInitPostEntity") );
-		g_EventQueue.AddEvent( m_pProxy, "CallScriptFunction", variant, 0, m_pProxy, m_pProxy );
-		m_ScriptScope.ReleaseFunction( hLevelInitPostEntity );
+		HSCRIPT hLevelInitPostEntity = g_pScriptVM->LookupFunction( "LevelInitPostEntity" );
+		if ( hLevelInitPostEntity )
+		{
+			variant_t variant;
+			variant.SetString( MAKE_STRING("LevelInitPostEntity") );
+			g_EventQueue.AddEvent( m_pProxy, "CallScriptFunction", variant, 0, m_pProxy, m_pProxy );
+			m_ScriptScope.ReleaseFunction( hLevelInitPostEntity );
+		}
 	}
 
 	UpdatePhysEnvironment();
@@ -1031,7 +1035,7 @@ void CHL2MPRules::ClientSettingsChanged( CBasePlayer *pPlayer )
 		//Too soon, set the cvar back to what it was.
 		//Note: this will make this function be called again
 		//but since our models will match it'll just skip this whole dealio.
-		if ( pHL2Player->GetNextModelChangeTime() >= gpGlobals->curtime )
+		if ( IsMultiplayer() && pHL2Player->GetNextModelChangeTime() >= gpGlobals->curtime )
 		{
 			char szReturnString[512];
 
@@ -1047,12 +1051,15 @@ void CHL2MPRules::ClientSettingsChanged( CBasePlayer *pPlayer )
 		{
 			pHL2Player->SetPlayerModel();
 
-			const char *pszCurrentModelName = modelinfo->GetModelName( pHL2Player->GetModel() );
+			if ( IsMultiplayer() )
+			{
+				const char *pszCurrentModelName = modelinfo->GetModelName( pHL2Player->GetModel() );
 
-			char szReturnString[128];
-			Q_snprintf( szReturnString, sizeof( szReturnString ), "Your player model is: %s\n", pszCurrentModelName );
+				char szReturnString[128];
+				Q_snprintf( szReturnString, sizeof( szReturnString ), "Your player model is: %s\n", pszCurrentModelName );
 
-			ClientPrint( pHL2Player, HUD_PRINTTALK, szReturnString );
+				ClientPrint( pHL2Player, HUD_PRINTTALK, szReturnString );
+			}
 		}
 		else
 		{
@@ -1190,6 +1197,10 @@ float CHL2MPRules::GetMapRemainingTime()
 //-----------------------------------------------------------------------------
 void CHL2MPRules::Precache( void )
 {
+#ifdef GAME_DLL
+	BaseClass::Precache();
+#endif
+
 	CBaseEntity::PrecacheScriptSound( "AlyxEmp.Charge" );
 }
 
@@ -2059,6 +2070,11 @@ bool ScriptIsEpisodic()
 	return DemezGameManager()->IsEpisodic();
 }
 
+bool ScriptIsPortal()
+{
+	return DemezGameManager()->IsPortalMap();
+}
+
 #endif
 
 
@@ -2077,9 +2093,11 @@ void CHL2MPRules::RegisterScriptFunctions()
 	ScriptRegisterFunctionNamed( g_pScriptVM, ScriptIsHL2Map,    "IsHL2Map",    "Is Half-Life 2 Map" );
 	ScriptRegisterFunctionNamed( g_pScriptVM, ScriptIsEP1Map,    "IsEP1Map",    "Is Episode 1 Map" );
 	ScriptRegisterFunctionNamed( g_pScriptVM, ScriptIsEP2Map,    "IsEP2Map",    "Is Episode 2 Map" );
+	ScriptRegisterFunctionNamed( g_pScriptVM, ScriptIsPortal,    "IsPortalMap", "Is Portal Map" );
 
 	ScriptRegisterFunctionNamed( g_pScriptVM, ScriptIsHL2,       "IsHL2",       "Is Half-Life 2" );
 	ScriptRegisterFunctionNamed( g_pScriptVM, ScriptIsEpisodic,  "IsEpisodic",  "Is Episodic" );
+	ScriptRegisterFunctionNamed( g_pScriptVM, ScriptIsPortal,    "IsPortal",    "Is Portal" );
 
 #endif
 
