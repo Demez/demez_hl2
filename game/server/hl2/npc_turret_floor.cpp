@@ -23,7 +23,7 @@
 #include "props.h"
 #include "particle_parse.h"
 
-#ifdef PORTAL
+#ifdef PORTAL_DLL
 	#include "prop_portal_shared.h"
 	#include "portal_util_shared.h"
 #endif
@@ -1186,7 +1186,7 @@ bool CNPC_FloorTurret::IsValidEnemy( CBaseEntity *pEnemy )
 	//	- Can only aim +-15 degrees, + the 10 degree slop they're allowed.
 	Vector vEnemyPos = pEnemy->EyePosition();
 
-#ifdef PORTAL
+#ifdef PORTAL_DLL
 	if ( !FInViewCone( pEnemy ) || !FVisible( pEnemy ) )
 	{
 		CProp_Portal *pPortal = FInViewConeThroughPortal( pEnemy );

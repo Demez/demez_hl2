@@ -43,5 +43,12 @@ void RegisterUserMessages( void )
 	usermessages->Register( "LogoTimeMsg", 4 );
 	usermessages->Register( "AchievementEvent", -1 );
 	usermessages->Register( "UpdateJalopyRadar", -1 );
+
+#ifdef PORTAL_DLL
+	usermessages->Register( "CreditsPortalMsg", 1 );
+	usermessages->Register( "EntityPortalled", sizeof( long ) + sizeof( long ) + sizeof( Vector ) + sizeof( QAngle ) ); //something got teleported through a portal
+	usermessages->Register( "KillCam", -1 );	
+#endif
+
 #endif
 }

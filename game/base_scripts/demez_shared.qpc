@@ -21,7 +21,9 @@ macro ENGINE_SHARED		"$ENGINE_SRC/game/shared"
 macro SHARED_GAME		"$ENGINE_SHARED/$GAME_FOLDER"
 macro FULL_GAME_NAME	"$GAME_FOLDER_$ENGINE_OUT_NAME"
 
-macro BASE_DEBUG_ARGS "-w 1920 -h 1080 -noborder -sw -console -novid -dev -game \"$ROOT_DIR_ABS/output/$FULL_GAME_NAME\""
+// must be backslashes for asw
+// QPC PARSER BUG: if i put a comment next to that line i get an error lmao
+macro BASE_DEBUG_ARGS "-w 1920 -h 1080 -noborder -sw -console -novid -dev -game \"$ROOT_DIR_ABS\output\$FULL_GAME_NAME\""
 macro BASE_DEBUG_ARGS "-vrapi -shadersondemand -ignoredxsupportcfg -maxdxlevel 100 -override_vpk $BASE_DEBUG_ARGS" [$ENGINE_ASW]
 
 configuration
@@ -39,6 +41,8 @@ configuration
 			"shared/episodic"
 			"shared/hl2"
 			"shared/hl2mp"
+			"shared/portal"
+			"shared/Multiplayer"
 			
 			"shared/weapons"
 			"shared/weapons/hl2mp"
@@ -50,6 +54,7 @@ configuration
 			"$TYPE/episodic"
 			"$TYPE/vehicles"
 			"$TYPE/base_classes"
+			"$TYPE/portal"
 			
 			"$ENGINE_SRC/game/$TYPE"
 			
@@ -65,6 +70,8 @@ configuration
 			
 			"HL2MP"
 			"HL2_EPISODIC"
+			
+			"PORTAL" "PORTAL_DLL" "PORTAL_SUPPORT=1" [$PORTAL]
 			
 			"ENGINE_NEW=0" "ENGINE_OLD=1" [$ENGINE_2013 || $ENGINE_QUIVER]
 			"ENGINE_NEW=1" "ENGINE_OLD=0" [$ENGINE_CSGO || $ENGINE_ASW]
@@ -210,6 +217,13 @@ files
 			"shared/weapons/hl2mp/weapon_slam.h"
 			"shared/weapons/hl2mp/weapon_smg1.cpp"
 		}
+	}
+	
+	folder "Portal" [$PORTAL]
+	{
+		"shared/Multiplayer/multiplayer_animstate_oldengine.cpp"  [$ENGINE_QUIVER || $ENGINE_2013]
+		"shared/Multiplayer/multiplayer_animstate.cpp"  [$ENGINE_ASW || $ENGINE_CSGO]
+		"shared/Multiplayer/multiplayer_animstate.h"
 	}
 }
 

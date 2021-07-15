@@ -16,19 +16,36 @@
 	#include "model_types.h"
 	// #include "ClientEffectPrecacheSystem.h"
 	#include "fx_interpvalue.h"
+
+	#ifdef PORTAL_DLL
+		#include "c_portal_player.h"
+	#endif
+
 #else
 	#include "hl2mp_player.h"
 	#include "soundent.h"
 	#include "ndebugoverlay.h"
 	#include "ai_basenpc.h"
-	#include "player_pickup.h"
 	#include "physics_prop_ragdoll.h"
 	#include "globalstate.h"
 	#include "props.h"
 	#include "te_effect_dispatch.h"
 	#include "util.h"
+	#include "prop_combine_ball.h"
+
+	#ifdef PORTAL_DLL
+		#include "weapon_portalgun.h"
+		#include "portal_player.h"
+	#endif
+
 #endif
 
+#ifdef PORTAL_DLL
+#include "prop_portal_shared.h"
+#include "portal_util_shared.h"
+#endif
+
+#include "player_pickup.h"
 #include "gamerules.h"
 #include "soundenvelope.h"
 #include "engine/IEngineSound.h"
@@ -187,6 +204,49 @@ static void TraceCollideAgainstBBox( const CPhysCollide *pCollide, const Vector 
 	}
 }
 
+#ifdef GAME_DLL
+//-----------------------------------------------------------------------------
+// Purpose: Finds the nearest ragdoll sub-piece to a location and returns it
+// Input  : *pTarget - entity that is the potential ragdoll
+//			&position - position we're testing against
+// Output : IPhysicsObject - sub-object (if any)
+//-----------------------------------------------------------------------------
+IPhysicsObject *GetRagdollChildAtPosition( CBaseEntity *pTarget, const Vector &position )
+{
+	// Check for a ragdoll
+	if ( dynamic_cast<CRagdollProp*>( pTarget ) == NULL )
+		return NULL;
+
+	// Get the root
+	IPhysicsObject *pList[VPHYSICS_MAX_OBJECT_LIST_COUNT];
+	int count = pTarget->VPhysicsGetObjectList( pList, ARRAYSIZE( pList ) );
+
+	IPhysicsObject *pBestChild = NULL;
+	float			flBestDist = 99999999.0f;
+	float			flDist;
+	Vector			vPos;
+
+	// Find the nearest child to where we're looking
+	for ( int i = 0; i < count; i++ )
+	{
+		pList[i]->GetPosition( &vPos, NULL );
+
+		flDist = ( position - vPos ).LengthSqr();
+
+		if ( flDist < flBestDist )
+		{
+			pBestChild = pList[i];
+			flBestDist = flDist;
+		}
+	}
+
+	// Make this our base now
+	pTarget->VPhysicsSwapObject( pBestChild );
+
+	return pTarget->VPhysicsGetObject();
+}
+#endif
+
 //-----------------------------------------------------------------------------
 // Purpose: Computes a local matrix for the player clamped to valid carry ranges
 //-----------------------------------------------------------------------------
@@ -323,6 +383,15 @@ void CGrabController::SetTargetPosition( const Vector &target, const QAngle &tar
 	}
 }
 
+void CGrabController::GetTargetPosition( Vector *target, QAngle *targetOrientation )
+{
+	if ( target )
+		*target = m_shadow.targetPosition;
+
+	if ( targetOrientation )
+		*targetOrientation = m_shadow.targetRotation;
+}
+
 //-----------------------------------------------------------------------------
 // Purpose: 
 // Output : float
@@ -440,6 +509,177 @@ QAngle CGrabController::TransformAnglesFromPlayerSpace( const QAngle &anglesIn, 
 
 void CGrabController::AttachEntity( CBasePlayer *pPlayer, CBaseEntity *pEntity, IPhysicsObject *pPhys, bool bIsMegaPhysCannon, const Vector &vGrabPosition, bool bUseGrabPosition )
 {
+#ifdef PORTAL_DLL
+
+	CPortal_Player *pPortalPlayer = ToPortalPlayer( pPlayer );
+	// play the impact sound of the object hitting the player
+	// used as feedback to let the player know he picked up the object
+#ifndef CLIENT_DLL
+	if ( !pPortalPlayer->m_bSilentDropAndPickup )
+	{
+		int hitMaterial = pPhys->GetMaterialIndex();
+		int playerMaterial = pPlayer->VPhysicsGetObject() ? pPlayer->VPhysicsGetObject()->GetMaterialIndex() : hitMaterial;
+		PhysicsImpactSound( pPlayer, pPhys, CHAN_STATIC, hitMaterial, playerMaterial, 1.0, 64 );
+	}
+#endif
+	Vector position;
+	QAngle angles;
+	pPhys->GetPosition( &position, &angles );
+	// If it has a preferred orientation, use that instead.
+	Pickup_GetPreferredCarryAngles( pEntity, pPlayer, pPlayer->EntityToWorldTransform(), angles );
+
+	//Fix attachment orientation weirdness
+	if( pPortalPlayer->IsHeldObjectOnOppositeSideOfPortal() )
+	{
+		Vector vPlayerForward;
+		pPlayer->EyeVectors( &vPlayerForward );
+
+		Vector radial = physcollision->CollideGetExtent( pPhys->GetCollide(), vec3_origin, pEntity->GetAbsAngles(), -vPlayerForward );
+		Vector player2d = pPlayer->CollisionProp()->OBBMaxs();
+		float playerRadius = player2d.Length2D();
+		float flDot = DotProduct( vPlayerForward, radial );
+
+		float radius = playerRadius + fabs( flDot );
+
+		float distance = 24 + ( radius * 2.0f );		
+
+		//find out which portal the object is on the other side of....
+		Vector start = pPlayer->Weapon_ShootPosition();		
+		Vector end = start + ( vPlayerForward * distance );
+
+		CProp_Portal *pObjectPortal = NULL;
+		pObjectPortal = pPortalPlayer->GetHeldObjectPortal();
+
+		// If our end point hasn't gone into the portal yet we at least need to know what portal is in front of us
+		if ( !pObjectPortal )
+		{
+			Ray_t rayPortalTest;
+			rayPortalTest.Init( start, start + vPlayerForward * 1024.0f );
+
+			int iPortalCount = CProp_Portal_Shared::AllPortals.Count();
+			if( iPortalCount != 0 )
+			{
+				CProp_Portal **pPortals = CProp_Portal_Shared::AllPortals.Base();
+				float fMinDist = 2.0f;
+				for( int i = 0; i != iPortalCount; ++i )
+				{
+					CProp_Portal *pTempPortal = pPortals[i];
+					if( pTempPortal->m_bActivated &&
+						(pTempPortal->m_hLinkedPortal.Get() != NULL) )
+					{
+						float fDist = UTIL_IntersectRayWithPortal( rayPortalTest, pTempPortal );
+						if( (fDist >= 0.0f) && (fDist < fMinDist) )
+						{
+							fMinDist = fDist;
+							pObjectPortal = pTempPortal;
+						}
+					}
+				}
+			}
+		}
+
+		if( pObjectPortal )
+		{
+			UTIL_Portal_AngleTransform( pObjectPortal->m_hLinkedPortal->MatrixThisToLinked(), angles, angles );
+		}
+	}
+
+	VectorITransform( pEntity->WorldSpaceCenter(), pEntity->EntityToWorldTransform(), m_attachedPositionObjectSpace );
+//	ComputeMaxSpeed( pEntity, pPhys );
+
+#ifdef GAME_DLL
+	// If we haven't been killed by a grab, we allow the gun to grab the nearest part of a ragdoll
+	if ( bUseGrabPosition )
+	{
+		IPhysicsObject *pChild = GetRagdollChildAtPosition( pEntity, vGrabPosition );
+		
+		if ( pChild )
+		{
+			pPhys = pChild;
+		}
+	}
+#endif
+
+	// Carried entities can never block LOS
+	m_bCarriedEntityBlocksLOS = pEntity->BlocksLOS();
+	pEntity->SetBlocksLOS( false );
+	m_controller = physenv->CreateMotionController( this );
+	m_controller->AttachObject( pPhys, true );
+	// Don't do this, it's causing trouble with constraint solvers.
+	//m_controller->SetPriority( IPhysicsMotionController::HIGH_PRIORITY );
+
+	pPhys->Wake();
+	PhysSetGameFlags( pPhys, FVPHYSICS_PLAYER_HELD );
+	SetTargetPosition( position, angles );
+	m_attachedEntity = pEntity;
+	IPhysicsObject *pList[VPHYSICS_MAX_OBJECT_LIST_COUNT];
+	int count = pEntity->VPhysicsGetObjectList( pList, ARRAYSIZE(pList) );
+	m_flLoadWeight = 0;
+	float damping = 10;
+	float flFactor = count / 7.5f;
+	if ( flFactor < 1.0f )
+	{
+		flFactor = 1.0f;
+	}
+	for ( int i = 0; i < count; i++ )
+	{
+		float mass = pList[i]->GetMass();
+		pList[i]->GetDamping( NULL, &m_savedRotDamping[i] );
+		m_flLoadWeight += mass;
+		m_savedMass[i] = mass;
+
+		// reduce the mass to prevent the player from adding crazy amounts of energy to the system
+		pList[i]->SetMass( REDUCED_CARRY_MASS / flFactor );
+		pList[i]->SetDamping( NULL, &damping );
+	}
+	
+	// Give extra mass to the phys object we're actually picking up
+	pPhys->SetMass( REDUCED_CARRY_MASS );
+	pPhys->EnableDrag( false );
+
+	m_errorTime = bIsMegaPhysCannon ? -1.5f : -1.0f; // 1 seconds until error starts accumulating
+	m_error = 0;
+	m_contactAmount = 0;
+
+	m_attachedAnglesPlayerSpace = TransformAnglesToPlayerSpace( angles, pPlayer );
+	if ( m_angleAlignment != 0 )
+	{
+		m_attachedAnglesPlayerSpace = AlignAngles( m_attachedAnglesPlayerSpace, m_angleAlignment );
+	}
+
+#ifndef CLIENT_DLL
+	// Ragdolls don't offset this way
+	if ( dynamic_cast<CRagdollProp*>(pEntity) )
+	{
+		m_attachedPositionObjectSpace.Init();
+	}
+	else
+	{
+		VectorITransform( pEntity->WorldSpaceCenter(), pEntity->EntityToWorldTransform(), m_attachedPositionObjectSpace );
+	}
+
+	// If it's a prop, see if it has desired carry angles
+	CPhysicsProp *pProp = dynamic_cast<CPhysicsProp *>(pEntity);
+	if ( pProp )
+	{
+		m_bHasPreferredCarryAngles = pProp->GetPropDataAngles( "preferred_carryangles", m_vecPreferredCarryAngles );
+		m_flDistanceOffset = pProp->GetCarryDistanceOffset();
+	}
+	else
+	{
+		m_bHasPreferredCarryAngles = false;
+		m_flDistanceOffset = 0;
+	}
+
+	m_bAllowObjectOverhead = IsObjectAllowedOverhead( pEntity );
+#else
+
+	m_bAllowObjectOverhead = false;
+#endif
+
+#else
+
+
 	// play the impact sound of the object hitting the player
 	// used as feedback to let the player know he picked up the object
 #ifndef CLIENT_DLL
@@ -449,7 +689,7 @@ void CGrabController::AttachEntity( CBasePlayer *pPlayer, CBaseEntity *pEntity, 
 	QAngle angles;
 	pPhys->GetPosition( &position, &angles );
 	// If it has a preferred orientation, use that instead.
-#ifndef CLIENT_DLL
+#if 1 //ndef CLIENT_DLL
 	Pickup_GetPreferredCarryAngles( pEntity, pPlayer, pPlayer->EntityToWorldTransform(), angles );
 #endif
 
@@ -520,6 +760,7 @@ void CGrabController::AttachEntity( CBasePlayer *pPlayer, CBaseEntity *pEntity, 
 	m_bHasPreferredCarryAngles = false;
 #endif
 
+#endif
 }
 
 static void ClampPhysicsVelocity( IPhysicsObject *pPhys, float linearLimit, float angularLimit )
@@ -650,6 +891,40 @@ float CGrabController::GetSavedMass( IPhysicsObject *pObject )
 	return 0.0f;
 }
 
+
+//-----------------------------------------------------------------------------
+// Is this an object that the player is allowed to lift to a position 
+// directly overhead? The default behavior prevents lifting objects directly
+// overhead, but there are exceptions for gameplay purposes.
+//-----------------------------------------------------------------------------
+#ifdef GAME_DLL
+bool CGrabController::IsObjectAllowedOverhead( CBaseEntity *pEntity )
+{
+	// Allow combine balls overhead 
+	if( UTIL_IsCombineBallDefinite(pEntity) )
+		return true;
+
+	// Allow props that are specifically flagged as such
+	CPhysicsProp *pPhysProp = dynamic_cast<CPhysicsProp *>(pEntity);
+	if ( pPhysProp != NULL && pPhysProp->HasInteraction( PROPINTER_PHYSGUN_ALLOW_OVERHEAD ) )
+		return true;
+
+	// String checks are fine here, we only run this code one time- when the object is picked up.
+	if( pEntity->ClassMatches("grenade_helicopter") )
+		return true;
+
+	if( pEntity->ClassMatches("weapon_striderbuster") )
+		return true;
+
+	return false;
+}
+#endif
+
+
+void CGrabController::SetPortalPenetratingEntity( CBaseEntity *pPenetrated )
+{
+	m_PenetratedEntity = pPenetrated;
+}
 
 
 //----------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -806,6 +1081,17 @@ IMPLEMENT_ACTTABLE(CWeaponPhysCannon);*/
 //-----------------------------------------------------------------------------
 bool CGrabController::UpdateObject( CBasePlayer *pPlayer, float flError )
 {
+	CBaseEntity *pPenetratedEntity = m_PenetratedEntity.Get();
+	if( pPenetratedEntity )
+	{
+		//FindClosestPassableSpace( pPenetratedEntity, Vector( 0.0f, 0.0f, 1.0f ) );
+		IPhysicsObject *pPhysObject = pPenetratedEntity->VPhysicsGetObject();
+		if( pPhysObject )
+			pPhysObject->Wake();
+
+		m_PenetratedEntity = NULL; //assume we won
+	}
+
 	CBaseEntity *pEntity = GetAttached();
 	if ( !pEntity )
 		return false;
@@ -835,6 +1121,91 @@ bool CGrabController::UpdateObject( CBasePlayer *pPlayer, float flError )
 	playerAngles.x = clamp( pitch, -75, 75 );
 	AngleVectors( playerAngles, &forward, &right, &up );
 
+	Vector start = pPlayer->Weapon_ShootPosition();
+
+#ifdef PORTAL_DLL
+	{
+		// If the player is upside down then we need to hold the box closer to their feet.
+		if ( up.z < 0.0f )
+			start += pPlayer->GetViewOffset() * up.z;
+		if ( right.z < 0.0f )
+			start += pPlayer->GetViewOffset() * right.z;
+
+		CPortal_Player *pPortalPlayer = ToPortalPlayer( pPlayer );
+
+		// Find out if it's being held across a portal
+		bool bLookingAtHeldPortal = true;
+		CProp_Portal *pPortal = pPortalPlayer->GetHeldObjectPortal();
+
+		if ( !pPortal )
+		{
+			// If the portal is invalid make sure we don't try to hold it across the portal
+			pPortalPlayer->SetHeldObjectOnOppositeSideOfPortal( false );
+		}
+
+		if ( pPortalPlayer->IsHeldObjectOnOppositeSideOfPortal() )
+		{
+			Ray_t rayPortalTest;
+			rayPortalTest.Init( start, start + forward * 1024.0f );
+
+			// Check if we're looking at the portal we're holding through
+			if ( pPortal )
+			{
+				if ( UTIL_IntersectRayWithPortal( rayPortalTest, pPortal ) < 0.0f )
+				{
+					bLookingAtHeldPortal = false;
+				}
+			}
+			// If our end point hasn't gone into the portal yet we at least need to know what portal is in front of us
+			else
+			{
+				int iPortalCount = CProp_Portal_Shared::AllPortals.Count();
+				if( iPortalCount != 0 )
+				{
+					CProp_Portal **pPortals = CProp_Portal_Shared::AllPortals.Base();
+					float fMinDist = 2.0f;
+					for( int i = 0; i != iPortalCount; ++i )
+					{
+						CProp_Portal *pTempPortal = pPortals[i];
+						if( pTempPortal->m_bActivated &&
+						   (pTempPortal->m_hLinkedPortal.Get() != NULL) )
+						{
+							float fDist = UTIL_IntersectRayWithPortal( rayPortalTest, pTempPortal );
+							if( (fDist >= 0.0f) && (fDist < fMinDist) )
+							{
+								fMinDist = fDist;
+								pPortal = pTempPortal;
+							}
+						}
+					}
+				}
+			}
+		}
+		else
+		{
+			pPortal = NULL;
+		}
+
+		QAngle qEntityAngles = pEntity->GetAbsAngles();
+
+		if ( pPortal )
+		{
+			// If the portal isn't linked we need to drop the object
+			if ( !pPortal->m_hLinkedPortal.Get() )
+			{
+#ifdef GAME_DLL
+				pPlayer->ForceDropOfCarriedPhysObjects();
+#endif
+				return false;
+			}
+
+			UTIL_Portal_AngleTransform( pPortal->m_hLinkedPortal->MatrixThisToLinked(), qEntityAngles, qEntityAngles );
+		}
+	}
+#endif
+
+
+
 	// Now clamp a sphere of object radius at end to the player's bbox
 	Vector radial = physcollision->CollideGetExtent( pPhys->GetCollide(), vec3_origin, pEntity->GetAbsAngles(), -forward );
 	Vector player2d = pPlayer->CollisionProp()->OBBMaxs();
@@ -845,7 +1216,7 @@ bool CGrabController::UpdateObject( CBasePlayer *pPlayer, float flError )
 
 	float distance = 24 + ( radius * 2.0f );
 
-	Vector start = pPlayer->Weapon_ShootPosition();
+	// Vector start = pPlayer->Weapon_ShootPosition();
 	Vector end = start + ( forward * distance );
 
 	trace_t	tr;

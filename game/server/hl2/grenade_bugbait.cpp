@@ -15,7 +15,7 @@
 #include "antlion_maker.h"
 #include "eventqueue.h"
 
-#ifdef PORTAL
+#ifdef PORTAL_DLL
 	#include "portal_util_shared.h"
 #endif
 

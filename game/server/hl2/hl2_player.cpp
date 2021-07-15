@@ -274,7 +274,7 @@ void CC_ToggleDuck( void )
 static ConCommand toggle_duck("toggle_duck", CC_ToggleDuck, "Toggles duck" );
 
 #ifndef HL2MP
-#ifndef PORTAL
+#ifndef PORTAL_DLL
 LINK_ENTITY_TO_CLASS( player, CHL2_Player );
 #endif
 #endif
@@ -1082,7 +1082,7 @@ void CHL2_Player::Spawn(void)
 {
 
 #ifndef HL2MP
-#ifndef PORTAL
+#ifndef PORTAL_DLL
 	SetModel( "models/player.mdl" );
 #endif
 #endif

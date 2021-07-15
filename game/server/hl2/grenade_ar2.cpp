@@ -18,7 +18,7 @@
 #include "weapon_ar2.h"
 #include "engine_defines.h"
 
-#ifdef PORTAL
+#ifdef PORTAL_DLL
 	#include "portal_util_shared.h"
 #endif
 

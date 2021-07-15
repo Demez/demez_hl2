@@ -4,13 +4,9 @@
 //
 //=============================================================================//
 
-#ifndef WEAPON_PHYSCANNON_H
-#define WEAPON_PHYSCANNON_H
-#ifdef _WIN32
 #pragma once
-#endif
 
-
+class CGrabController;
 
 //-----------------------------------------------------------------------------
 // Do we have the super-phys gun?
@@ -30,4 +26,13 @@ CBaseEntity *GetPlayerHeldEntity( CBasePlayer *pPlayer );
 
 bool PhysCannonAccountableForObject( CBaseCombatWeapon *pPhysCannon, CBaseEntity *pObject );
 
-#endif // WEAPON_PHYSCANNON_H
+// new portal shit
+void ShutdownPickupController( CBaseEntity *pPickupControllerEntity );
+CBasePlayer *GetPlayerHoldingEntity( CBaseEntity *pEntity );
+CGrabController *GetGrabControllerForPlayer( CBasePlayer *pPlayer );
+CGrabController *GetGrabControllerForPhysCannon( CBaseCombatWeapon *pActiveWeapon );
+void GetSavedParamsForCarriedPhysObject( CGrabController *pGrabController, IPhysicsObject *pObject, float *pSavedMassOut, float *pSavedRotationalDampingOut );
+void UpdateGrabControllerTargetPosition( CBasePlayer *pPlayer, Vector *vPosition, QAngle *qAngles );
+void GrabController_SetPortalPenetratingEntity( CGrabController *pController, CBaseEntity *pPenetrated );
+
+

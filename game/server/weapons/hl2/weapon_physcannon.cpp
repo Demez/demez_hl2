@@ -340,47 +340,6 @@ static void TraceCollideAgainstBBox( const CPhysCollide *pCollide, const Vector 
 }
 
 //-----------------------------------------------------------------------------
-// Purpose: Finds the nearest ragdoll sub-piece to a location and returns it
-// Input  : *pTarget - entity that is the potential ragdoll
-//			&position - position we're testing against
-// Output : IPhysicsObject - sub-object (if any)
-//-----------------------------------------------------------------------------
-IPhysicsObject *GetRagdollChildAtPosition( CBaseEntity *pTarget, const Vector &position )
-{
-	// Check for a ragdoll
-	if ( dynamic_cast<CRagdollProp*>( pTarget ) == NULL )
-		return NULL;
-
-	// Get the root
-	IPhysicsObject *pList[VPHYSICS_MAX_OBJECT_LIST_COUNT];
-	int count = pTarget->VPhysicsGetObjectList( pList, ARRAYSIZE( pList ) );
-	
-	IPhysicsObject *pBestChild = NULL;
-	float			flBestDist = 99999999.0f;
-	float			flDist;
-	Vector			vPos;
-
-	// Find the nearest child to where we're looking
-	for ( int i = 0; i < count; i++ )
-	{
-		pList[i]->GetPosition( &vPos, NULL );
-		
-		flDist = ( position - vPos ).LengthSqr();
-
-		if ( flDist < flBestDist )
-		{
-			pBestChild = pList[i];
-			flBestDist = flDist;
-		}
-	}
-
-	// Make this our base now
-	pTarget->VPhysicsSwapObject( pBestChild );
-
-	return pTarget->VPhysicsGetObject();
-}
-
-//-----------------------------------------------------------------------------
 // Purpose: Computes a local matrix for the player clamped to valid carry ranges
 //-----------------------------------------------------------------------------
 // when looking level, hold bottom of object 8 inches below eye level
@@ -4461,6 +4420,13 @@ bool PlayerPickupControllerIsHoldingEntity( CBaseEntity *pPickupControllerEntity
 	return pController ? pController->IsHoldingEntity( pHeldEntity ) : false;
 }
 
+void ShutdownPickupController( CBaseEntity *pPickupControllerEntity )
+{
+	CPlayerPickupController *pController = dynamic_cast<CPlayerPickupController *>(pPickupControllerEntity);
+
+	pController->Shutdown( false );
+}
+
 
 float PhysCannonGetHeldObjectMass( CBaseCombatWeapon *pActiveWeapon, IPhysicsObject *pHeldObject )
 {
@@ -4521,4 +4487,94 @@ float PlayerPickupGetHeldObjectMass( CBaseEntity *pPickupControllerEntity, IPhys
 		mass = grab.GetSavedMass( pHeldObject );
 	}
 	return mass;
+}
+
+
+
+
+CBasePlayer *GetPlayerHoldingEntity( CBaseEntity *pEntity )
+{
+	for( int i = 1; i <= gpGlobals->maxClients; ++i )
+	{
+		CBasePlayer *pPlayer = UTIL_PlayerByIndex( i );
+		if ( pPlayer )
+		{
+			if ( GetPlayerHeldEntity( pPlayer ) == pEntity || PhysCannonGetHeldEntity( pPlayer->GetActiveWeapon() ) == pEntity )
+				return pPlayer;
+		}
+	}
+	return NULL;
+}
+
+CGrabController *GetGrabControllerForPlayer( CBasePlayer *pPlayer )
+{
+	CPlayerPickupController *pPlayerPickupController = (CPlayerPickupController *)(pPlayer->GetUseEntity());
+	if( pPlayerPickupController )
+		return &(pPlayerPickupController->GetGrabController());
+
+	return NULL;
+}
+
+CGrabController *GetGrabControllerForPhysCannon( CBaseCombatWeapon *pActiveWeapon )
+{
+	CWeaponPhysCannon *pCannon = dynamic_cast<CWeaponPhysCannon *>(pActiveWeapon);
+	if ( pCannon )
+	{
+		return &(pCannon->GetGrabController());
+	}
+
+	return NULL;
+}
+
+void GetSavedParamsForCarriedPhysObject( CGrabController *pGrabController, IPhysicsObject *pObject, float *pSavedMassOut, float *pSavedRotationalDampingOut )
+{
+	CBaseEntity *pHeld = pGrabController->m_attachedEntity;
+	if( pHeld )
+	{
+		if( pObject->GetGameData() == (void*)pHeld )
+		{
+			IPhysicsObject *pList[VPHYSICS_MAX_OBJECT_LIST_COUNT];
+			int count = pHeld->VPhysicsGetObjectList( pList, ARRAYSIZE(pList) );
+			for ( int i = 0; i < count; i++ )
+			{
+				if ( pList[i] == pObject )
+				{
+					if( pSavedMassOut )
+						*pSavedMassOut = pGrabController->m_savedMass[i];
+
+					if( pSavedRotationalDampingOut )
+						*pSavedRotationalDampingOut = pGrabController->m_savedRotDamping[i];
+
+					return;
+				}
+			}
+		}
+	}
+
+	if( pSavedMassOut )
+		*pSavedMassOut = 0.0f;
+
+	if( pSavedRotationalDampingOut )
+		*pSavedRotationalDampingOut = 0.0f;
+
+	return;
+}
+
+void UpdateGrabControllerTargetPosition( CBasePlayer *pPlayer, Vector *vPosition, QAngle *qAngles )
+{
+	CGrabController *pGrabController = GetGrabControllerForPlayer( pPlayer );
+
+	if ( !pGrabController )
+		return;
+
+	pGrabController->UpdateObject( pPlayer, 12 );
+	pGrabController->GetTargetPosition( vPosition, qAngles );
+}
+
+
+
+
+void GrabController_SetPortalPenetratingEntity( CGrabController *pController, CBaseEntity *pPenetrated )
+{
+	pController->SetPortalPenetratingEntity( pPenetrated );
 }

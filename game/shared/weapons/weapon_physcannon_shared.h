@@ -44,6 +44,7 @@ public:
 	bool UpdateObject( CBasePlayer *pPlayer, float flError );
 
 	void SetTargetPosition( const Vector &target, const QAngle &targetOrientation );
+	void GetTargetPosition( Vector *target, QAngle *targetOrientation );
 	float ComputeError();
 	float GetLoadWeight( void ) const { return m_flLoadWeight; }
 	void SetAngleAlignment( float alignAngleCosine ) { m_angleAlignment = alignAngleCosine; }
@@ -56,7 +57,11 @@ public:
 	IMotionEvent::simresult_e Simulate( IPhysicsMotionController *pController, IPhysicsObject *pObject, float deltaTime, Vector &linear, AngularImpulse &angular );
 	float GetSavedMass( IPhysicsObject *pObject );
 
-private:
+	bool IsObjectAllowedOverhead( CBaseEntity *pEntity );
+
+	//set when a held entity is penetrating another through a portal. Needed for special fixes
+	void SetPortalPenetratingEntity( CBaseEntity *pPenetrated );
+
 	// Compute the max speed for an attached object
 	void ComputeMaxSpeed( CBaseEntity *pEntity, IPhysicsObject *pPhysics );
 
@@ -86,6 +91,9 @@ private:
 	IPhysicsMotionController *m_controller;
 
 	bool			m_bAllowObjectOverhead; // Can the player hold this object directly overhead? (Default is NO)
+
+	//set when a held entity is penetrating another through a portal. Needed for special fixes
+	EHANDLE			m_PenetratedEntity;
 
 	friend class CWeaponPhysCannon;
 };

@@ -60,6 +60,10 @@ allWeapons <- [
 
 
 mapSpawnWeapons <- {
+	
+	// ===========================================================
+	// hl2
+	
 	d1_trainstation_01 = 	[],
 	d1_trainstation_02 = 	[],
 	d1_trainstation_03 = 	[],
@@ -190,6 +194,10 @@ mapSpawnWeapons <- {
 
 function HandleSuit()
 {
+	// no suit in portal of course
+	if (IsPortal())
+		return;
+	
 	local equipSuit = true;
 	for (local i = 0; i < mapsNoSuit.len(); i++)
 	{

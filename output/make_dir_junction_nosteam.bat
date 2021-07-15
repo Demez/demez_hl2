@@ -3,6 +3,7 @@
 @REM replace this with your Half-Life 2 or Source 2013 directory
 set "hl2_dir=C:\Program Files (x86)\Steam\steamapps\common\Half-Life 2"
 set "hl2mp_dir=C:\Program Files (x86)\Steam\steamapps\common\Half-Life 2 Deathmatch\hl2mp"
+set "portal_dir=C:\Program Files (x86)\Steam\steamapps\common\Portal\portal"
 
 if not exist "%hl2_dir%\hl2" (
 	echo Unable to find the directory "%hl2_dir%"
@@ -26,6 +27,16 @@ if not exist "%hl2mp_dir%" (
 )
 
 mklink /J "%cd%\hl2mp" "%hl2mp_dir%"
+echo.
+
+if not exist "%portal_dir%" (
+	echo Unable to find the directory "%portal_dir%"
+	echo If you've not done so already, please set the environment variable portal_dir to your Source 2013 MP or Hl2DM install directory.
+	pause
+	exit
+)
+
+mklink /J "%cd%\portal" "%portal_dir%"
 echo.
 
 pause
