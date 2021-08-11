@@ -453,6 +453,8 @@ void CPropJeepEpisodic::Spawn( void )
 {
 	BaseClass::Spawn();
 
+	Precache();
+
 	SetBlocksLOS( false );
 
 	UTIL_FOREACHPLAYER(i)
