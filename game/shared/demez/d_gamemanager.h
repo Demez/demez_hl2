@@ -53,6 +53,8 @@ public:
 
 #ifdef GAME_DLL
 	void                    CreateGameRules();
+
+	void                    ClientPutInServer( edict_t *pEdict, const char *playername );
 #endif
 
 	const char*             GetMapName();

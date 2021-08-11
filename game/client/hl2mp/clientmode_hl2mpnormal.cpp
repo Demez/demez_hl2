@@ -18,6 +18,7 @@
 #include "hl2mpclientscoreboard.h"
 #include "hl2mptextwindow.h"
 #include "ienginevgui.h"
+#include "d_gamemanager.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -136,6 +137,9 @@ void ClientModeHL2MPNormal::Init()
 
 void ClientModeHL2MPNormal::LevelInit( const char *newmap )
 {
+	// has to be here or it won't be early enough
+	DemezGameManager()->LevelInit( newmap );
+
 	BaseClass::LevelInit( newmap );
 
 	// V_memcpy( (void*)mapName, newmap, sizeof(newmap) );

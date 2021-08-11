@@ -96,6 +96,9 @@ called each time a player is spawned into the game
 */
 void ClientPutInServer( edict_t *pEdict, const char *playername )
 {
+	// DEMEZ TODO: use this instead
+	// DemezGameManager()->ClientPutInServer( pEdict, playername );
+
 	// Allocate a Player for pev, and call spawn
 	CHL2MP_Player *pPlayer = CHL2MP_Player::CreatePlayer( "player", pEdict );
 	pPlayer->SetPlayerName( playername );

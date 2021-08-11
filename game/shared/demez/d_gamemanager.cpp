@@ -401,6 +401,30 @@ void CDemezGameManager::CreateGameRules()
 		CreateGameRulesObject( "CHL2MPRules" );
 	}
 }
+
+
+void CDemezGameManager::ClientPutInServer( edict_t *pEdict, const char *playername )
+{
+	CBasePlayer* pPlayer = NULL;
+
+	// DEMEZ TODO: this has to always be true right now due to CPortalGameMovement expecting this
+	// gonna have to see if i can have that be determined here as well
+#ifdef PORTAL_DLL
+	if ( true ) // IsPortal() )
+	{
+		pPlayer = CHL2MP_Player::CreatePlayer( "player_portal", pEdict );
+	}
+#endif
+
+	// fallback
+	if ( pPlayer == NULL )
+	{
+		pPlayer = CHL2MP_Player::CreatePlayer( "player", pEdict );
+	}
+
+	pPlayer->SetClassname( "player" );
+	pPlayer->SetPlayerName( playername );
+}
 #endif
 
 
