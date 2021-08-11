@@ -20,7 +20,7 @@
 #endif
 #define UI_USING_DEVCOMMENTARIES						// implement!!!
 #define UI_USING_GAMEPLAYCONFIGDIALOG					// "gameplay" menu
-#define UI_USING_MAINMENUMUSIC							// main menu background music ("Misc.MainUI" by default)
+// #define UI_USING_MAINMENUMUSIC							// main menu background music ("Misc.MainUI" by default)
 
 // --- UI colors (random shades of gray for now)
 #define UI_STYLE_ENABLED5			169, 169, 169, 255	// style5
