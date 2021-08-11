@@ -197,7 +197,7 @@ public:
 	bool			SpeakCommandResponse( AIConcept_t concept, const char *modifiers = NULL );
 
 	// Demez: Health regeneration for these guys so they're less useless
-	virtual bool ShouldRegenerateHealth( void ) { return CanJoinPlayerSquad(); }
+	virtual bool ShouldRegenerateHealth( void );
 	
 	//---------------------------------
 	// Scanner interaction

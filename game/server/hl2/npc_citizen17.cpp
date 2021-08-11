@@ -44,6 +44,7 @@ extern ConVar sk_healthvial;
 
 const int MAX_PLAYER_SQUAD = 4;
 
+ConVar	sk_citizen_squad_regen			( "sk_citizen_squad_regen",				"0");
 ConVar	sk_citizen_health				( "sk_citizen_health",					"0");
 ConVar	sk_citizen_heal_player			( "sk_citizen_heal_player",				"25");
 ConVar	sk_citizen_heal_player_delay	( "sk_citizen_heal_player_delay",		"25");
@@ -368,6 +369,11 @@ bool CNPC_Citizen::CreateBehaviors()
 	AddBehavior( &m_FuncTankBehavior );
 	
 	return true;
+}
+
+bool CNPC_Citizen::ShouldRegenerateHealth()
+{
+	return (sk_citizen_squad_regen.GetBool() && CanJoinPlayerSquad());
 }
 
 //-----------------------------------------------------------------------------
