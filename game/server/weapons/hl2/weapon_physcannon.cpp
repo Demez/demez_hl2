@@ -4528,6 +4528,9 @@ CGrabController *GetGrabControllerForPhysCannon( CBaseCombatWeapon *pActiveWeapo
 
 void GetSavedParamsForCarriedPhysObject( CGrabController *pGrabController, IPhysicsObject *pObject, float *pSavedMassOut, float *pSavedRotationalDampingOut )
 {
+	if ( !pGrabController )
+		return;
+
 	CBaseEntity *pHeld = pGrabController->m_attachedEntity;
 	if( pHeld )
 	{
