@@ -473,6 +473,16 @@ void CNPC_Strider::Precache()
 
 	UTIL_PrecacheOther( "sparktrail" );
 
+#if ENGINE_NEW
+	CRopeKeyframe::PrecacheShakeRopes();
+
+	UTIL_BloodSprayPrecache();
+
+	PrecacheEffect( "StriderMuzzleFlash" );
+	PrecacheEffect( "watersplash" );
+	PrecacheEffect( "StriderTracer" );
+#endif
+
 	BaseClass::Precache();
 }
 
@@ -2788,7 +2798,6 @@ void CNPC_Strider::DoImpactEffect( trace_t &tr, int nDamageType )
 
 		Vector vecReTrace = tr.endpos + vecDir * 12;
 
-		// idk
 #if ENGINE_NEW
 		if( UTIL_PointContents( vecReTrace, MASK_ALL ) == CONTENTS_EMPTY )
 #else

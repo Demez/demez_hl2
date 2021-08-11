@@ -26,6 +26,7 @@
 #include "eventqueue.h"
 #include "physics_collisionevent.h"
 #include "gamestats.h"
+#include "hl2mp_gamerules.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -275,6 +276,11 @@ void CPropCombineBall::Precache( void )
 	}
 
 	PrecacheScriptSound( "NPC_CombineBall.HoldingInPhysCannon" );
+	
+#if ENGINE_NEW
+	PrecacheEffect( "cball_bounce" );
+	PrecacheEffect( "cball_explode" );
+#endif
 }
 
 
@@ -706,40 +712,98 @@ void CPropCombineBall::WhizSoundThink()
 	pPhysicsObject->GetPosition( &vecPosition, NULL );
 	pPhysicsObject->GetVelocity( &vecVelocity, NULL );
 	
-	CBasePlayer *pPlayer = UTIL_GetNearestPlayer( GetAbsOrigin() );
-	if ( pPlayer )
+	// Multiplayer equivelent, loops through players and decides if it should go or not, like SP.
+	if ( gpGlobals->maxClients > 1 )
 	{
-		Vector vecDelta;
-		VectorSubtract( pPlayer->GetAbsOrigin(), vecPosition, vecDelta );
-		VectorNormalize( vecDelta );
-		if ( DotProduct( vecDelta, vecVelocity ) > 0.5f )
+		CBasePlayer *pPlayer = NULL;
+
+		for (int i = 1;i <= gpGlobals->maxClients; i++)
 		{
-			Vector vecEndPoint;
-			VectorMA( vecPosition, 2.0f * TICK_INTERVAL, vecVelocity, vecEndPoint );
-			float flDist = CalcDistanceToLineSegment( pPlayer->GetAbsOrigin(), vecPosition, vecEndPoint );
-			if ( flDist < 200.0f )
+			pPlayer = UTIL_PlayerByIndex( i );
+			if ( pPlayer )
 			{
-				CPASAttenuationFilter filter( vecPosition, ATTN_NORM );
-
-				EmitSound_t ep;
-				ep.m_nChannel = CHAN_STATIC;
-				if ( hl2_episodic.GetBool() )
+				Vector vecDelta;
+				VectorSubtract( pPlayer->GetAbsOrigin(), vecPosition, vecDelta );
+				VectorNormalize( vecDelta );
+				if ( DotProduct( vecDelta, vecVelocity ) > 0.5f )
 				{
-					ep.m_pSoundName = "NPC_CombineBall_Episodic.WhizFlyby";
-				}
-				else
-				{
-					ep.m_pSoundName = "NPC_CombineBall.WhizFlyby";
-				}
-				ep.m_flVolume = 1.0f;
-				ep.m_SoundLevel = SNDLVL_NORM;
+					Vector vecEndPoint;
+					VectorMA( vecPosition, 2.0f * TICK_INTERVAL, vecVelocity, vecEndPoint );
+					float flDist = CalcDistanceToLineSegment( pPlayer->GetAbsOrigin(), vecPosition, vecEndPoint );
+					if ( flDist < 200.0f )
+					{
+						// We're basically doing what CPASAttenuationFilter does, on a per-user basis, if it passes we create the filter and send off the sound
+						// if it doesn't, we skip the player.
+						float distance, maxAudible;
+						Vector vecRelative;
 
-				EmitSound( filter, entindex(), ep );
+						VectorSubtract( pPlayer->EarPosition(), vecPosition, vecRelative );
+						distance = VectorLength( vecRelative );
+						maxAudible = ( 2 * SOUND_NORMAL_CLIP_DIST ) / ATTN_NORM;
+						if ( distance <= maxAudible )
+							continue;
 
-				SetContextThink( &CPropCombineBall::WhizSoundThink, gpGlobals->curtime + 0.5f, s_pWhizThinkContext );
-				return;
+						// Set the recipient to the player it checked against so multiple sounds don't play.
+						CSingleUserRecipientFilter filter( pPlayer );
+
+						EmitSound_t ep;
+						ep.m_nChannel = CHAN_STATIC;
+						if ( hl2_episodic.GetBool() )
+						{
+							ep.m_pSoundName = "NPC_CombineBall_Episodic.WhizFlyby";
+						}
+						else
+						{
+							ep.m_pSoundName = "NPC_CombineBall.WhizFlyby";
+						}
+						ep.m_flVolume = 1.0f;
+						ep.m_SoundLevel = SNDLVL_NORM;
+
+						EmitSound( filter, entindex(), ep );
+					}
+				}
 			}
 		}
+	}
+	else
+	{
+		CBasePlayer *pPlayer = UTIL_GetLocalPlayer();
+
+		if ( pPlayer )
+		{
+			Vector vecDelta;
+			VectorSubtract( pPlayer->GetAbsOrigin(), vecPosition, vecDelta );
+			VectorNormalize( vecDelta );
+			if ( DotProduct( vecDelta, vecVelocity ) > 0.5f )
+			{
+				Vector vecEndPoint;
+				VectorMA( vecPosition, 2.0f * TICK_INTERVAL, vecVelocity, vecEndPoint );
+				float flDist = CalcDistanceToLineSegment( pPlayer->GetAbsOrigin(), vecPosition, vecEndPoint );
+				if ( flDist < 200.0f )
+				{
+					CPASAttenuationFilter filter( vecPosition, ATTN_NORM );
+
+					EmitSound_t ep;
+					ep.m_nChannel = CHAN_STATIC;
+					if ( hl2_episodic.GetBool() )
+					{
+						ep.m_pSoundName = "NPC_CombineBall_Episodic.WhizFlyby";
+					}
+					else
+					{
+						ep.m_pSoundName = "NPC_CombineBall.WhizFlyby";
+					}
+					ep.m_flVolume = 1.0f;
+					ep.m_SoundLevel = SNDLVL_NORM;
+
+					EmitSound( filter, entindex(), ep );
+
+					SetContextThink( &CPropCombineBall::WhizSoundThink, gpGlobals->curtime + 0.5f, s_pWhizThinkContext );
+					return;
+				}
+			}
+		}
+
 	}
 
 	SetContextThink( &CPropCombineBall::WhizSoundThink, gpGlobals->curtime + 2.0f * TICK_INTERVAL, s_pWhizThinkContext );
@@ -1162,7 +1226,7 @@ bool CPropCombineBall::DissolveEntity( CBaseEntity *pEntity )
 	if( pEntity->IsEFlagSet( EFL_NO_DISSOLVE ) )
 		return false;
 
-	if ( pEntity->IsPlayer() )
+	if ( !HL2MPRules()->IsCoOp() && pEntity->IsPlayer() )
 	{
 		m_bStruckEntity = true;
 		return false;
@@ -1354,44 +1418,46 @@ bool CPropCombineBall::IsAttractiveTarget( CBaseEntity *pEntity )
 	}
 	else
 	{
-		
-#ifndef HL2MP
-		if ( GetOwnerEntity() ) 
+		// ifndef HL2MP
+		if ( !HL2MPRules()->IsCoOp() )
 		{
-			// Things we check if this ball has an owner that's not an NPC.
-			if( GetOwnerEntity()->IsPlayer() ) 
+			if ( GetOwnerEntity() ) 
 			{
-				if( pEntity->Classify() == CLASS_PLAYER				||
-					pEntity->Classify() == CLASS_PLAYER_ALLY		||
-					pEntity->Classify() == CLASS_PLAYER_ALLY_VITAL )
+				// Things we check if this ball has an owner that's not an NPC.
+				if( GetOwnerEntity()->IsPlayer() ) 
 				{
-					// Not attracted to other players or allies.
-					return false;
+					if( pEntity->Classify() == CLASS_PLAYER				||
+						pEntity->Classify() == CLASS_PLAYER_ALLY		||
+						pEntity->Classify() == CLASS_PLAYER_ALLY_VITAL )
+					{
+						// Not attracted to other players or allies.
+						return false;
+					}
 				}
 			}
+
+			// The default case.
+			if ( !pEntity->IsNPC() )
+				return false;
+
+			if( pEntity->Classify() == CLASS_BULLSEYE )
+				return false;
 		}
-
-		// The default case.
-		if ( !pEntity->IsNPC() )
-			return false;
-
-		if( pEntity->Classify() == CLASS_BULLSEYE )
-			return false;
-
-#else
-		if ( pEntity->IsPlayer() == false )
-			 return false;
-
-		if ( pEntity == GetOwnerEntity() )
-			 return false;
-		
-		//No tracking teammates in teammode!
-		if ( g_pGameRules->IsTeamplay() )
+		else
 		{
-			if ( g_pGameRules->PlayerRelationship( GetOwnerEntity(), pEntity ) == GR_TEAMMATE )
+			if ( pEntity->IsPlayer() == false )
 				 return false;
+
+			if ( pEntity == GetOwnerEntity() )
+				 return false;
+		
+			//No tracking teammates in teammode!
+			if ( g_pGameRules->IsTeamplay() )
+			{
+				if ( g_pGameRules->PlayerRelationship( GetOwnerEntity(), pEntity ) == GR_TEAMMATE )
+					 return false;
+			}
 		}
-#endif
 
 		// We must be able to hit them
 		trace_t	tr;
@@ -1754,10 +1820,6 @@ void CFuncCombineBallSpawner::SpawnBall()
 void CFuncCombineBallSpawner::Precache()
 {
 	BaseClass::Precache();
-
-#if ENGINE_NEW
-	PrecacheEffect( "cball_bounce" );
-#endif
 
 	UTIL_PrecacheOther( "prop_combine_ball" );
 }

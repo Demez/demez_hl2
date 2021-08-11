@@ -1174,6 +1174,11 @@ void CNPC_Vortigaunt::Precache()
 
 	PrecacheMaterial( "sprites/light_glow02_add" );
 
+#if ENGINE_NEW
+	PrecacheEffect( "VortDispel" );
+	PrecacheEffect( "AntlionGib" );
+#endif
+
 	BaseClass::Precache();
 }	
 

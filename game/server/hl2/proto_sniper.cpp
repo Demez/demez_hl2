@@ -917,6 +917,11 @@ void CProtoSniper::Precache( void )
 	PrecacheScriptSound( "NPC_Sniper.Reload" );
 	PrecacheScriptSound( "NPC_Sniper.SonicBoom" );
 
+#if ENGINE_NEW
+	PrecacheEffect("StriderTracer");
+	PrecacheEffect("CommandPointer");
+#endif
+
 	BaseClass::Precache();
 }
 
