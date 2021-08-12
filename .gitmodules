@@ -1,10 +1,6 @@
 [submodule "qpc"]
 	path = qpc
 	url = https://github.com/quiverteam/QuiverProjectCreator.git
-[submodule "branches/quiver"]
-	path = branches/quiver
-	url = https://github.com/quiverteam/Engine
-	branch = upcoming
 [submodule "branches/asw"]
 	path = branches/asw
 	url = https://github.com/Demez/demez_asw_base
