@@ -272,8 +272,10 @@ public:
 	friend class CPortalRenderable;
 	friend void OnRenderStart();
 
+#if ENGINE_NEW
 private:
 	mutable ShaderStencilState_t state;
+#endif
 };
 
 extern CPortalRender* g_pPortalRender;

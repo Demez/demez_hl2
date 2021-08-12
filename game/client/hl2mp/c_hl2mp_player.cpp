@@ -500,9 +500,6 @@ bool C_HL2MP_Player::ShouldDraw( void )
 	if ( !IsAlive() )
 		return false;
 
-	if ( g_VR.active )
-		return true;
-
 //	if( GetTeamNumber() == TEAM_SPECTATOR )
 //		return false;
 

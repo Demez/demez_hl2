@@ -1213,6 +1213,13 @@ void CProp_Portal::TeleportTouchingEntity( CBaseEntity *pOther )
 			pOtherAsPlayer->pl.fixangle = FIXANGLE_ABSOLUTE;
 			pOtherAsPlayer->UpdateVPhysicsPosition( ptNewOrigin, vNewVelocity, 0.0f );
 			pOtherAsPlayer->Teleport( &ptNewOrigin, &qNewAngles, &vNewVelocity );
+
+			CVRBasePlayer* vrPlayer = ToVRPlayer(pOtherAsPlayer);
+			if ( vrPlayer->m_bInVR )
+			{
+				vrPlayer->AddViewRotation( qNewAngles.y );
+			}
+
 			//pOtherAsPlayer->UnDuck();
 
 			//pOtherAsPlayer->m_angEyeAngles = qTransformedEyeAngles;
@@ -1240,11 +1247,16 @@ void CProp_Portal::TeleportTouchingEntity( CBaseEntity *pOther )
 	if( (pPhys != NULL) && (pPhys->GetGameFlags() & FVPHYSICS_PLAYER_HELD) )
 	{
 		CPortal_Player *pHoldingPlayer = (CPortal_Player *)GetPlayerHoldingEntity( pOther );
-		pHoldingPlayer->ToggleHeldObjectOnOppositeSideOfPortal();
-		if ( pHoldingPlayer->IsHeldObjectOnOppositeSideOfPortal() )
-			pHoldingPlayer->SetHeldObjectPortal( this );
-		else
-			pHoldingPlayer->SetHeldObjectPortal( NULL );
+
+		// VR: can crash here
+		if ( pHoldingPlayer )
+		{
+			pHoldingPlayer->ToggleHeldObjectOnOppositeSideOfPortal();
+			if ( pHoldingPlayer->IsHeldObjectOnOppositeSideOfPortal() )
+				pHoldingPlayer->SetHeldObjectPortal( this );
+			else
+				pHoldingPlayer->SetHeldObjectPortal( NULL );
+		}
 	}
 	else if( bPlayer )
 	{
@@ -1323,7 +1335,7 @@ void CProp_Portal::TeleportTouchingEntity( CBaseEntity *pOther )
 
 
 	pOther->NetworkProp()->NetworkStateForceUpdate();
-	if( bPlayer )
+	if( bPlayer && pOtherAsPlayer )
 		pOtherAsPlayer->pl.NetworkStateChanged();
 
 	//if( bPlayer )

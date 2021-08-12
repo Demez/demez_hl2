@@ -1296,25 +1296,34 @@ bool CHL2GameMovement::LadderMove( void )
 
 	float speed = player->MaxSpeed();
 
+	CVRBasePlayer* vrPlayer = (CVRBasePlayer*)player;
 
-	if ( mv->m_nButtons & IN_BACK )
+	if ( vrPlayer->m_bInVR )
 	{
-		forwardSpeed -= speed;
+		forwardSpeed = mv->m_flForwardMove;
+		rightSpeed = mv->m_flSideMove;
 	}
-	
-	if ( mv->m_nButtons & IN_FORWARD )
+	else
 	{
-		forwardSpeed += speed;
-	}
+		if ( mv->m_nButtons & IN_BACK )
+		{
+			forwardSpeed -= speed;
+		}
 	
-	if ( mv->m_nButtons & IN_MOVELEFT )
-	{
-		rightSpeed -= speed;
-	}
+		if ( mv->m_nButtons & IN_FORWARD )
+		{
+			forwardSpeed += speed;
+		}
 	
-	if ( mv->m_nButtons & IN_MOVERIGHT )
-	{
-		rightSpeed += speed;
+		if ( mv->m_nButtons & IN_MOVELEFT )
+		{
+			rightSpeed -= speed;
+		}
+	
+		if ( mv->m_nButtons & IN_MOVERIGHT )
+		{
+			rightSpeed += speed;
+		}
 	}
 	
 	if ( mv->m_nButtons & IN_JUMP )

@@ -658,7 +658,7 @@ void CWeaponPortalgun::StartEffects( void )
 void CWeaponPortalgun::DestroyEffects( void )
 {
 	// Stop everything
-	// StopEffects();
+	StopEffects();
 }
 
 //-----------------------------------------------------------------------------

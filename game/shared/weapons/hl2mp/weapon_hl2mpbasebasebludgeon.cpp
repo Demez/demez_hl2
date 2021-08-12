@@ -171,7 +171,11 @@ void CBaseHL2MPBludgeonWeapon::Hit( trace_t &traceHit, Activity nHitActivity )
 	if ( pHitEntity != NULL )
 	{
 		Vector hitDirection;
-		pPlayer->EyeVectors( &hitDirection, NULL, NULL );
+		// pPlayer->EyeVectors( &hitDirection, NULL, NULL );
+		
+		CVRBasePlayerShared* vrPlayer = (CVRBasePlayerShared*)pPlayer;
+		hitDirection = vrPlayer->GetWeaponShootDir();
+
 		VectorNormalize( hitDirection );
 
 #ifndef CLIENT_DLL
@@ -314,14 +318,19 @@ void CBaseHL2MPBludgeonWeapon::Swing( int bIsSecondary )
 	trace_t traceHit;
 
 	// Try a ray
-	CBasePlayer *pOwner = ToBasePlayer( GetOwner() );
+	CVRBasePlayerShared *pOwner = (CVRBasePlayerShared*)ToBasePlayer( GetOwner() );
 	if ( !pOwner )
 		return;
+
 
 	Vector swingStart = pOwner->Weapon_ShootPosition( );
 	Vector forward;
 
-	pOwner->EyeVectors( &forward, NULL, NULL );
+	CVRBasePlayerShared *vrPlayer = (CVRBasePlayerShared*)pOwner;
+
+	// VR TODO: should be able to actually swing this thing and do damage, same with any physics prop you're holding
+	// pOwner->EyeVectors( &forward, NULL, NULL );
+	forward = vrPlayer->GetWeaponShootDir();
 
 	Vector swingEnd = swingStart + forward * GetRange();
 	UTIL_TraceLine( swingStart, swingEnd, MASK_SHOT_HULL, pOwner, COLLISION_GROUP_NONE, &traceHit );

@@ -30,7 +30,7 @@
 #undef CPortal_Player	
 #endif
 
-// adjusted for vr
+// adjusted cause imo it's too slow
 ConVar cl_portal_reorient_rate( "cl_portal_reorient_rate", "750", FCVAR_ARCHIVE );  // 120
 ConVar cl_portal_reorient_accel_rate( "cl_portal_reorient_accel_rate", "2000", FCVAR_ARCHIVE );  // 400
 
@@ -555,6 +555,8 @@ void C_Portal_Player::UpdateLookAt( void )
 void C_Portal_Player::ClientThink( void )
 {
 	//PortalEyeInterpolation.m_bNeedToUpdateEyePosition = true;
+
+	BaseClass::ClientThink();
 
 	Vector vForward;
 	AngleVectors( GetLocalAngles(), &vForward );

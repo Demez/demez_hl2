@@ -594,7 +594,7 @@ void C_Prop_Portal::Simulate()
 	m_fGhostRenderablesClip[3] = pLinkedPortal->m_plane_Origin.dist - 0.75f;
 
 #if ENGINE_NEW
-	return ret;
+	return true;
 #else
 	return;
 #endif
@@ -974,7 +974,7 @@ int C_Prop_Portal::DrawModel( int flags RENDER_INSTANCE_INPUT )
 	if( m_bActivated == false || building_cubemaps.GetBool() )
 		return 0;
 
-	int iRetVal = 0;
+	// int iRetVal = 0;
 
 	C_Prop_Portal *pLinkedPortal = m_hLinkedPortal.Get();
 

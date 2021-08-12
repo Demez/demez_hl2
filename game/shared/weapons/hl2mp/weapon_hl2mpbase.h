@@ -13,6 +13,7 @@
 #include "hl2mp_player_shared.h"
 #include "basecombatweapon_shared.h"
 #include "hl2mp_weapon_parse.h"
+#include "vr_base_weapon.h"
 
 #if defined( CLIENT_DLL )
 	#define CWeaponHL2MPBase C_WeaponHL2MPBase
@@ -29,10 +30,10 @@ class CHL2MP_Player;
 // MIKETODO: this should use indexing instead of searching and strcmp()'ing all the time.
 bool IsAmmoType( int iAmmoType, const char *pAmmoName );
 
-class CWeaponHL2MPBase : public CBaseCombatWeapon
+class CWeaponHL2MPBase : public CVRBaseWeapon
 {
 public:
-	DECLARE_CLASS( CWeaponHL2MPBase, CBaseCombatWeapon );
+	DECLARE_CLASS( CWeaponHL2MPBase, CVRBaseWeapon );
 	DECLARE_NETWORKCLASS(); 
 	DECLARE_PREDICTABLE();
 

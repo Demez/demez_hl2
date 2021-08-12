@@ -7,6 +7,7 @@
 #include "basecombatweapon_shared.h"
 #include "hl2mp_weapon_parse.h"
 #include "hl2_shareddefs.h"
+#include "vr_base_weapon.h"
 
 #ifdef CLIENT_DLL
 #include "c_hl2mp_player.h"
@@ -28,7 +29,7 @@ class CHL2MP_Player;
 
 extern ConVar sk_auto_reload_time;
 
-class CBaseHLCombatWeapon : public CBaseCombatWeapon
+class CBaseHLCombatWeapon : public CVRBaseWeapon
 {
 #if !defined( CLIENT_DLL )
 #ifndef _XBOX
@@ -40,7 +41,7 @@ private:
 #endif
 #endif
 
-	DECLARE_CLASS( CBaseHLCombatWeapon, CBaseCombatWeapon );
+	DECLARE_CLASS( CBaseHLCombatWeapon, CVRBaseWeapon );
 
 public:
 	DECLARE_NETWORKCLASS();
