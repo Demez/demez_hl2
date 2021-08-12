@@ -1,6 +1,3 @@
-[submodule "branches/2013"]
-	path = branches/2013
-	url = https://github.com/Demez/demez_source_2013
 [submodule "qpc"]
 	path = qpc
 	url = https://github.com/quiverteam/QuiverProjectCreator.git
@@ -11,9 +8,6 @@
 [submodule "branches/asw"]
 	path = branches/asw
 	url = https://github.com/Demez/demez_asw_base
-[submodule "branches/csgo"]
-	path = branches/csgo
-	url = https://gitlab.com/demez/hl2_vr_csgo
 [submodule "game/vr_base"]
 	path = game/vr_base
 	url = https://github.com/Demez/SourceEngineVR
