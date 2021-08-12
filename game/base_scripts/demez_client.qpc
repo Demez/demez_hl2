@@ -20,6 +20,7 @@ configuration
 		preprocessor_definitions
 		{
 			"HL2_CLIENT_DLL"
+			"DXVK_VR=1"
 		}
 	}
 }
