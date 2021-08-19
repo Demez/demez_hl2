@@ -36,6 +36,7 @@
 			game        |gameinfo_path|../episodic/ep1_pak.vpk
 			game        |gameinfo_path|../hl2/hl2_textures.vpk
 			game        |gameinfo_path|../hl2/hl2_sound_misc.vpk
+			game        |gameinfo_path|../hl2/hl2_sound_vo_english.vpk
 			
 			game        |gameinfo_path|../ep2
 			game        |gameinfo_path|../episodic
