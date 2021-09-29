@@ -49,7 +49,8 @@ public:
 		else
 			UTIL_EmitSoundSuit(pPlayer->edict(), "!HEV_AAx");	// long version of suit logon
 
-		pPlayer->EquipSuit();
+		// don't play animations if already equipped
+		pPlayer->EquipSuit( !pPlayer->IsSuitEquipped() );
 				
 		return true;
 	}
