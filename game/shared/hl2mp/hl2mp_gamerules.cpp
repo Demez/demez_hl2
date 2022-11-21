@@ -38,6 +38,8 @@
 	#include "voice_gamemgr.h"
 	#include "hl2mp_gameinterface.h"
 	#include "hl2mp_cvars.h"
+	#include "ai_basenpc.h"
+	#include "weapon_physcannon.h"
 
 	#include "demez_items.h"
 	#include "datacache/imdlcache.h"
@@ -56,6 +58,138 @@ ConVar sv_hl2mp_weapon_respawn_time( "d_sv_respawn_time_weapon", "20", FCVAR_GAM
 ConVar sv_hl2mp_item_respawn_time( "d_sv_respawn_time_item", "30", FCVAR_GAMEDLL | FCVAR_NOTIFY );
 ConVar sv_hl2mp_other_respawn_time( "d_sv_respawn_time_other", "30", FCVAR_GAMEDLL | FCVAR_NOTIFY );
 ConVar sv_report_client_settings("sv_report_client_settings", "0", FCVAR_GAMEDLL | FCVAR_NOTIFY );
+
+// --------------------------------------------------------------------------------------------------
+// Skill Convars
+
+// Damage scale for damage inflicted by the player on each skill level.
+ConVar	sk_dmg_inflict_scale1( "sk_dmg_inflict_scale1", "1.50", FCVAR_REPLICATED );
+ConVar	sk_dmg_inflict_scale2( "sk_dmg_inflict_scale2", "1.00", FCVAR_REPLICATED );
+ConVar	sk_dmg_inflict_scale3( "sk_dmg_inflict_scale3", "0.75", FCVAR_REPLICATED );
+
+// Damage scale for damage taken by the player on each skill level.
+ConVar	sk_dmg_take_scale1( "sk_dmg_take_scale1", "0.50", FCVAR_REPLICATED );
+ConVar	sk_dmg_take_scale2( "sk_dmg_take_scale2", "1.00", FCVAR_REPLICATED );
+#ifdef HL2_EPISODIC
+ConVar	sk_dmg_take_scale3( "sk_dmg_take_scale3", "2.0", FCVAR_REPLICATED );
+#else
+ConVar	sk_dmg_take_scale3( "sk_dmg_take_scale3", "1.50", FCVAR_REPLICATED );
+#endif//HL2_EPISODIC
+
+ConVar	sk_allow_autoaim( "sk_allow_autoaim", "1", FCVAR_REPLICATED | FCVAR_ARCHIVE_XBOX );
+
+// Autoaim scale
+ConVar	sk_autoaim_scale1( "sk_autoaim_scale1", "1.0", FCVAR_REPLICATED );
+ConVar	sk_autoaim_scale2( "sk_autoaim_scale2", "0.5", FCVAR_REPLICATED );
+ConVar	sk_autoaim_scale3( "sk_autoaim_scale3", "0.0", FCVAR_REPLICATED ); //NOT CURRENTLY OFFERED ON SKILL 3
+
+																		   // Quantity scale for ammo received by the player.
+ConVar	sk_ammo_qty_scale1 ( "sk_ammo_qty_scale1", "1.20", FCVAR_REPLICATED );
+ConVar	sk_ammo_qty_scale2 ( "sk_ammo_qty_scale2", "1.00", FCVAR_REPLICATED );
+ConVar	sk_ammo_qty_scale3 ( "sk_ammo_qty_scale3", "0.60", FCVAR_REPLICATED );
+
+ConVar	sk_plr_health_drop_time		( "sk_plr_health_drop_time", "30", FCVAR_REPLICATED );
+ConVar	sk_plr_grenade_drop_time	( "sk_plr_grenade_drop_time", "30", FCVAR_REPLICATED );
+
+ConVar	sk_plr_dmg_small_round	( "sk_plr_dmg_small_round", "0", FCVAR_REPLICATED );
+ConVar	sk_npc_dmg_small_round	( "sk_npc_dmg_small_round", "0", FCVAR_REPLICATED );
+ConVar	sk_max_small_round		( "sk_max_small_round", "0", FCVAR_REPLICATED );
+
+ConVar	sk_plr_dmg_medium_round	( "sk_plr_dmg_medium_round", "0", FCVAR_REPLICATED );
+ConVar	sk_npc_dmg_medium_round	( "sk_npc_dmg_medium_round", "0", FCVAR_REPLICATED );
+ConVar	sk_max_medium_round		( "sk_max_medium_round", "0", FCVAR_REPLICATED );
+
+ConVar	sk_plr_dmg_large_round	( "sk_plr_dmg_large_round", "0", FCVAR_REPLICATED );
+ConVar	sk_npc_dmg_large_round	( "sk_npc_dmg_large_round", "0", FCVAR_REPLICATED );
+ConVar	sk_max_large_round		( "sk_max_large_round", "0", FCVAR_REPLICATED );
+
+ConVar	sk_plr_dmg_ar2			( "sk_plr_dmg_ar2","0", FCVAR_REPLICATED );
+ConVar	sk_npc_dmg_ar2			( "sk_npc_dmg_ar2","0", FCVAR_REPLICATED);
+ConVar	sk_max_ar2				( "sk_max_ar2","0", FCVAR_REPLICATED);
+ConVar	sk_max_ar2_altfire		( "sk_max_ar2_altfire","0", FCVAR_REPLICATED);
+
+ConVar	sk_plr_dmg_alyxgun		( "sk_plr_dmg_alyxgun","0", FCVAR_REPLICATED );
+ConVar	sk_npc_dmg_alyxgun		( "sk_npc_dmg_alyxgun","0", FCVAR_REPLICATED);
+ConVar	sk_max_alyxgun			( "sk_max_alyxgun","0", FCVAR_REPLICATED);
+
+ConVar	sk_plr_dmg_pistol		( "sk_plr_dmg_pistol","0", FCVAR_REPLICATED );
+ConVar	sk_npc_dmg_pistol		( "sk_npc_dmg_pistol","0", FCVAR_REPLICATED);
+ConVar	sk_max_pistol			( "sk_max_pistol","0", FCVAR_REPLICATED);
+
+ConVar	sk_plr_dmg_smg1			( "sk_plr_dmg_smg1","0", FCVAR_REPLICATED );
+ConVar	sk_npc_dmg_smg1			( "sk_npc_dmg_smg1","0", FCVAR_REPLICATED);
+ConVar	sk_max_smg1				( "sk_max_smg1","0", FCVAR_REPLICATED);
+
+ConVar	sk_plr_dmg_flare_round	( "sk_plr_dmg_flare_round","0", FCVAR_REPLICATED);
+ConVar	sk_npc_dmg_flare_round	( "sk_npc_dmg_flare_round","0", FCVAR_REPLICATED);
+ConVar	sk_max_flare_round		( "sk_max_flare_round","0", FCVAR_REPLICATED);
+
+ConVar	sk_plr_dmg_buckshot		( "sk_plr_dmg_buckshot","0", FCVAR_REPLICATED);	
+ConVar	sk_npc_dmg_buckshot		( "sk_npc_dmg_buckshot","0", FCVAR_REPLICATED);
+ConVar	sk_max_buckshot			( "sk_max_buckshot","0", FCVAR_REPLICATED);
+ConVar	sk_plr_num_shotgun_pellets( "sk_plr_num_shotgun_pellets","7", FCVAR_REPLICATED);
+
+ConVar	sk_plr_dmg_rpg_round	( "sk_plr_dmg_rpg_round","0", FCVAR_REPLICATED);
+ConVar	sk_npc_dmg_rpg_round	( "sk_npc_dmg_rpg_round","0", FCVAR_REPLICATED);
+ConVar	sk_max_rpg_round		( "sk_max_rpg_round","0", FCVAR_REPLICATED);
+
+ConVar	sk_plr_dmg_sniper_round	( "sk_plr_dmg_sniper_round","0", FCVAR_REPLICATED);	
+ConVar	sk_npc_dmg_sniper_round	( "sk_npc_dmg_sniper_round","0", FCVAR_REPLICATED);
+ConVar	sk_max_sniper_round		( "sk_max_sniper_round","0", FCVAR_REPLICATED);
+
+ConVar	sk_max_slam				( "sk_max_slam","0", FCVAR_REPLICATED);
+ConVar	sk_max_tripwire			( "sk_max_tripwire","0", FCVAR_REPLICATED);
+
+ConVar	sk_plr_dmg_molotov		( "sk_plr_dmg_molotov","0", FCVAR_REPLICATED);
+ConVar	sk_npc_dmg_molotov		( "sk_npc_dmg_molotov","0", FCVAR_REPLICATED);
+ConVar	sk_max_molotov			( "sk_max_molotov","0", FCVAR_REPLICATED);
+
+ConVar	sk_plr_dmg_grenade		( "sk_plr_dmg_grenade","0", FCVAR_REPLICATED);
+ConVar	sk_npc_dmg_grenade		( "sk_npc_dmg_grenade","0", FCVAR_REPLICATED);
+ConVar	sk_max_grenade			( "sk_max_grenade","0", FCVAR_REPLICATED);
+
+#ifdef HL2_EPISODIC
+ConVar	sk_max_hopwire			( "sk_max_hopwire", "3", FCVAR_REPLICATED);
+ConVar	sk_max_striderbuster	( "sk_max_striderbuster", "3", FCVAR_REPLICATED);
+#endif
+
+ConVar sk_plr_dmg_brickbat	( "sk_plr_dmg_brickbat","0", FCVAR_REPLICATED);
+ConVar sk_npc_dmg_brickbat	( "sk_npc_dmg_brickbat","0", FCVAR_REPLICATED);
+ConVar sk_max_brickbat		( "sk_max_brickbat","0", FCVAR_REPLICATED);
+
+ConVar	sk_plr_dmg_smg1_grenade	( "sk_plr_dmg_smg1_grenade","0", FCVAR_REPLICATED);
+ConVar	sk_npc_dmg_smg1_grenade	( "sk_npc_dmg_smg1_grenade","0", FCVAR_REPLICATED);
+ConVar	sk_max_smg1_grenade		( "sk_max_smg1_grenade","0", FCVAR_REPLICATED );
+
+ConVar	sk_plr_dmg_ml_grenade		( "sk_plr_dmg_ml_grenade","0", FCVAR_REPLICATED);
+ConVar	sk_npc_dmg_ml_grenade		( "sk_npc_dmg_ml_grenade","0", FCVAR_REPLICATED);
+ConVar	sk_max_ml_grenade			( "sk_max_ml_grenade","0", FCVAR_REPLICATED);
+
+ConVar	sk_plr_dmg_ar2_grenade	( "sk_plr_dmg_ar2_grenade", "0", FCVAR_REPLICATED );
+ConVar	sk_npc_dmg_ar2_grenade	( "sk_npc_dmg_ar2_grenade", "0", FCVAR_REPLICATED );
+ConVar	sk_max_ar2_grenade		( "sk_max_ar2_grenade", "0", FCVAR_REPLICATED );
+
+ConVar	sk_plr_dmg_357			( "sk_plr_dmg_357", "0", FCVAR_REPLICATED );
+ConVar	sk_npc_dmg_357			( "sk_npc_dmg_357", "0", FCVAR_REPLICATED );
+ConVar	sk_max_357				( "sk_max_357", "0", FCVAR_REPLICATED );
+
+ConVar	sk_plr_dmg_crossbow		( "sk_plr_dmg_crossbow", "0", FCVAR_REPLICATED );
+ConVar	sk_npc_dmg_crossbow		( "sk_npc_dmg_crossbow", "0", FCVAR_REPLICATED );
+ConVar	sk_max_crossbow			( "sk_max_crossbow", "0", FCVAR_REPLICATED );
+
+ConVar	sk_dmg_sniper_penetrate_plr( "sk_dmg_sniper_penetrate_plr","0", FCVAR_REPLICATED);
+ConVar	sk_dmg_sniper_penetrate_npc( "sk_dmg_sniper_penetrate_npc","0", FCVAR_REPLICATED);
+
+ConVar	sk_plr_dmg_airboat		( "sk_plr_dmg_airboat", "0", FCVAR_REPLICATED );
+ConVar	sk_npc_dmg_airboat		( "sk_npc_dmg_airboat", "0", FCVAR_REPLICATED );
+
+ConVar	sk_max_gauss_round		( "sk_max_gauss_round", "0", FCVAR_REPLICATED );
+
+// Gunship & Dropship cannons
+ConVar	sk_npc_dmg_gunship			( "sk_npc_dmg_gunship", "0", FCVAR_REPLICATED );
+ConVar	sk_npc_dmg_gunship_to_plr	( "sk_npc_dmg_gunship_to_plr", "0", FCVAR_REPLICATED );
+
+// --------------------------------------------------------------------------------------------------
 
 // Set the gamemode
 // maybe FCVAR_NOT_CONNECTED?
@@ -165,6 +299,9 @@ static const char *s_PreserveEnts[] =
 	"predicted_viewmodel",
 	"worldspawn",
 	"point_devshot_camera",
+
+	// DEMEZ ADDED
+	"info_node_link",
 	"", // END Marker
 };
 
@@ -379,16 +516,45 @@ void CHL2MPRules::LevelInitPostEntity()
 #ifdef GAME_DLL
 
 	// DEMEZ: this breaks on save game loading in singleplayer
-	if ( IsMultiplayer() )
+
+	HSCRIPT hScope = g_pScriptVM->CreateScope( "hl2mp_script" );
+
+	if ( hScope != INVALID_HSCRIPT )
 	{
-		HSCRIPT hLevelInitPostEntity = g_pScriptVM->LookupFunction( "LevelInitPostEntity" );
+		HSCRIPT	hScript = VScriptCompileScript( "gamerules.nut", false );
+		bool bSuccess = false;
+		if ( hScript )
+		{
+			bSuccess = ( g_pScriptVM->Run( hScript, hScope ) != SCRIPT_ERROR );
+			if ( !bSuccess )
+			{
+				Log_Warning( LOG_VScript, "Error running script named %s\n", "gamerules.nut" );
+				Assert( "Error running script" );
+			}
+
+			HSCRIPT hLevelInitPostEntity = g_pScriptVM->LookupFunction( "LevelInitPostEntity", hScope );
+
+			if ( hLevelInitPostEntity )
+			{
+				g_pScriptVM->Call( hLevelInitPostEntity, hScope, false, 0 );
+				g_pScriptVM->ReleaseFunction( hLevelInitPostEntity );
+			}
+
+			g_pScriptVM->ReleaseScript( hScript );
+		}
+
+		g_pScriptVM->ReleaseScope( hScope );
+
+		/*HSCRIPT hLevelInitPostEntity = g_pScriptVM->LookupFunction("LevelInitPostEntity");
 		if ( hLevelInitPostEntity )
 		{
+			g_pScriptVM->Call( hLevelInitPostEntity, 0, false, 0 );
+
 			variant_t variant;
 			variant.SetString( MAKE_STRING("LevelInitPostEntity") );
 			g_EventQueue.AddEvent( m_pProxy, "CallScriptFunction", variant, 0, m_pProxy, m_pProxy );
 			m_ScriptScope.ReleaseFunction( hLevelInitPostEntity );
-		}
+		}*/
 	}
 
 	UpdatePhysEnvironment();
@@ -429,6 +595,7 @@ void CHL2MPRules::CreateStandardEntities( void )
 	g_pLastCombineSpawn = NULL;
 	g_pLastRebelSpawn = NULL;
 
+#if 0
 	m_pProxy = CreateEntityByName( "hl2mp_gamerules" );
 	m_pProxy->SetLocalOrigin( vec3_origin );
 	m_pProxy->SetLocalAngles( vec3_angle );
@@ -441,7 +608,10 @@ void CHL2MPRules::CreateStandardEntities( void )
 
 	DispatchSpawn( m_pProxy );
 
-	// m_pProxy = CBaseEntity::Create( "hl2mp_gamerules", vec3_origin, vec3_angle );
+#else
+	m_pProxy = CBaseEntity::Create( "hl2mp_gamerules", vec3_origin, vec3_angle );
+#endif
+
 	Assert( m_pProxy );
 #endif
 }
@@ -502,6 +672,8 @@ void CHL2MPRules::Think( void )
 {
 
 #ifndef CLIENT_DLL
+
+	m_bCoOpEnabled = (demez_gamemode.GetInt() == DEMEZ_GAMEMODE_COOP);
 	
 	CGameRules::Think();
 
@@ -1760,6 +1932,45 @@ float CHL2MPRules::GetAmmoDamage( CBaseEntity *pAttacker, CBaseEntity *pVictim, 
 }
 
 
+bool CHL2MPRules::AllowDamage( CBaseEntity *pVictim, const CTakeDamageInfo &info )
+{
+#ifndef CLIENT_DLL
+	if( (info.GetDamageType() & DMG_CRUSH) && info.GetInflictor() && pVictim->MyNPCPointer() )
+	{
+		if( pVictim->MyNPCPointer()->IsPlayerAlly() )
+		{
+			// A physics object has struck a player ally. Don't allow damage if it
+			// came from the player's physcannon. 
+			CBasePlayer *pPlayer = UTIL_PlayerByIndex(1);
+
+			if( pPlayer )
+			{
+				CBaseEntity *pWeapon = pPlayer->HasNamedPlayerItem( "weapon_physcannon" );
+
+				if( pWeapon )
+				{
+					CBaseCombatWeapon *pCannon = assert_cast <CBaseCombatWeapon*>(pWeapon);
+
+					if( pCannon )
+					{
+						if( PhysCannonAccountableForObject( pCannon, info.GetInflictor() ) )
+						{
+							// Antlions can always be squashed!
+							if ( pVictim->Classify() == CLASS_ANTLION )
+								return true;
+
+							return false;
+						}
+					}
+				}
+			}
+		}
+	}
+#endif
+	return true;
+}
+
+
 int CHL2MPRules::ItemShouldRespawn( CItem *pItem )
 {
 	CDemezItem *pDemezItem = dynamic_cast<CDemezItem*>(pItem);
@@ -1783,9 +1994,9 @@ void CHL2MPRules::StartTransitionTimer( CChangeLevel* changeLevel )
 
 void CHL2MPRules::EndTransitionTimer()
 {
-	m_bTransitionTimerOn = false;
+	// m_bTransitionTimerOn = false;
 	m_flTransitionTimerEnd = 0.0f;
-	m_pChangeLevel = NULL;
+	// m_pChangeLevel = NULL;
 }
 
 
@@ -1936,6 +2147,75 @@ void CEntitySpawnInfo::SetNeedsRespawn( bool enabled )
 CBaseEntity* CEntitySpawnInfo::CreateEntity()
 {
 	return m_pEntity;
+}
+
+
+//-----------------------------------------------------------------------------
+// Purpose: MULTIPLAYER BODY QUE HANDLING
+//-----------------------------------------------------------------------------
+class CCorpse : public CBaseAnimating
+{
+public:
+	DECLARE_CLASS( CCorpse, CBaseAnimating );
+	DECLARE_SERVERCLASS();
+
+	virtual int ObjectCaps( void ) { return FCAP_DONT_SAVE; }	
+
+public:
+	CNetworkVar( int, m_nReferencePlayer );
+};
+
+IMPLEMENT_SERVERCLASS_ST(CCorpse, DT_Corpse)
+SendPropInt( SENDINFO(m_nReferencePlayer), 10, SPROP_UNSIGNED )
+END_SEND_TABLE()
+
+LINK_ENTITY_TO_CLASS( bodyque, CCorpse );
+
+
+CCorpse		*g_pBodyQueueHead;
+
+void InitBodyQue(void)
+{
+	CCorpse *pEntity = ( CCorpse * )CreateEntityByName( "bodyque" );
+	pEntity->AddEFlags( EFL_KEEP_ON_RECREATE_ENTITIES );
+	g_pBodyQueueHead = pEntity;
+	CCorpse *p = g_pBodyQueueHead;
+
+	// Reserve 3 more slots for dead bodies
+	for ( int i = 0; i < 3; i++ )
+	{
+		CCorpse *next = ( CCorpse * )CreateEntityByName( "bodyque" );
+		next->AddEFlags( EFL_KEEP_ON_RECREATE_ENTITIES );
+		p->SetOwnerEntity( next );
+		p = next;
+	}
+
+	p->SetOwnerEntity( g_pBodyQueueHead );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: make a body que entry for the given ent so the ent can be respawned elsewhere
+// GLOBALS ASSUMED SET:  g_eoBodyQueueHead
+//-----------------------------------------------------------------------------
+void CopyToBodyQue( CBaseAnimating *pCorpse ) 
+{
+	if ( pCorpse->IsEffectActive( EF_NODRAW ) )
+		return;
+
+	CCorpse *pHead	= g_pBodyQueueHead;
+
+	pHead->CopyAnimationDataFrom( pCorpse );
+
+	pHead->SetMoveType( MOVETYPE_FLYGRAVITY );
+	pHead->SetAbsVelocity( pCorpse->GetAbsVelocity() );
+	pHead->ClearFlags();
+	pHead->m_nReferencePlayer	= ENTINDEX( pCorpse );
+
+	pHead->SetLocalAngles( pCorpse->GetAbsAngles() );
+	UTIL_SetOrigin(pHead, pCorpse->GetAbsOrigin());
+
+	UTIL_SetSize(pHead, pCorpse->WorldAlignMins(), pCorpse->WorldAlignMaxs());
+	g_pBodyQueueHead = (CCorpse *)pHead->GetOwnerEntity();
 }
 
 
@@ -2103,6 +2383,68 @@ void CHL2MPRules::RegisterScriptFunctions()
 
 	// static global func
 	// ScriptRegisterFunction( g_pScriptVM, GivePlayerItem, "Get the name of the map." );
+}
+#endif
+
+
+//------------------------------------------------------------------------------
+// Normal HL2 Gamerules stuff
+//------------------------------------------------------------------------------
+
+#ifdef GAME_DLL
+//-----------------------------------------------------------------------------
+// Purpose: Whether or not the NPC should drop a health vial
+// Output : Returns true on success, false on failure.
+//-----------------------------------------------------------------------------
+bool CHL2MPRules::NPC_ShouldDropHealth( CBasePlayer *pRecipient )
+{
+	// Can only do this every so often
+	if ( m_flLastHealthDropTime > gpGlobals->curtime )
+		return false;
+
+	//Try to throw dynamic health
+	float healthPerc = ( (float) pRecipient->m_iHealth / (float) pRecipient->m_iMaxHealth );
+
+	if ( random->RandomFloat( 0.0f, 1.0f ) > healthPerc*1.5f )
+		return true;
+
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Whether or not the NPC should drop grenades
+// Output : Returns true on success, false on failure.
+//-----------------------------------------------------------------------------
+bool CHL2MPRules::NPC_ShouldDropGrenade( CBasePlayer *pRecipient )
+{
+	// Can only do this every so often
+	if ( m_flLastGrenadeDropTime > gpGlobals->curtime )
+		return false;
+
+	int grenadeIndex = GetAmmoDef()->Index( "grenade" );
+	int numGrenades = pRecipient->GetAmmoCount( grenadeIndex );
+
+	// If we're not maxed out on grenades and we've randomly okay'd it
+	if ( ( numGrenades < GetAmmoDef()->AmmoMaxCarry( grenadeIndex, pRecipient ) ) && ( random->RandomInt( 0, 2 ) == 0 ) )
+		return true;
+
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Update the drop counter for health
+//-----------------------------------------------------------------------------
+void CHL2MPRules::NPC_DroppedHealth( void )
+{
+	m_flLastHealthDropTime = gpGlobals->curtime + sk_plr_health_drop_time.GetFloat();
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Update the drop counter for grenades
+//-----------------------------------------------------------------------------
+void CHL2MPRules::NPC_DroppedGrenade( void )
+{
+	m_flLastGrenadeDropTime = gpGlobals->curtime + sk_plr_grenade_drop_time.GetFloat();
 }
 #endif
 

@@ -356,7 +356,8 @@ void CItem_ItemCrate::Break( CBaseEntity *pBreaker, const CTakeDamageInfo &info 
 		{
 			bSmashed = true;
 		}
-		else if ( m_hPhysicsAttacker.Get() && m_hPhysicsAttacker->IsPlayer() )
+		// else if ( m_hPhysicsAttacker.Get() && m_hPhysicsAttacker->IsPlayer() )
+		else if ( HasPhysicsAttacker( gpGlobals->frametime ) && HasPhysicsAttacker( gpGlobals->frametime )->IsPlayer() )
 		{
 			bSmashed = true;
 		}

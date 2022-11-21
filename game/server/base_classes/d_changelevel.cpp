@@ -475,8 +475,8 @@ bool CChangeLevel::ShouldChangeLevelOld( CBaseEntity *pActivator )
 	FindLandmark();
 
 	// Don't work in deathmatch
-	if ( g_pGameRules->IsDeathmatch() )
-		return false;
+	// if ( g_pGameRules->IsDeathmatch() )
+	// 	return false;
 
 	if ( mp_transition_players_percent.GetInt() > 0 )
 	{
@@ -536,8 +536,8 @@ bool CChangeLevel::ShouldChangeLevel( CBaseEntity *pActivator, bool force )
 	FindLandmark();
 
 	// Don't work in deathmatch
-	if ( g_pGameRules->IsDeathmatch() )
-		return false;
+	// if ( g_pGameRules->IsDeathmatch() )
+	// 	return false;
 
 	if ( gpGlobals->maxClients == 1 )
 		return true;
@@ -594,6 +594,7 @@ bool CChangeLevel::ShouldChangeLevel( CBaseEntity *pActivator, bool force )
 		if (percentage > mp_transition_players_percent.GetInt())
 		{
 			Msg("Transitions: Triggering level change - %d/%d players - %d%%\n", m_iTransitionPlayers, totalPlayers, percentage);
+			DemezGameRules()->StartTransitionTimer( this );
 			DemezGameRules()->EndTransitionTimer();
 			if ( gpGlobals->maxClients > 1 )
 			{

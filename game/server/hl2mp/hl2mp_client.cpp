@@ -214,11 +214,13 @@ void GameStartFrame( void )
 
 	teamplay.SetValue(demez_gamemode.GetInt() == DEMEZ_GAMEMODE_TEAMPLAY);
 	coop.SetValue(demez_gamemode.GetInt() == DEMEZ_GAMEMODE_COOP);
-	deathmatch.SetValue(demez_gamemode.GetInt() == DEMEZ_GAMEMODE_DEATHMATCH);
+	// deathmatch.SetValue(demez_gamemode.GetInt() == DEMEZ_GAMEMODE_DEATHMATCH);
+	deathmatch.SetValue(demez_gamemode.GetInt() == DEMEZ_GAMEMODE_COOP);
 
 	gpGlobals->teamplay =	(demez_gamemode.GetInt() == DEMEZ_GAMEMODE_TEAMPLAY);
 	gpGlobals->coop =		(demez_gamemode.GetInt() == DEMEZ_GAMEMODE_COOP);
-	gpGlobals->deathmatch = (demez_gamemode.GetInt() == DEMEZ_GAMEMODE_DEATHMATCH);
+	// gpGlobals->deathmatch = (demez_gamemode.GetInt() == DEMEZ_GAMEMODE_DEATHMATCH);
+	gpGlobals->deathmatch = (demez_gamemode.GetInt() == DEMEZ_GAMEMODE_COOP);
 
 #ifdef DEBUG
 	extern void Bot_RunAll();

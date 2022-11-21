@@ -21,7 +21,7 @@
 #include "Sprite.h"
 #include "soundenvelope.h"
 #include "weapon_physcannon.h"
-#include "hl2_gamerules.h"
+#include "hl2mp_gamerules.h"
 #include "gameweaponmanager.h"
 #include "vehicle_base.h"
 
@@ -339,22 +339,20 @@ void CNPC_CombineS::Event_Killed( const CTakeDamageInfo &info )
 			}
 		}
 
-		CHalfLife2 *pHL2GameRules = static_cast<CHalfLife2 *>(g_pGameRules);
-
 		// Attempt to drop health
-		if ( pHL2GameRules->NPC_ShouldDropHealth( pPlayer ) )
+		if ( HL2MPRules()->NPC_ShouldDropHealth( pPlayer ) )
 		{
 			DropItem( "item_healthvial", WorldSpaceCenter()+RandomVector(-4,4), RandomAngle(0,360) );
-			pHL2GameRules->NPC_DroppedHealth();
+			HL2MPRules()->NPC_DroppedHealth();
 		}
 		
 		if ( HasSpawnFlags( SF_COMBINE_NO_GRENADEDROP ) == false )
 		{
 			// Attempt to drop a grenade
-			if ( pHL2GameRules->NPC_ShouldDropGrenade( pPlayer ) )
+			if ( HL2MPRules()->NPC_ShouldDropGrenade( pPlayer ) )
 			{
 				DropItem( "weapon_frag", WorldSpaceCenter()+RandomVector(-4,4), RandomAngle(0,360) );
-				pHL2GameRules->NPC_DroppedGrenade();
+				HL2MPRules()->NPC_DroppedGrenade();
 			}
 		}
 	}

@@ -63,12 +63,16 @@ public:
 	bool                    IsEP2Map();
 	bool                    IsPortalMap();
 
-	bool                    IsHL2();
+	//bool                    IsHL2();
 	// bool                    IsEP1();
 	// bool                    IsEP2();
-	bool                    IsEpisodic();
-	bool                    IsPortal();
+	//bool                    IsEpisodic();
+	//bool                    IsPortal();
 	// bool                    IsSandbox();
+	
+	inline bool IsHL2()        { return ( m_gameType == EDemezGame::HalfLife2 ) || IsEpisodic(); }
+	inline bool IsEpisodic()   { return ( m_gameType == EDemezGame::Episodic ); }
+	inline bool IsPortal()     { return ( m_gameType == EDemezGame::Portal ); }
 
 	// -------------------------------------------------------------
 	

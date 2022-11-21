@@ -243,7 +243,7 @@ void CDemezGameManager::LevelInitSetGame()
 	}
 	else*/
 
-	if ( m_gameType == EDemezGame::Invalid )
+	// if ( m_gameType == EDemezGame::Invalid )
 	{
 		DetermineGameFromMap();
 	}
@@ -427,26 +427,8 @@ void CDemezGameManager::ClientPutInServer( edict_t *pEdict, const char *playerna
 }
 #endif
 
-
-bool CDemezGameManager::IsHL2()
-{
-	return ( m_gameType == EDemezGame::HalfLife2 ) || IsEpisodic();
-}
-
-bool CDemezGameManager::IsEpisodic()
-{
-	return ( m_gameType == EDemezGame::Episodic );
-}
-
-bool CDemezGameManager::IsPortal()
-{
-	return ( m_gameType == EDemezGame::Portal );
-}
-
-/*bool CDemezGameManager::IsSandbox()
-{
-	// return ( V_strcmp( demez_game.GetString(), "sandbox" ) == 0 );
-	return ( m_gameType == EDemezGame::SANDBOX );
-}*/
+//inline bool CDemezGameManager::IsHL2()        { return ( m_gameType == EDemezGame::HalfLife2 ) || IsEpisodic(); }
+//inline bool CDemezGameManager::IsEpisodic()   { return ( m_gameType == EDemezGame::Episodic ); }
+//inline bool CDemezGameManager::IsPortal()     { return ( m_gameType == EDemezGame::Portal ); }
 
 

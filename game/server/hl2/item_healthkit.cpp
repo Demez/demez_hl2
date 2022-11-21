@@ -28,9 +28,9 @@ class CHealthKit : public CDemezItem
 public:
 	DECLARE_CLASS( CHealthKit, CDemezItem );
 
-	void Spawn( void );
-	void Precache( void );
-	bool MyTouch( CBasePlayer *pPlayer );
+	void Spawn( void ) override;
+	void Precache( void ) override;
+	bool MyTouch( CBasePlayer *pPlayer ) override;
 };
 
 LINK_ENTITY_TO_CLASS( item_healthkit, CHealthKit );

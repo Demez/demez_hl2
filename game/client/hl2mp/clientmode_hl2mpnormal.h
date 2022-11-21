@@ -53,12 +53,18 @@ public:
 #endif
 
 #if ENGINE_CSGO
-	inline const char* GetMapNameChar() { return mapName; }
+	inline const char* GetMapNameChar() override { return mapName; }
+#elif ENGINE_ASW
+	inline const char* GetMapName() override { return mapName; }
 #else
-	inline const char* GetMapName() { return mapName; }
+	inline wchar_t* GetMapName() override { return mapName; }
 #endif
 
+#if ENGINE_NEW
 	const char* mapName;
+#else
+	wchar_t* mapName;
+#endif
 };
 
 extern IClientMode *GetClientModeNormal();

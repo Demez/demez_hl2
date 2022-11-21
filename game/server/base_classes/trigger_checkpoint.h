@@ -51,10 +51,10 @@ public:
 
 	void Spawn();
 
-	Vector GetSpawnPos();
+	const Vector& GetSpawnPos();
 
-	void SetSpawnPos( Vector spawnPos );
-	void SetSpawnAng( QAngle spawnAng );
+	void SetSpawnPos( const Vector& spawnPos );
+	void SetSpawnAng( const QAngle& spawnAng );
 	void CalcSpawn();
 
 	void ScriptSetOriginOverride( const Vector &v );

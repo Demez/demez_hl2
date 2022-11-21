@@ -1293,52 +1293,31 @@ int CHL2MP_Player::FlashlightIsOn( void )
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void CHL2MP_Player::FlashlightTurnOn( void )
-{
-	FlashlightTurnOn( true );
-}
 
-
-bool CHL2MP_Player::FlashlightTurnOn( bool playSound )
-{
+#if ENGINE_NEW
+bool CHL2MP_Player::FlashlightTurnOn( bool playSound ) {
 	BaseClass::FlashlightTurnOn();
 	return FlashlightIsOn();
-
-	/*if (demez_flashlight.GetBool() && IsAlive())
-	{
-		AddEffects( EF_DIMLIGHT );
-
-		if (playSound)
-			EmitSound( "HL2Player.FlashlightOn" );
-
-		return true;
-	}
-	
-	return false;*/
 }
-
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-void CHL2MP_Player::FlashlightTurnOff( void )
-{
-	FlashlightTurnOff( true );
+#else
+void CHL2MP_Player::FlashlightTurnOn( void ) {
+	BaseClass::FlashlightTurnOn();
 }
+#endif
 
 
-void CHL2MP_Player::FlashlightTurnOff( bool playSound )
-{
+#if ENGINE_NEW
+void CHL2MP_Player::FlashlightTurnOff( bool playSound ) {
 	BaseClass::FlashlightTurnOff();
-
-	/*RemoveEffects( EF_DIMLIGHT );
-	
-	if( IsAlive() && playSound )
-	{
-		EmitSound( "HL2Player.FlashlightOff" );
-	}*/
 }
+#else
+void CHL2MP_Player::FlashlightTurnOff( void ) {
+	BaseClass::FlashlightTurnOff();
+}
+#endif
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 
 void CHL2MP_Player::Weapon_Drop( CBaseCombatWeapon *pWeapon, const Vector *pvecTarget, const Vector *pVelocity )
 {
@@ -1421,7 +1400,11 @@ void CHL2MP_Player::Event_Killed( const CTakeDamageInfo &info )
 		GetGlobalTeam( pAttacker->GetTeamNumber() )->AddScore( iScoreToAdd );
 	}
 
+#if ENGINE_NEW
 	FlashlightTurnOff( true );
+#else
+	FlashlightTurnOff();
+#endif
 
 	m_lifeState = LIFE_DEAD;
 

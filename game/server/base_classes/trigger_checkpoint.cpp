@@ -161,7 +161,7 @@ void CCheckpoint::Spawn()
 }
 
 
-void CCheckpoint::SetSpawnPos( Vector spawnPos )
+void CCheckpoint::SetSpawnPos( const Vector& spawnPos )
 {
 	m_spawnPos = spawnPos;
 
@@ -169,6 +169,9 @@ void CCheckpoint::SetSpawnPos( Vector spawnPos )
 	{
 		SetAbsOrigin( m_spawnPos );
 	}
+
+	m_spawnPos = GetAbsOrigin();
+	m_spawnPos.z += 4;
 }
 
 
@@ -179,17 +182,15 @@ void CCheckpoint::ScriptSetOriginOverride( const Vector &v )
 }
 
 
-void CCheckpoint::SetSpawnAng( QAngle spawnAng )
+void CCheckpoint::SetSpawnAng( const QAngle& spawnAng )
 {
 	// m_spawnAng = spawnAng;
 	SetAbsAngles( spawnAng );
 }
 
 
-Vector CCheckpoint::GetSpawnPos()
+const Vector& CCheckpoint::GetSpawnPos()
 {
-	m_spawnPos = GetAbsOrigin();
-	m_spawnPos.z += 4;
 	return m_spawnPos;
 }
 
@@ -251,7 +252,7 @@ void CCheckpoint::TeleportPlayer( CBasePlayer* pPlayer )
 
 	if ( m_bActive && pPlayer && pPlayer->IsAlive() )
 	{
-		pPlayer->Teleport( &GetSpawnPos(), &GetAbsAngles(), &Vector(0, 0, 0) );
+		pPlayer->Teleport( &GetSpawnPos(), &GetAbsAngles(), &vec3_origin );
 		pPlayer->SetAbsOrigin( GetSpawnPos() );  // just in case
 	}
 }

@@ -81,11 +81,13 @@ public:
 		
 	int FlashlightIsOn( void );
 
-	void FlashlightTurnOn( void );
+#if ENGINE_NEW
 	bool FlashlightTurnOn( bool playSound = true );
-
-	void FlashlightTurnOff( void );
 	void FlashlightTurnOff( bool playSound = true );
+#else
+	void FlashlightTurnOn( void );
+	void FlashlightTurnOff( void );
+#endif
 
 	virtual void	PrecacheFootStepSounds( void );
 	virtual bool	ValidatePlayerModel( const char *pModel );

@@ -19,14 +19,18 @@
 			
 			game        |gameinfo_path|../vr_assets
 			
+			// game        "D:\projects_assets\vrchat_to_source\demez_proto\out_alyx_asw"
 			game        |gameinfo_path|../vrc_mdl_test
 			
 			// game        "|gameinfo_path|../content_portal"
 			// game        "|gameinfo_path|../portal/portal_pak.vpk"
 			// game        "|gameinfo_path|../portal"
 			
-			Game		"|gameinfo_path|../assets_hl2_asw/test"
-			Game		"|gameinfo_path|../hl2_asw_assets"
+			// dumb, need to clean out that original base folder and see wtf is even in it
+			game        "|gameinfo_path|../demez_base2"
+			
+			Game        "|gameinfo_path|../assets_hl2_asw/test"
+			Game        "|gameinfo_path|../hl2_asw_assets"
 			game        "|gameinfo_path|../demez_base"
 			
 			// mount maps
@@ -42,6 +46,10 @@
 			game        |gameinfo_path|../episodic
 			game        |gameinfo_path|../hl2
 			// game        |gameinfo_path|../hl2mp
+			
+			// lostcoast
+			game        |gameinfo_path|../lostcoast/lostcoast_pak.vpk
+			game        |gameinfo_path|../lostcoast
 			
 			game        swarm
 			game        swarm_base

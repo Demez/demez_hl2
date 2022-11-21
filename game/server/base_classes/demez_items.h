@@ -29,7 +29,7 @@ public:
 	
 	DECLARE_DATADESC()
 	
-	void		Spawn( void );
+	void		Spawn( void ) override;
 	void		FallThink( void );
 
 	bool		CanRespawn( void );
@@ -37,7 +37,6 @@ public:
 	float		m_flNextResetCheckTime;
 	bool		m_bCanRespawn;
 };
-
 
 
 #endif // DEMEZ_ITEMS_H

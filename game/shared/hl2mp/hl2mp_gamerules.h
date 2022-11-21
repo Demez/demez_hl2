@@ -11,8 +11,6 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#ifndef HL2MP_GAMERULES_H
-#define HL2MP_GAMERULES_H
 #pragma once
 
 #include "gamerules.h"
@@ -224,6 +222,7 @@ public:
 	bool CheckGameOver( void );
 	bool IsIntermission( void );
 
+	bool AllowDamage( CBaseEntity *pVictim, const CTakeDamageInfo &info );
 	void PlayerKilled( CBasePlayer *pVictim, const CTakeDamageInfo &info );
 
 	bool	IsTeamplay( void )		{ return m_bTeamPlayEnabled; }
@@ -239,6 +238,13 @@ public:
 	int ItemShouldRespawn( CItem *pItem );
 
 	void RegisterScriptFunctions();
+
+#ifdef GAME_DLL
+	bool	NPC_ShouldDropGrenade( CBasePlayer *pRecipient );
+	bool	NPC_ShouldDropHealth( CBasePlayer *pRecipient );
+	void	NPC_DroppedHealth( void );
+	void	NPC_DroppedGrenade( void );
+#endif
 	
 private:
 	
@@ -256,6 +262,9 @@ private:
 
 #ifdef GAME_DLL
 	CBaseEntity* m_pProxy;
+
+	float	m_flLastHealthDropTime;
+	float	m_flLastGrenadeDropTime;
 
 public:
 	float m_flTransitionTimerEnd;
@@ -279,7 +288,13 @@ private:
 #endif
 };
 
+
 inline CHL2MPRules* HL2MPRules()
+{
+	return static_cast<CHL2MPRules*>(g_pGameRules);
+}
+
+inline CHL2MPRules* HL2GameRules()
 {
 	return static_cast<CHL2MPRules*>(g_pGameRules);
 }
@@ -297,4 +312,3 @@ inline CDemezGameRules* DGameRules()
 	return static_cast<CDemezGameRules*>(g_pGameRules);
 }
 
-#endif //HL2MP_GAMERULES_H

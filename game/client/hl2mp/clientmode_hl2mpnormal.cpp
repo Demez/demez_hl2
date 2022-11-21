@@ -114,6 +114,8 @@ ClientModeHL2MPNormal::ClientModeHL2MPNormal()
 //-----------------------------------------------------------------------------
 ClientModeHL2MPNormal::~ClientModeHL2MPNormal()
 {
+	// if ( mapName )
+	// 	delete mapName;
 }
 
 
@@ -142,8 +144,16 @@ void ClientModeHL2MPNormal::LevelInit( const char *newmap )
 
 	BaseClass::LevelInit( newmap );
 
+#if ENGINE_OLD
+	if ( mapName )
+		delete mapName;
+
+	mapName = new wchar_t[strlen(newmap)];
+	mbstowcs(mapName, newmap, strlen(newmap) + 1);
+#else
 	// V_memcpy( (void*)mapName, newmap, sizeof(newmap) );
 	mapName = newmap;
+#endif
 }
 
 
